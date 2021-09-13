@@ -81,4 +81,16 @@ body {
     width: 100%;
     font-size: 40px;
   }
+
+  h1 {
+    font-size: 8em;
+  }
+
+  h3 {
+    font-size: 4.8em;
+  }
+
+  p, li {
+    font-size: 3.4em;
+  }
 }
