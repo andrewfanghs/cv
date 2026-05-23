@@ -3,83 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Fishnoply</title>
+<title>Fishnoply Multiplayer</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:'Segoe UI',sans-serif;color:#fff;}
-#splash{position:fixed;inset:0;background:linear-gradient(180deg,#0a1628 0%,#0d2444 50%,#0a1628 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;}
-#splash h1{font-size:52px;color:#00d4ff;text-shadow:0 0 30px #00a8cc,0 0 60px #007799;letter-spacing:4px;margin-bottom:4px;}
-#splash .tagline{color:#4ab8d4;font-size:14px;letter-spacing:3px;margin-bottom:8px;}
-#splash .credit{color:#1a4a6a;font-size:11px;letter-spacing:2px;margin-bottom:40px;}
-#splash .fish-row{font-size:36px;margin-bottom:40px;letter-spacing:8px;}
-#splash .start-btn{background:linear-gradient(135deg,#006688,#00aacc);color:#fff;font-size:20px;font-weight:bold;padding:16px 60px;border:none;border-radius:40px;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 24px rgba(0,170,204,0.4);}
-#splash .start-btn:active{transform:scale(0.97);}
 
+/* LOBBY */
+#lobby{position:fixed;inset:0;background:linear-gradient(180deg,#0a1628 0%,#0d2444 60%,#0a1628 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;padding:24px;}
+#lobby h1{font-size:44px;color:#00d4ff;text-shadow:0 0 30px #00a8cc;letter-spacing:4px;margin-bottom:2px;}
+#lobby .tagline{color:#4ab8d4;font-size:12px;letter-spacing:3px;margin-bottom:4px;}
+#lobby .credit{color:#1a4a6a;font-size:11px;letter-spacing:1px;margin-bottom:28px;}
+#lobby .fish-row{font-size:32px;margin-bottom:28px;letter-spacing:6px;}
+#lobby .section{width:100%;max-width:320px;margin-bottom:16px;}
+#lobby .section-title{font-size:11px;color:#4a8a9a;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;}
+#lobby input{width:100%;background:#0d2040;border:1px solid rgba(0,200,255,0.25);border-radius:10px;padding:11px 14px;font-size:15px;color:#fff;outline:none;letter-spacing:1px;}
+#lobby input:focus{border-color:rgba(0,200,255,0.6);}
+#lobby input::placeholder{color:#2a5a7a;}
+.lobby-btn{width:100%;max-width:320px;padding:13px;border:none;border-radius:24px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px;margin-bottom:10px;}
+.lobby-btn-host{background:linear-gradient(135deg,#006688,#00aacc);color:#fff;}
+.lobby-btn-join{background:linear-gradient(135deg,#1a4a1a,#2a8a2a);color:#fff;}
+.lobby-btn:active{transform:scale(0.97);}
+#lobby .or{color:#2a5a7a;font-size:12px;margin:4px 0 14px;letter-spacing:2px;}
+#token-pick{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;}
+.token-opt{font-size:28px;padding:6px;border-radius:10px;border:2px solid transparent;cursor:pointer;}
+.token-opt.selected{border-color:#00d4ff;background:rgba(0,200,255,0.15);}
+#status-msg{color:#4ab8d4;font-size:13px;text-align:center;margin-top:12px;min-height:20px;letter-spacing:1px;}
+#waiting-room{display:none;width:100%;max-width:320px;background:#0d2040;border-radius:12px;padding:14px;border:1px solid rgba(0,200,255,0.2);}
+#waiting-room h3{color:#00d4ff;font-size:14px;margin-bottom:10px;letter-spacing:1px;}
+#waiting-list{font-size:13px;color:#7ab8cc;line-height:2;}
+#room-code-display{font-size:32px;font-weight:bold;color:#ffd700;letter-spacing:8px;text-align:center;margin:8px 0;}
+.start-game-btn{width:100%;padding:12px;border:none;border-radius:20px;background:#006688;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;margin-top:10px;letter-spacing:1px;}
+.start-game-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* GAME */
 #game{display:none;position:fixed;inset:0;flex-direction:column;}
-#topbar{background:rgba(0,20,40,0.95);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,200,255,0.15);flex-shrink:0;}
-#topbar .title{font-size:18px;color:#00d4ff;font-weight:bold;letter-spacing:2px;}
-#topbar .pearls{font-size:14px;color:#ffd700;}
+#topbar{background:rgba(0,20,40,0.95);padding:6px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,200,255,0.15);flex-shrink:0;}
+#topbar .title{font-size:15px;color:#00d4ff;font-weight:bold;letter-spacing:2px;}
+#topbar .pearls{font-size:13px;color:#ffd700;}
+#players-bar{background:rgba(0,10,25,0.9);padding:5px 8px;display:flex;gap:5px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid rgba(0,200,255,0.1);}
+.player-chip{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border-radius:20px;padding:3px 9px;font-size:11px;white-space:nowrap;border:1.5px solid transparent;}
+.player-chip.active{border-color:rgba(0,200,255,0.6);background:rgba(0,200,255,0.12);}
+.player-chip.bankrupt{opacity:0.3;text-decoration:line-through;}
+.chip-pearls{color:#ffd700;}
 #board-wrap{flex:1;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
 #board-canvas{touch-action:none;}
-
-#panel{background:rgba(0,15,35,0.97);border-top:1px solid rgba(0,200,255,0.2);padding:10px 12px;flex-shrink:0;min-height:180px;max-height:220px;overflow-y:auto;}
-#panel .turn-header{font-size:13px;color:#00d4ff;font-weight:bold;margin-bottom:6px;letter-spacing:1px;}
-#panel .log{font-size:12px;color:#7ab8cc;line-height:1.6;margin-bottom:8px;max-height:60px;overflow-y:auto;}
-#panel .actions{display:flex;gap:8px;flex-wrap:wrap;}
-.btn{padding:9px 18px;border:none;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer;letter-spacing:1px;}
+#panel{background:rgba(0,15,35,0.97);border-top:1px solid rgba(0,200,255,0.2);padding:8px 12px;flex-shrink:0;min-height:155px;max-height:195px;overflow-y:auto;}
+#panel .turn-header{font-size:12px;color:#00d4ff;font-weight:bold;margin-bottom:5px;letter-spacing:1px;}
+#panel .log{font-size:11px;color:#7ab8cc;line-height:1.5;margin-bottom:7px;max-height:50px;overflow-y:auto;}
+#panel .actions{display:flex;gap:7px;flex-wrap:wrap;}
+.btn{padding:8px 16px;border:none;border-radius:20px;font-size:12px;font-weight:bold;cursor:pointer;letter-spacing:.5px;}
 .btn-primary{background:#006688;color:#fff;}
 .btn-primary:active{background:#004466;}
 .btn-secondary{background:#1a3a4a;color:#7ab8cc;border:1px solid #2a5a6a;}
 .btn-secondary:active{background:#0a2030;}
-.btn-danger{background:#6a1a1a;color:#ffaaaa;border:1px solid #aa3333;}
-.btn-danger:active{background:#4a0a0a;}
 .btn:disabled{opacity:0.4;cursor:not-allowed;}
-
-#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:50;display:none;align-items:center;justify-content:center;padding:16px;}
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:50;display:none;align-items:center;justify-content:center;padding:16px;}
 #modal{background:#0a1e35;border:1px solid rgba(0,200,255,0.3);border-radius:16px;padding:20px;width:100%;max-width:340px;max-height:80vh;overflow-y:auto;}
-#modal h2{color:#00d4ff;font-size:18px;margin-bottom:10px;letter-spacing:1px;}
-#modal p{color:#7ab8cc;font-size:13px;line-height:1.6;margin-bottom:12px;}
+#modal h2{color:#00d4ff;font-size:17px;margin-bottom:10px;letter-spacing:1px;}
+#modal p{color:#7ab8cc;font-size:13px;line-height:1.6;margin-bottom:12px;white-space:pre-wrap;}
 #modal .modal-actions{display:flex;gap:8px;flex-wrap:wrap;}
-
 #dice-overlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;pointer-events:none;}
 #dice-display{font-size:80px;text-align:center;text-shadow:0 0 30px #fff;}
-
-#players-bar{background:rgba(0,10,25,0.9);padding:6px 8px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid rgba(0,200,255,0.1);}
-.player-chip{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border-radius:20px;padding:4px 10px;font-size:11px;white-space:nowrap;border:1px solid transparent;}
-.player-chip.active{border-color:rgba(0,200,255,0.5);background:rgba(0,200,255,0.1);}
-.player-chip.bankrupt{opacity:0.35;}
-.chip-token{font-size:16px;}
-.chip-name{color:#ccc;font-weight:bold;}
-.chip-pearls{color:#ffd700;}
-
-#prop-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:55;display:none;align-items:flex-end;justify-content:center;}
-#prop-modal{background:#0a1e35;border-top:2px solid rgba(0,200,255,0.3);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:400px;max-height:70vh;overflow-y:auto;}
+#waiting-turn{position:fixed;bottom:0;left:0;width:100%;background:rgba(0,10,25,0.92);border-top:1px solid rgba(0,200,255,0.15);padding:10px;text-align:center;font-size:13px;color:#4a8a9a;display:none;z-index:5;letter-spacing:1px;}
 </style>
 </head>
 <body>
 
-<div id="splash">
+<!-- LOBBY -->
+<div id="lobby">
   <div class="fish-row">🐟🦀🦑🦈</div>
   <h1>FISHNOPLY</h1>
-  <div class="tagline">THE OCEAN PROPERTY GAME</div>
-  <div class="credit">Created by Ethan & Elroy Fang · 2026</div>
-  <button class="start-btn" id="start-btn">DIVE IN 🌊</button>
+  <div class="tagline">MULTIPLAYER OCEAN GAME</div>
+  <div class="credit">Created by Ethan &amp; Elroy Fang · 2026</div>
+
+  <div class="section">
+    <div class="section-title">Choose your token</div>
+    <div id="token-pick">
+      <span class="token-opt selected" data-token="🦈">🦈</span>
+      <span class="token-opt" data-token="🐠">🐠</span>
+      <span class="token-opt" data-token="🦀">🦀</span>
+      <span class="token-opt" data-token="🐡">🐡</span>
+      <span class="token-opt" data-token="🐙">🐙</span>
+      <span class="token-opt" data-token="🦑">🦑</span>
+      <span class="token-opt" data-token="🐬">🐬</span>
+      <span class="token-opt" data-token="🦞">🦞</span>
+    </div>
+    <div class="section">
+      <div class="section-title">Your name</div>
+      <input id="player-name" placeholder="Enter your name" maxlength="12" value=""/>
+    </div>
+  </div>
+
+  <button class="lobby-btn lobby-btn-host" id="host-btn">🌊 Host New Game</button>
+  <div class="or">— OR —</div>
+  <div class="section">
+    <div class="section-title">Room code</div>
+    <input id="join-code" placeholder="Enter 4-digit code" maxlength="4" style="text-align:center;font-size:22px;letter-spacing:8px;" type="number"/>
+  </div>
+  <button class="lobby-btn lobby-btn-join" id="join-btn">🐟 Join Game</button>
+
+  <div id="status-msg"></div>
+
+  <div id="waiting-room">
+    <h3>🌊 Waiting for players...</h3>
+    <div id="room-code-display"></div>
+    <div style="font-size:11px;color:#4a8a9a;text-align:center;margin-bottom:10px;">Share this code with friends</div>
+    <div id="waiting-list"></div>
+    <button class="start-game-btn" id="start-game-btn" disabled>Start Game (need 2+ players)</button>
+  </div>
 </div>
 
+<!-- GAME -->
 <div id="game">
   <div id="topbar">
     <div class="title">🌊 FISHNOPLY</div>
     <div class="pearls" id="top-pearls">🪙 1500</div>
   </div>
-  <div id="players-bar" id="players-bar"></div>
-  <div id="board-wrap">
-    <canvas id="board-canvas"></canvas>
-  </div>
+  <div id="players-bar"></div>
+  <div id="board-wrap"><canvas id="board-canvas"></canvas></div>
   <div id="panel">
-    <div class="turn-header" id="turn-header">Your turn, Shark!</div>
+    <div class="turn-header" id="turn-header"></div>
     <div class="log" id="log"></div>
     <div class="actions" id="actions"></div>
   </div>
+  <div id="waiting-turn">Waiting for other player's turn...</div>
 </div>
 
 <div id="modal-bg">
@@ -89,21 +136,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
     <div class="modal-actions" id="modal-actions"></div>
   </div>
 </div>
+<div id="dice-overlay"><div id="dice-display"></div></div>
 
-<div id="dice-overlay">
-  <div id="dice-display"></div>
-</div>
-
-<div id="prop-modal-bg" id="prop-modal-bg">
-  <div id="prop-modal">
-    <h2 id="pm-title"></h2>
-    <p id="pm-body"></p>
-    <div id="pm-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;"></div>
-  </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/ably@1/ably.min.js"></script>
 <script>
-const SQUARES = [
+const ABLY_KEY = 'S4V2Tw.1ozI7g:9FOhAo1Uej8UubN3zVgWSnswcXAJ6wiSzHC2jBq2dZ4';
+
+// ── GAME DATA ──────────────────────────────────────────────────
+const SQUARES=[
   {type:'go',name:'GO',emoji:'🌊'},
   {type:'prop',name:'Plankton',emoji:'🦠',group:0,price:60,rent:[2,10,30,90,160,250],houseCost:50},
   {type:'tide',name:'Tide Card',emoji:'🌊'},
@@ -131,11 +171,11 @@ const SQUARES = [
   {type:'prop',name:'Hammerhead',emoji:'🔨',group:4,price:240,rent:[20,100,300,750,925,1100],houseCost:150},
   {type:'sub',name:'Submarine 3',emoji:'🚢',price:200,subRent:[25,50,100,200]},
   {type:'prop',name:'Orca',emoji:'🐳',group:5,price:260,rent:[22,110,330,800,975,1150],houseCost:150},
-  {type:'prop',name:'Humpback Whale',emoji:'🐋',group:5,price:260,rent:[22,110,330,800,975,1150],houseCost:150},
+  {type:'prop',name:'Humpback',emoji:'🐋',group:5,price:260,rent:[22,110,330,800,975,1150],houseCost:150},
   {type:'utility',name:'Sonar Station',emoji:'📡',price:150},
   {type:'prop',name:'Sperm Whale',emoji:'🐋',group:5,price:280,rent:[24,120,360,850,1025,1200],houseCost:150},
   {type:'gonet',name:'Go to Net',emoji:'🕸️'},
-  {type:'prop',name:'Colossal Squid',emoji:'🦑',group:6,price:300,rent:[26,130,390,900,1100,1275],houseCost:200},
+  {type:'prop',name:'Col. Squid',emoji:'🦑',group:6,price:300,rent:[26,130,390,900,1100,1275],houseCost:200},
   {type:'prop',name:'Megalodon',emoji:'🦷',group:6,price:300,rent:[26,130,390,900,1100,1275],houseCost:200},
   {type:'tide',name:'Tide Card',emoji:'🌊'},
   {type:'prop',name:'Blue Whale',emoji:'🐋',group:6,price:320,rent:[28,150,450,1000,1200,1400],houseCost:200},
@@ -145,732 +185,729 @@ const SQUARES = [
   {type:'tax',name:'Pearl Tax',emoji:'💸',amount:100},
   {type:'prop',name:'Leviathan',emoji:'🐉',group:7,price:400,rent:[50,200,600,1400,1700,2000],houseCost:200},
 ];
+const GROUP_COLORS=['#8B4513','#87CEEB','#FF69B4','#FFA500','#FF4444','#FFFF00','#228B22','#00008B'];
+const GROUP_NAMES=['Brown','Sky Blue','Pink','Orange','Red','Yellow','Green','Dark Blue'];
+const PLAYER_COLORS=['#00aaff','#ff8800','#ff3333','#44cc44','#cc44cc','#ffcc00','#00ccaa','#ff6688'];
 
-const GROUP_COLORS = ['#8B4513','#87CEEB','#FF69B4','#FFA500','#FF4444','#FFFF00','#228B22','#00008B'];
-const GROUP_NAMES = ['Brown','Sky Blue','Pink','Orange','Red','Yellow','Green','Dark Blue'];
-
-const TIDE_CARDS = [
-  {text:'The current carries you to GO. Collect 🪙200!',action:'goto',val:0,gain:200},
-  {text:'Pearl bonus from the deep! Collect 🪙50.',action:'gain',val:50},
-  {text:'Collect 🪙200 salary as you pass GO.',action:'gain',val:200},
+const TIDE_CARDS=[
+  {text:'Current carries you to GO! Collect 🪙200.',action:'goto',val:0,gain:200},
+  {text:'Pearl bonus! Collect 🪙50.',action:'gain',val:50},
+  {text:'Salary! Collect 🪙200.',action:'gain',val:200},
   {text:'Pearl dividend! Collect 🪙50 from each player.',action:'collectall',val:50},
-  {text:'Bank error in your favour! Collect 🪙200.',action:'gain',val:200},
-  {text:'You found a pearl treasure chest! Collect 🪙100.',action:'gain',val:100},
-  {text:'Pay 🪙150 for deep sea repairs.',action:'pay',val:150},
-  {text:'Pay 🪙100 to the pearl doctor.',action:'pay',val:100},
-  {text:'Go directly to The Net! Do not pass GO.',action:'gonet',val:0},
+  {text:'Bank error! Collect 🪙200.',action:'gain',val:200},
+  {text:'Pearl chest! Collect 🪙100.',action:'gain',val:100},
+  {text:'Deep sea repairs. Pay 🪙150.',action:'pay',val:150},
+  {text:'Pearl doctor. Pay 🪙100.',action:'pay',val:100},
+  {text:'Go directly to The Net!',action:'gonet',val:0},
   {text:'Get out of The Net free!',action:'jailcard',val:0},
-  {text:'You are elected Ocean Mayor! Pay 🪙50 to each player.',action:'payall',val:50},
-  {text:'Advance to Kraken! Pay rent if needed.',action:'goto',val:37,gain:0},
+  {text:'Ocean Mayor elected. Pay 🪙50 to each.',action:'payall',val:50},
+  {text:'Advance to Kraken!',action:'goto',val:37,gain:0},
 ];
-
-const CURRENT_CARDS = [
-  {text:'Ride the current to GO! Collect 🪙200.',action:'goto',val:0,gain:200},
-  {text:'You win the Ocean Beauty Contest! Collect 🪙10.',action:'gain',val:10},
-  {text:'Pearl income tax refund! Collect 🪙20.',action:'gain',val:20},
-  {text:'Go to The Net. Go directly to The Net.',action:'gonet',val:0},
+const CURRENT_CARDS=[
+  {text:'Ride to GO! Collect 🪙200.',action:'goto',val:0,gain:200},
+  {text:'Beauty Contest! Collect 🪙10.',action:'gain',val:10},
+  {text:'Tax refund! Collect 🪙20.',action:'gain',val:20},
+  {text:'Go to The Net.',action:'gonet',val:0},
   {text:'Get out of The Net free!',action:'jailcard',val:0},
-  {text:'Advance to Submarine 1! Pay rent if needed.',action:'goto',val:5,gain:0},
+  {text:'Advance to Submarine 1!',action:'goto',val:5,gain:0},
   {text:'Go back 3 squares.',action:'back',val:3},
-  {text:'Pay 🪙15 for poor fin maintenance.',action:'pay',val:15},
-  {text:'Pay 🪙100 for sonar repairs.',action:'pay',val:100},
-  {text:'Collect 🪙25 from each player for fishing them out of The Net.',action:'collectall',val:25},
-  {text:'Advance to Leviathan! Pay rent if needed.',action:'goto',val:39,gain:0},
-  {text:'Make general repairs — 🪙40 per fish, 🪙115 per coral castle.',action:'repairs',val:[40,115]},
+  {text:'Fin maintenance. Pay 🪙15.',action:'pay',val:15},
+  {text:'Sonar repairs. Pay 🪙100.',action:'pay',val:100},
+  {text:'Collect 🪙25 from each player.',action:'collectall',val:25},
+  {text:'Advance to Leviathan!',action:'goto',val:39,gain:0},
+  {text:'Repairs — 🪙40/fish, 🪙115/castle.',action:'repairs',val:[40,115]},
 ];
 
-const PLAYERS = [
-  {name:'Shark',emoji:'🦈',color:'#00aaff',isHuman:true,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
-  {name:'Clownfish',emoji:'🐠',color:'#ff6600',isHuman:false,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
-  {name:'Crab',emoji:'🦀',color:'#cc2222',isHuman:false,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
-  {name:'Pufferfish',emoji:'🐡',color:'#228B22',isHuman:false,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
-];
+// ── STATE ──────────────────────────────────────────────────────
+let ably, channel;
+let roomCode = null;
+let myId = null;  // my player index in PLAYERS array
+let isHost = false;
+let gameStarted = false;
 
-const ownership = new Array(40).fill(null);
-const houses = new Array(40).fill(0);
+// Shared game state (host is source of truth, broadcasts to all)
+let PLAYERS = [];
+let ownership = new Array(40).fill(null);
+let houses = new Array(40).fill(0);
 let currentPlayer = 0;
-let gamePhase = 'roll';
-let tideDeck = shuffle([...TIDE_CARDS]);
-let currentDeck = shuffle([...CURRENT_CARDS]);
+let tideDeck = [];
+let currentDeck = [];
 let logLines = [];
 let diceResult = [1,1];
-let pendingAction = null;
-let gameOver = false;
+let pendingBuyCallback = null;
 
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
+// Lobby state
+let lobbyPlayers = []; // [{id, name, token, color}]
+let myToken = '🦈';
+let myName = '';
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+
+// ── LOBBY UI ──────────────────────────────────────────────────
+document.querySelectorAll('.token-opt').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.token-opt').forEach(e=>e.classList.remove('selected'));
+    el.classList.add('selected');
+    myToken=el.dataset.token;
+  });
+});
+
+function setStatus(msg){document.getElementById('status-msg').textContent=msg;}
+
+function connectAbly(cb){
+  setStatus('Connecting to ocean...');
+  ably = new Ably.Realtime({key:ABLY_KEY, clientId:'player-'+Math.random().toString(36).slice(2,8)});
+  ably.connection.on('connected',()=>{setStatus('');cb();});
+  ably.connection.on('failed',()=>setStatus('Connection failed. Check your internet.'));
+}
+
+document.getElementById('host-btn').addEventListener('click',()=>{
+  myName = document.getElementById('player-name').value.trim() || 'Player 1';
+  connectAbly(()=>{
+    roomCode = Math.floor(1000+Math.random()*9000).toString();
+    isHost = true;
+    myId = 0;
+    joinRoom(roomCode);
+  });
+});
+
+document.getElementById('join-btn').addEventListener('click',()=>{
+  myName = document.getElementById('player-name').value.trim() || 'Guest';
+  const code = document.getElementById('join-code').value.trim();
+  if(code.length!==4){setStatus('Enter a 4-digit room code');return;}
+  connectAbly(()=>{
+    roomCode = code;
+    isHost = false;
+    joinRoom(roomCode);
+  });
+});
+
+function joinRoom(code){
+  channel = ably.channels.get('fishnoply-'+code);
+  channel.subscribe(handleMessage);
+
+  // announce presence
+  const me = {name:myName, token:myToken, color:PLAYER_COLORS[0]};
+  channel.publish('join',{name:myName,token:myToken});
+
+  document.getElementById('waiting-room').style.display='block';
+  document.getElementById('room-code-display').textContent=code;
+
+  if(isHost){
+    // host adds themselves
+    lobbyPlayers = [{id:0,name:myName,token:myToken,color:PLAYER_COLORS[0]}];
+    updateWaitingList();
+    setStatus('');
+    // send current lobby state after short delay
+    setTimeout(()=>broadcastLobby(),500);
+  } else {
+    setStatus('Joining room '+code+'...');
   }
-  return arr;
 }
 
-function addLog(msg){
-  logLines.unshift(msg);
-  if(logLines.length>30) logLines.pop();
-  document.getElementById('log').innerHTML = logLines.slice(0,5).map(l=>`<div>${l}</div>`).join('');
+function broadcastLobby(){
+  if(!isHost)return;
+  channel.publish('lobby',{players:lobbyPlayers});
 }
 
-function updateTopPearls(){
-  document.getElementById('top-pearls').textContent = '🪙 '+PLAYERS[0].money;
+document.getElementById('start-game-btn').addEventListener('click',()=>{
+  if(!isHost||lobbyPlayers.length<2)return;
+  // Build initial game state
+  const initialState = buildInitialState();
+  channel.publish('start',{state:initialState});
+  startGame(initialState);
+});
+
+function buildInitialState(){
+  const decks = {tide:shuffle([...Array(12).keys()]), current:shuffle([...Array(12).keys()])};
+  return {
+    players: lobbyPlayers.map((lp,i)=>({
+      name:lp.name,emoji:lp.token,color:lp.color,
+      money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false
+    })),
+    ownership: new Array(40).fill(null),
+    houses: new Array(40).fill(0),
+    currentPlayer:0,
+    tideDeck: decks.tide,
+    currentDeck: decks.current,
+    log:[]
+  };
 }
 
-function updatePlayersBar(){
-  const bar = document.getElementById('players-bar');
-  bar.innerHTML = PLAYERS.map((p,i)=>`
-    <div class="player-chip ${i===currentPlayer?'active':''} ${p.bankrupt?'bankrupt':''}">
-      <span class="chip-token">${p.emoji}</span>
-      <span class="chip-name">${p.name}</span>
-      <span class="chip-pearls">🪙${p.money}</span>
-      ${p.inJail?'<span style="font-size:10px;color:#ff8888;">NET</span>':''}
-    </div>
-  `).join('');
+function updateWaitingList(){
+  document.getElementById('waiting-list').innerHTML=
+    lobbyPlayers.map((p,i)=>`<div>${p.token} <strong>${p.name}</strong>${i===0?' (Host)':''}</div>`).join('');
+  const btn=document.getElementById('start-game-btn');
+  btn.disabled=lobbyPlayers.length<2;
+  btn.textContent=lobbyPlayers.length<2?'Waiting for more players...':'Start Game ('+lobbyPlayers.length+' players)';
 }
 
-// ── BOARD DRAWING ──────────────────────────────────────────────
-const canvas = document.getElementById('board-canvas');
-const bctx = canvas.getContext('2d');
-let CELL, BOARD_SIZE, OFFSET_X, OFFSET_Y;
+// ── ABLY MESSAGING ────────────────────────────────────────────
+function handleMessage(msg){
+  const d=msg.data;
+  switch(msg.name){
+    case 'join':
+      if(isHost){
+        // assign color and id, add to lobby
+        const newId=lobbyPlayers.length;
+        if(newId>=8)return; // max 8
+        const newPlayer={id:newId,name:d.name,token:d.token,color:PLAYER_COLORS[newId]};
+        lobbyPlayers.push(newPlayer);
+        updateWaitingList();
+        setTimeout(()=>broadcastLobby(),200);
+      }
+      break;
+    case 'lobby':
+      if(!isHost){
+        lobbyPlayers=d.players;
+        // figure out my id by token+name match
+        myId=lobbyPlayers.findIndex(p=>p.name===myName&&p.token===myToken);
+        updateWaitingList();
+        setStatus('Connected! Waiting for host to start...');
+      }
+      break;
+    case 'start':
+      if(!isHost) startGame(d.state);
+      break;
+    case 'state':
+      // full state sync from host
+      applyState(d);
+      break;
+    case 'action':
+      // host processes action from non-host player
+      if(isHost) processAction(d);
+      break;
+    case 'log':
+      if(!isHost){addLog(d.msg);}
+      break;
+  }
+}
+
+function applyState(s){
+  PLAYERS=s.players;
+  ownership=s.ownership;
+  houses=s.houses;
+  currentPlayer=s.currentPlayer;
+  if(s.log) logLines=s.log;
+  diceResult=s.diceResult||[1,1];
+  tideDeck=s.tideDeck||tideDeck;
+  currentDeck=s.currentDeck||currentDeck;
+  updateTopPearls();updatePlayersBar();drawBoard();
+  renderMyTurn();
+}
+
+function broadcastState(extra){
+  if(!isHost)return;
+  const s={players:PLAYERS,ownership,houses,currentPlayer,log:logLines,diceResult,tideDeck,currentDeck,...extra};
+  channel.publish('state',s);
+}
+
+function sendAction(type,data){
+  channel.publish('action',{type,playerId:myId,...data});
+}
+
+function processAction(d){
+  // host only: process actions from other players
+  if(d.playerId!==currentPlayer)return;
+  switch(d.type){
+    case 'roll': hostDoRoll(d.playerId); break;
+    case 'buy': hostDoBuy(d.playerId,d.sqIdx,d.confirm); break;
+    case 'build': hostDoBuild(d.playerId,d.sqIdx); break;
+    case 'jailRoll': hostJailRoll(d.playerId); break;
+    case 'payBail': hostPayBail(d.playerId); break;
+    case 'useJailCard': hostUseJailCard(d.playerId); break;
+  }
+}
+
+// ── GAME START ────────────────────────────────────────────────
+function startGame(state){
+  gameStarted=true;
+  applyState(state);
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('game').style.display='flex';
+  layoutBoard();drawBoard();
+  renderMyTurn();
+}
+
+// ── BOARD ─────────────────────────────────────────────────────
+const canvas=document.getElementById('board-canvas');
+const bctx=canvas.getContext('2d');
+let CELL,BOARD_SIZE;
 
 function layoutBoard(){
-  const wrap = document.getElementById('board-wrap');
-  const size = Math.min(wrap.clientWidth, wrap.clientHeight) - 8;
-  canvas.width = size; canvas.height = size;
-  BOARD_SIZE = size;
-  CELL = size / 11;
-  OFFSET_X = 0; OFFSET_Y = 0;
+  const wrap=document.getElementById('board-wrap');
+  const size=Math.min(wrap.clientWidth,wrap.clientHeight)-8;
+  canvas.width=size;canvas.height=size;BOARD_SIZE=size;CELL=size/11;
 }
 
 function squarePos(idx){
-  // 40 squares around the board
-  // bottom row: 0-10 (right to left), right col: 11-19 (bottom to top), top row: 20-30 (left to right), left col: 31-39 (top to bottom)
-  const C = CELL, S = BOARD_SIZE;
-  if(idx<=10){ // bottom row, right to left
-    return {x: S - (idx+1)*C, y: S - C*1.6, w: idx===0||idx===10?C*1.6:C, h:C*1.6, corner:idx===0||idx===10};
-  } else if(idx<=19){ // right col, bottom to top
-    const r=idx-10;
-    return {x: S - C*1.6, y: S - C*1.6 - r*C, w:C*1.6, h:C, corner:false};
-  } else if(idx<=30){ // top row, left to right
-    const r=idx-20;
-    return {x: r*C, y: 0, w: idx===20||idx===30?C*1.6:C, h:C*1.6, corner:idx===20||idx===30};
-  } else { // left col, top to bottom
-    const r=idx-30;
-    return {x: 0, y: C*1.6 + (r-1)*C, w:C*1.6, h:C, corner:false};
-  }
+  const C=CELL,S=BOARD_SIZE,CW=C*1.6;
+  if(idx===0)  return{x:S-CW,y:S-CW,w:CW,h:CW,corner:true,side:'br'};
+  if(idx===10) return{x:0,y:S-CW,w:CW,h:CW,corner:true,side:'bl'};
+  if(idx===20) return{x:0,y:0,w:CW,h:CW,corner:true,side:'tl'};
+  if(idx===30) return{x:S-CW,y:0,w:CW,h:CW,corner:true,side:'tr'};
+  if(idx>=1&&idx<=9){const x=S-CW-idx*C;return{x,y:S-CW,w:C,h:CW,corner:false,side:'bottom'};}
+  if(idx>=11&&idx<=19){const y=S-CW-(idx-10)*C;return{x:0,y,w:CW,h:C,corner:false,side:'left'};}
+  if(idx>=21&&idx<=29){const x=CW+(idx-21)*C;return{x,y:0,w:C,h:CW,corner:false,side:'top'};}
+  if(idx>=31&&idx<=39){const y=CW+(idx-31)*C;return{x:S-CW,y,w:CW,h:C,corner:false,side:'right'};}
 }
 
 function drawBoard(){
-  const C=CELL, S=BOARD_SIZE;
+  if(!BOARD_SIZE)return;
+  const C=CELL,S=BOARD_SIZE,CW=C*1.6;
   bctx.clearRect(0,0,S,S);
-
-  // background
-  bctx.fillStyle='#0a1628';
-  bctx.fillRect(0,0,S,S);
-
-  // center area
-  bctx.fillStyle='#0d2040';
-  bctx.fillRect(C*1.6,C*1.6,S-C*3.2,S-C*3.2);
-
-  // center title
-  bctx.fillStyle='#00d4ff';
-  bctx.font=`bold ${Math.round(C*0.55)}px sans-serif`;
-  bctx.textAlign='center';
-  bctx.textBaseline='middle';
-  bctx.fillText('🌊 FISHNOPLY',S/2,S/2-C*0.4);
-  bctx.fillStyle='#4ab8d4';
-  bctx.font=`${Math.round(C*0.28)}px sans-serif`;
-  bctx.fillText('Created by Ethan & Elroy Fang · 2026',S/2,S/2+C*0.2);
-
-  // draw all squares
-  for(let i=0;i<40;i++) drawSquare(i);
-
-  // draw tokens
-  PLAYERS.forEach((p,pi)=>{
-    if(p.bankrupt) return;
-    const sq = squarePos(p.pos);
-    const cx = sq.x + sq.w/2 + (pi%2===0?-6:6);
-    const cy = sq.y + sq.h/2 + (pi<2?-5:5);
-    bctx.font=`${Math.round(C*0.32)}px sans-serif`;
-    bctx.textAlign='center';
-    bctx.textBaseline='middle';
-    bctx.fillText(p.emoji, cx, cy);
-  });
+  bctx.fillStyle='#0a1628';bctx.fillRect(0,0,S,S);
+  bctx.fillStyle='#0b1e3a';bctx.fillRect(CW,CW,S-CW*2,S-CW*2);
+  for(let i=0;i<40;i++)drawSquare(i);
+  drawCentre();drawTokens();
 }
 
 function drawSquare(i){
-  const sq=squarePos(i);
-  const s=SQUARES[i];
-  const C=CELL;
-
-  // border
-  bctx.strokeStyle='rgba(0,200,255,0.25)';
-  bctx.lineWidth=0.5;
+  const sq=squarePos(i),s=SQUARES[i],C=CELL;
+  bctx.strokeStyle='rgba(0,180,255,0.2)';bctx.lineWidth=0.5;
   bctx.strokeRect(sq.x,sq.y,sq.w,sq.h);
-
-  // color strip for properties
+  if(ownership[i]!==null){bctx.fillStyle=PLAYERS[ownership[i]].color+'28';bctx.fillRect(sq.x+1,sq.y+1,sq.w-2,sq.h-2);}
   if(s.type==='prop'){
-    const col=GROUP_COLORS[s.group];
-    // determine strip position based on board side
-    bctx.fillStyle=col;
-    if(i<=10){ // bottom
-      bctx.fillRect(sq.x,sq.y+sq.h-8,sq.w,8);
-    } else if(i<=19){ // right
-      bctx.fillRect(sq.x,sq.y,8,sq.h);
-    } else if(i<=30){ // top
-      bctx.fillRect(sq.x,sq.y,sq.w,8);
-    } else { // left
-      bctx.fillRect(sq.x+sq.w-8,sq.y,8,sq.h);
+    bctx.fillStyle=GROUP_COLORS[s.group];const ST=7;
+    if(sq.side==='bottom')bctx.fillRect(sq.x,sq.y,sq.w,ST);
+    else if(sq.side==='left')bctx.fillRect(sq.x+sq.w-ST,sq.y,ST,sq.h);
+    else if(sq.side==='top')bctx.fillRect(sq.x,sq.y+sq.h-ST,sq.w,ST);
+    else if(sq.side==='right')bctx.fillRect(sq.x,sq.y,ST,sq.h);
+  }
+  if(houses[i]>0&&!sq.corner){
+    const isC=houses[i]>=5;bctx.fillStyle=isC?'#ff4444':'#00ee55';const cnt=isC?1:houses[i];
+    for(let h=0;h<cnt;h++){
+      if(sq.side==='bottom'||sq.side==='top')bctx.fillRect(sq.x+3+h*6,sq.y+sq.h/2-2,5,5);
+      else bctx.fillRect(sq.x+sq.w/2-2,sq.y+3+h*6,5,5);
     }
   }
-
-  // owner highlight
-  if(ownership[i]!==null){
-    const owner=PLAYERS[ownership[i]];
-    bctx.fillStyle=owner.color+'33';
-    bctx.fillRect(sq.x+1,sq.y+1,sq.w-2,sq.h-2);
-  }
-
-  // houses/castles
-  if(houses[i]>0){
-    const hCount=Math.min(houses[i],4);
-    const isHotel=houses[i]>=5;
-    bctx.fillStyle=isHotel?'#ff4444':'#00cc44';
-    if(!sq.corner){
-      for(let h=0;h<(isHotel?1:hCount);h++){
-        bctx.fillRect(sq.x+2+h*5, sq.y+2, 4, 4);
-      }
-    }
-  }
-
-  // emoji & text
-  const fontSize = sq.corner ? C*0.38 : C*0.28;
-  bctx.font=`${Math.round(fontSize)}px sans-serif`;
-  bctx.textAlign='center';
-  bctx.textBaseline='middle';
-  const cx=sq.x+sq.w/2, cy=sq.y+sq.h/2;
-
+  bctx.save();
+  const cx=sq.x+sq.w/2,cy=sq.y+sq.h/2;
+  if(sq.side==='left'){bctx.translate(cx,cy);bctx.rotate(Math.PI/2);bctx.translate(-cx,-cy);}
+  else if(sq.side==='right'){bctx.translate(cx,cy);bctx.rotate(-Math.PI/2);bctx.translate(-cx,-cy);}
+  else if(sq.side==='top'){bctx.translate(cx,cy);bctx.rotate(Math.PI);bctx.translate(-cx,-cy);}
   if(sq.corner){
-    bctx.fillText(s.emoji, cx, cy-6);
-    bctx.fillStyle='#7ab8cc';
-    bctx.font=`${Math.round(C*0.18)}px sans-serif`;
-    bctx.fillText(s.name, cx, cy+10);
-  } else {
-    // rotate text for sides
-    bctx.save();
-    if(i>=11&&i<=19){ bctx.translate(cx,cy); bctx.rotate(-Math.PI/2); bctx.translate(-cx,-cy); }
-    else if(i>=31&&i<=39){ bctx.translate(cx,cy); bctx.rotate(Math.PI/2); bctx.translate(-cx,-cy); }
-    bctx.fillText(s.emoji, cx, cy-4);
-    bctx.fillStyle='#5a9aaa';
-    bctx.font=`${Math.round(C*0.15)}px sans-serif`;
-    const shortName = s.name.length>9?s.name.substring(0,9):s.name;
-    bctx.fillText(shortName, cx, cy+8);
-    if(s.price){
-      bctx.fillStyle='#ffd700';
-      bctx.font=`${Math.round(C*0.14)}px sans-serif`;
-      bctx.fillText('🪙'+s.price, cx, cy+18);
-    }
-    bctx.restore();
+    bctx.font=`${Math.round(C*0.38)}px sans-serif`;bctx.textAlign='center';bctx.textBaseline='middle';
+    bctx.fillText(s.emoji,cx,cy-8);
+    bctx.fillStyle='#7ab8cc';bctx.font=`bold ${Math.round(C*0.15)}px sans-serif`;
+    bctx.fillText(s.name,cx,cy+10);
+  }else{
+    bctx.font=`${Math.round(C*0.28)}px sans-serif`;bctx.textAlign='center';bctx.textBaseline='middle';
+    bctx.fillText(s.emoji,cx,cy-6);
+    bctx.fillStyle='#5a9aaa';bctx.font=`${Math.round(C*0.12)}px sans-serif`;
+    bctx.fillText(s.name.length>8?s.name.slice(0,8):s.name,cx,cy+5);
+    if(s.price){bctx.fillStyle='#ffd700';bctx.font=`${Math.round(C*0.11)}px sans-serif`;bctx.fillText('🪙'+s.price,cx,cy+14);}
   }
+  bctx.restore();
 }
 
-// ── GAME LOGIC ─────────────────────────────────────────────────
-
-function rollDice(){
-  const d1=Math.floor(Math.random()*6)+1;
-  const d2=Math.floor(Math.random()*6)+1;
-  diceResult=[d1,d2];
-  return [d1,d2];
+function drawCentre(){
+  const C=CELL,S=BOARD_SIZE,CW=C*1.6,cx=S/2,iy=CW,ix=CW,iw=S-CW*2,ih=S-CW*2;
+  bctx.fillStyle='#00d4ff';bctx.font=`bold ${Math.round(C*0.36)}px sans-serif`;
+  bctx.textAlign='center';bctx.textBaseline='middle';
+  bctx.fillText('🌊 FISHNOPLY',cx,iy+16);
+  bctx.fillStyle='#1a5a7a';bctx.font=`${Math.round(C*0.14)}px sans-serif`;
+  bctx.fillText('Ethan & Elroy Fang · 2026',cx,iy+30);
+  bctx.strokeStyle='rgba(0,180,255,0.12)';bctx.lineWidth=0.5;
+  bctx.beginPath();bctx.moveTo(ix+8,iy+40);bctx.lineTo(ix+iw-8,iy+40);bctx.stroke();
+  const padTop=46,gridX=ix+4,gridY=iy+padTop;
+  const cols=PLAYERS.length<=2?1:2;
+  const rows=Math.ceil(PLAYERS.length/cols);
+  const cellW=(iw-8)/cols,cellH=(ih-padTop-4)/rows;
+  PLAYERS.forEach((p,pi)=>{
+    const col=pi%cols,row=Math.floor(pi/cols);
+    drawPlayerPanel(p,pi,gridX+col*cellW,gridY+row*cellH,cellW-3,cellH-3);
+  });
 }
 
-const DICE_EMOJI=['','⚀','⚁','⚂','⚃','⚄','⚅'];
-
-function animateDice(d1,d2,cb){
-  const overlay=document.getElementById('dice-overlay');
-  const display=document.getElementById('dice-display');
-  overlay.style.display='flex';
-  let count=0;
-  const interval=setInterval(()=>{
-    const r1=Math.floor(Math.random()*6)+1;
-    const r2=Math.floor(Math.random()*6)+1;
-    display.textContent=DICE_EMOJI[r1]+' '+DICE_EMOJI[r2];
-    count++;
-    if(count>8){
-      clearInterval(interval);
-      display.textContent=DICE_EMOJI[d1]+' '+DICE_EMOJI[d2];
-      setTimeout(()=>{ overlay.style.display='none'; cb(); },600);
-    }
-  },80);
-}
-
-function movePlayer(pidx, steps, cb){
-  const p=PLAYERS[pidx];
-  const oldPos=p.pos;
-  p.pos=(p.pos+steps)%40;
-  if(p.pos<oldPos && steps>0){ // passed GO
-    p.money+=200;
-    addLog(`${p.emoji} passed GO — collected 🪙200!`);
-  }
-  updateTopPearls();
-  drawBoard();
-  if(cb) cb();
-}
-
-function gotoSquare(pidx, sq, collectGo, cb){
-  const p=PLAYERS[pidx];
-  if(sq<p.pos && collectGo){ p.money+=200; addLog(`${p.emoji} passed GO — 🪙200!`); }
-  p.pos=sq;
-  updateTopPearls();
-  drawBoard();
-  if(cb) cb();
-}
-
-function countPlayerSubs(pidx){
-  return SQUARES.filter((s,i)=>s.type==='sub'&&ownership[i]===pidx).length;
-}
-
-function countPlayerUtils(pidx){
-  return SQUARES.filter((s,i)=>s.type==='utility'&&ownership[i]===pidx).length;
-}
-
-function ownsGroup(pidx, group){
-  const groupProps=SQUARES.map((s,i)=>({s,i})).filter(({s})=>s.type==='prop'&&s.group===group);
-  return groupProps.every(({i})=>ownership[i]===pidx);
-}
-
-function calcRent(sqIdx, diceTotal){
-  const s=SQUARES[sqIdx];
-  const owner=ownership[sqIdx];
-  if(owner===null) return 0;
-  if(s.type==='sub'){
-    const count=countPlayerSubs(owner);
-    return s.subRent[count-1];
-  }
-  if(s.type==='utility'){
-    const count=countPlayerUtils(owner);
-    return diceTotal*(count===1?4:10);
-  }
-  if(s.type==='prop'){
-    const h=houses[sqIdx];
-    if(h>0) return s.rent[Math.min(h,5)];
-    if(ownsGroup(owner,s.group)) return s.rent[0]*2;
-    return s.rent[0];
-  }
-  return 0;
-}
-
-function payRent(from, to, amount, cb){
-  PLAYERS[from].money=Math.max(0,PLAYERS[from].money-amount);
-  PLAYERS[to].money+=amount;
-  addLog(`${PLAYERS[from].emoji} paid 🪙${amount} rent to ${PLAYERS[to].emoji}`);
-  updateTopPearls();
-  updatePlayersBar();
-  checkBankruptcy(from, cb);
-}
-
-function checkBankruptcy(pidx, cb){
-  const p=PLAYERS[pidx];
-  if(p.money<=0){
-    p.bankrupt=true;
-    addLog(`💀 ${p.emoji} ${p.name} is bankrupt! Game over for them.`);
-    // return all properties
-    SQUARES.forEach((s,i)=>{ if(ownership[i]===pidx){ ownership[i]=null; houses[i]=0; } });
-    updatePlayersBar();
-    drawBoard();
-    const alive=PLAYERS.filter(pl=>!pl.bankrupt);
-    if(alive.length===1){
-      showWinner(PLAYERS.indexOf(alive[0]));
-      return;
-    }
-  }
-  if(cb) cb();
-}
-
-function showWinner(pidx){
-  gameOver=true;
-  const p=PLAYERS[pidx];
-  showModal(`${p.emoji} ${p.name} WINS!`,`${p.name} dominates the ocean with 🪙${p.money} pearls!\n\nAll other creatures are bankrupt.`,[
-    {label:'Play Again',cls:'btn-primary',action:()=>location.reload()}
-  ]);
-}
-
-function drawTideCard(){
-  if(tideDeck.length===0) tideDeck=shuffle([...TIDE_CARDS]);
-  return tideDeck.pop();
-}
-function drawCurrentCard(){
-  if(currentDeck.length===0) currentDeck=shuffle([...CURRENT_CARDS]);
-  return currentDeck.pop();
-}
-
-function applyCard(pidx, card, cb){
-  const p=PLAYERS[pidx];
-  addLog(`${p.emoji} draws: "${card.text}"`);
-  switch(card.action){
-    case 'gain':
-      p.money+=card.val;
-      updateTopPearls(); updatePlayersBar();
-      if(cb) cb(); break;
-    case 'pay':
-      p.money=Math.max(0,p.money-card.val);
-      updateTopPearls(); updatePlayersBar();
-      checkBankruptcy(pidx,cb); break;
-    case 'goto':
-      gotoSquare(pidx,card.val,true,()=>landOn(pidx,diceResult[0]+diceResult[1],cb)); break;
-    case 'gonet':
-      p.inJail=true; p.jailTurns=0; p.pos=10;
-      drawBoard(); updatePlayersBar();
-      if(cb) cb(); break;
-    case 'jailcard':
-      p.jailCard=true;
-      if(cb) cb(); break;
-    case 'back':
-      p.pos=(p.pos-card.val+40)%40;
-      drawBoard();
-      landOn(pidx,diceResult[0]+diceResult[1],cb); break;
-    case 'collectall':
-      PLAYERS.forEach((pl,i)=>{ if(i!==pidx&&!pl.bankrupt){ pl.money=Math.max(0,pl.money-card.val); p.money+=card.val; } });
-      updateTopPearls(); updatePlayersBar();
-      if(cb) cb(); break;
-    case 'payall':
-      PLAYERS.forEach((pl,i)=>{ if(i!==pidx&&!pl.bankrupt){ pl.money+=card.val; p.money=Math.max(0,p.money-card.val); } });
-      updateTopPearls(); updatePlayersBar();
-      checkBankruptcy(pidx,cb); break;
-    case 'repairs':
-      let total=0;
-      SQUARES.forEach((s,i)=>{ if(ownership[i]===pidx&&houses[i]>0){ total+=houses[i]<5?houses[i]*card.val[0]:card.val[1]; } });
-      p.money=Math.max(0,p.money-total);
-      addLog(`${p.emoji} paid 🪙${total} for repairs`);
-      updateTopPearls(); updatePlayersBar();
-      checkBankruptcy(pidx,cb); break;
-    default:
-      if(cb) cb();
-  }
-}
-
-function landOn(pidx, diceTotal, cb){
-  const p=PLAYERS[pidx];
-  const sq=SQUARES[p.pos];
-  const owner=ownership[p.pos];
-
-  switch(sq.type){
-    case 'go':
-      if(cb) cb(); break;
-    case 'jail': case 'freeswim':
-      if(cb) cb(); break;
-    case 'gonet':
-      p.inJail=true; p.jailTurns=0; p.pos=10;
-      addLog(`${p.emoji} sent to The Net!`);
-      drawBoard(); updatePlayersBar();
-      if(cb) cb(); break;
-    case 'tax':
-      p.money=Math.max(0,p.money-sq.amount);
-      addLog(`${p.emoji} paid 🪙${sq.amount} tax`);
-      updateTopPearls(); updatePlayersBar();
-      checkBankruptcy(pidx,cb); break;
-    case 'tide':
-      const tc=drawTideCard();
-      applyCard(pidx,tc,cb); break;
-    case 'current':
-      const cc=drawCurrentCard();
-      applyCard(pidx,cc,cb); break;
-    case 'prop': case 'sub': case 'utility':
-      if(owner===null){
-        // unowned
-        if(p.isHuman){
-          offerBuy(pidx, p.pos, cb);
-        } else {
-          aiDecideBuy(pidx, p.pos, cb);
-        }
-      } else if(owner===pidx){
-        addLog(`${p.emoji} landed on own property`);
-        if(cb) cb();
-      } else {
-        const rent=calcRent(p.pos, diceTotal);
-        addLog(`${p.emoji} owes 🪙${rent} to ${PLAYERS[owner].emoji}`);
-        payRent(pidx, owner, rent, cb);
-      }
-      break;
-    default:
-      if(cb) cb();
-  }
-}
-
-function offerBuy(pidx, sqIdx, cb){
-  const sq=SQUARES[sqIdx];
-  const p=PLAYERS[pidx];
-  showModal(`Buy ${sq.emoji} ${sq.name}?`,
-    `Price: 🪙${sq.price}\nYour pearls: 🪙${p.money}\n\n${sq.type==='prop'?`Group: ${GROUP_NAMES[sq.group]}\nBase rent: 🪙${sq.rent[0]}`:''}`,
-    [
-      {label:`Buy 🪙${sq.price}`,cls:'btn-primary',disabled:p.money<sq.price,action:()=>{
-        p.money-=sq.price; ownership[sqIdx]=pidx;
-        addLog(`${p.emoji} bought ${sq.emoji} ${sq.name} for 🪙${sq.price}`);
-        updateTopPearls(); updatePlayersBar(); drawBoard();
-        closeModal(); if(cb) cb();
-      }},
-      {label:'Pass',cls:'btn-secondary',action:()=>{ closeModal(); if(cb) cb(); }},
-    ]
-  );
-}
-
-function aiDecideBuy(pidx, sqIdx, cb){
-  const sq=SQUARES[sqIdx];
-  const p=PLAYERS[pidx];
-  const willBuy = p.money>sq.price*1.2 && Math.random()>0.25;
-  if(willBuy){
-    p.money-=sq.price; ownership[sqIdx]=pidx;
-    addLog(`${p.emoji} ${p.name} bought ${sq.emoji} ${sq.name} for 🪙${sq.price}`);
-    updateTopPearls(); updatePlayersBar(); drawBoard();
-  } else {
-    addLog(`${p.emoji} ${p.name} passed on ${sq.name}`);
-  }
-  setTimeout(cb,600);
-}
-
-function aiTakeTurn(pidx, cb){
-  const p=PLAYERS[pidx];
-  const [d1,d2]=rollDice();
-  const total=d1+d2;
-  const isDoubles=d1===d2;
-  addLog(`${p.emoji} ${p.name} rolls ${DICE_EMOJI[d1]}${DICE_EMOJI[d2]} (${total})`);
-
-  if(p.inJail){
-    if(isDoubles){ p.inJail=false; addLog(`${p.emoji} rolled doubles — out of The Net!`); }
-    else{
-      p.jailTurns++;
-      if(p.jailTurns>=3){
-        p.money=Math.max(0,p.money-50); p.inJail=false;
-        addLog(`${p.emoji} paid 🪙50 bail`);
-      } else {
-        addLog(`${p.emoji} stuck in The Net (turn ${p.jailTurns})`);
-        updatePlayersBar();
-        setTimeout(cb,800); return;
-      }
-    }
-  }
-
-  setTimeout(()=>{
-    movePlayer(pidx, total, ()=>{
-      setTimeout(()=>landOn(pidx, total, ()=>{
-        // AI build houses
-        aiMaybeBuilds(pidx);
-        updatePlayersBar();
-        setTimeout(cb, 600);
-      }),400);
+function drawPlayerPanel(p,pi,px,py,pw,ph){
+  const C=CELL;
+  const isMe=pi===myId;
+  bctx.fillStyle=p.bankrupt?'rgba(40,10,10,0.6)':(currentPlayer===pi?p.color+'22':(isMe?'rgba(0,200,255,0.07)':'rgba(255,255,255,0.03)'));
+  bctx.strokeStyle=isMe?(currentPlayer===pi?p.color:'rgba(0,200,255,0.4)'):(currentPlayer===pi?p.color+'88':'rgba(0,180,255,0.1)');
+  bctx.lineWidth=currentPlayer===pi||isMe?1.5:0.5;
+  bctx.beginPath();bctx.roundRect(px,py,pw,ph,4);bctx.fill();bctx.stroke();
+  let y=py+9;
+  bctx.font=`${Math.round(C*0.26)}px sans-serif`;bctx.textAlign='left';bctx.textBaseline='top';
+  bctx.fillText(p.emoji,px+4,y-2);
+  bctx.fillStyle=p.bankrupt?'#664444':p.color;
+  bctx.font=`bold ${Math.round(C*0.15)}px sans-serif`;
+  bctx.fillText((isMe?'★ ':'')+p.name+(p.bankrupt?' ✗':''),px+20,y+1);
+  y+=20;
+  bctx.fillStyle='#ffd700';bctx.font=`bold ${Math.round(C*0.15)}px sans-serif`;
+  bctx.fillText('🪙'+p.money,px+4,y);
+  bctx.fillStyle='#4a8a9a';bctx.font=`${Math.round(C*0.12)}px sans-serif`;
+  bctx.fillText(p.inJail?'🕸️ Net':'📍'+(SQUARES[p.pos].name.slice(0,8)),px+4,y+12);
+  y+=26;
+  const myProps=SQUARES.map((sq,i)=>({sq,i})).filter(({i})=>ownership[i]===pi);
+  if(myProps.length){
+    bctx.fillStyle='#3a7a8a';bctx.font=`${Math.round(C*0.11)}px sans-serif`;
+    bctx.fillText('Properties:',px+4,y);y+=12;
+    myProps.forEach(({sq,i})=>{
+      if(y>py+ph-8)return;
+      const col=sq.type==='prop'?GROUP_COLORS[sq.group]:(sq.type==='sub'?'#8888ff':'#ffcc00');
+      bctx.fillStyle=col;bctx.beginPath();bctx.arc(px+8,y+4,3.5,0,Math.PI*2);bctx.fill();
+      bctx.fillStyle='#a0c8d8';bctx.font=`${Math.round(C*0.11)}px sans-serif`;
+      const hLabel=houses[i]>=5?'🪸':(houses[i]>0?'x'+houses[i]:'');
+      bctx.fillText((sq.name.length>9?sq.name.slice(0,9):sq.name)+(hLabel?' '+hLabel:''),px+14,y);
+      y+=11;
     });
-  },400);
+  }else if(!p.bankrupt){
+    bctx.fillStyle='#2a5a6a';bctx.font=`${Math.round(C*0.11)}px sans-serif`;bctx.fillText('No properties',px+4,y);
+  }
 }
 
-function aiMaybeBuilds(pidx){
-  const p=PLAYERS[pidx];
-  SQUARES.forEach((sq,i)=>{
-    if(sq.type==='prop' && ownership[i]===pidx && ownsGroup(pidx,sq.group) && p.money>sq.houseCost*2 && houses[i]<5 && Math.random()>0.55){
-      const maxInGroup=Math.max(...SQUARES.map((s2,i2)=>s2.type==='prop'&&s2.group===sq.group?houses[i2]:0));
-      if(houses[i]<=maxInGroup){
-        p.money-=sq.houseCost; houses[i]++;
-        addLog(`${p.emoji} built on ${sq.emoji} ${sq.name}`);
-      }
-    }
+function drawTokens(){
+  const C=CELL;
+  const byPos={};
+  PLAYERS.forEach((p,pi)=>{if(!p.bankrupt){if(!byPos[p.pos])byPos[p.pos]=[];byPos[p.pos].push(pi);}});
+  Object.entries(byPos).forEach(([pos,pids])=>{
+    const sq=squarePos(parseInt(pos));
+    const cx=sq.x+sq.w/2,cy=sq.y+sq.h/2;
+    pids.forEach((pi,offset)=>{
+      const p=PLAYERS[pi];
+      const angle=(offset/pids.length)*Math.PI*2-Math.PI/2;
+      const r=pids.length>1?C*0.17:0;
+      const tx=cx+Math.cos(angle)*r,ty=cy+Math.sin(angle)*r;
+      const isActive=pi===currentPlayer,isMe=pi===myId;
+      bctx.beginPath();bctx.arc(tx,ty,C*(isActive?0.27:0.21),0,Math.PI*2);
+      bctx.fillStyle=isActive?p.color+'55':'rgba(0,0,0,0.4)';bctx.fill();
+      bctx.strokeStyle=isActive?p.color:(isMe?'rgba(0,200,255,0.8)':p.color+'66');
+      bctx.lineWidth=isActive?2.5:(isMe?1.5:1);bctx.stroke();
+      bctx.font=`${Math.round(C*(isActive?0.28:0.22))}px sans-serif`;
+      bctx.textAlign='center';bctx.textBaseline='middle';bctx.fillText(p.emoji,tx,ty);
+    });
   });
 }
 
-// ── HUMAN TURN UI ──────────────────────────────────────────────
+// ── HUD ───────────────────────────────────────────────────────
+function updateTopPearls(){
+  if(myId!==null&&PLAYERS[myId]) document.getElementById('top-pearls').textContent='🪙 '+PLAYERS[myId].money;
+}
+function updatePlayersBar(){
+  document.getElementById('players-bar').innerHTML=PLAYERS.map((p,i)=>`
+    <div class="player-chip ${i===currentPlayer?'active':''} ${p.bankrupt?'bankrupt':''}">
+      <span>${p.emoji}</span><span style="font-weight:bold;color:${p.color}">${p.name}${i===myId?' ★':''}</span>
+      <span class="chip-pearls">🪙${p.money}</span>
+      ${p.inJail?'<span style="font-size:9px;color:#ff8888">NET</span>':''}
+    </div>`).join('');
+}
+function addLog(msg){
+  logLines.unshift(msg);if(logLines.length>30)logLines.pop();
+  document.getElementById('log').innerHTML=logLines.slice(0,5).map(l=>`<div>${l}</div>`).join('');
+}
+function setHeader(t){document.getElementById('turn-header').textContent=t;}
 function setActions(btns){
-  const el=document.getElementById('actions');
-  el.innerHTML='';
-  btns.forEach(b=>{
-    const btn=document.createElement('button');
-    btn.className='btn '+(b.cls||'btn-primary');
-    btn.textContent=b.label;
-    if(b.disabled) btn.disabled=true;
-    btn.onclick=b.action;
-    el.appendChild(btn);
-  });
+  const el=document.getElementById('actions');el.innerHTML='';
+  btns.forEach(b=>{const btn=document.createElement('button');btn.className='btn '+(b.cls||'btn-primary');btn.textContent=b.label;if(b.disabled)btn.disabled=true;btn.onclick=b.action;el.appendChild(btn);});
+}
+function showModal(title,body,actions){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').textContent=body;
+  const el=document.getElementById('modal-actions');el.innerHTML='';
+  actions.forEach(a=>{const btn=document.createElement('button');btn.className='btn '+(a.cls||'btn-primary');btn.textContent=a.label;if(a.disabled)btn.disabled=true;btn.onclick=a.action;el.appendChild(btn);});
+  document.getElementById('modal-bg').style.display='flex';
+}
+function closeModal(){document.getElementById('modal-bg').style.display='none';}
+
+function renderMyTurn(){
+  const waitEl=document.getElementById('waiting-turn');
+  if(currentPlayer===myId){
+    waitEl.style.display='none';
+    myTurn();
+  } else {
+    waitEl.style.display='block';
+    waitEl.textContent=`⏳ ${PLAYERS[currentPlayer].emoji} ${PLAYERS[currentPlayer].name}'s turn...`;
+    setHeader(`${PLAYERS[currentPlayer].emoji} ${PLAYERS[currentPlayer].name}'s turn`);
+    setActions([]);
+  }
 }
 
-function setHeader(txt){
-  document.getElementById('turn-header').textContent=txt;
-}
-
-function humanTurn(){
-  const p=PLAYERS[0];
-  if(p.bankrupt){ nextTurn(); return; }
-  setHeader(`Your turn, ${p.emoji} Shark!`);
-
+// ── MY TURN ───────────────────────────────────────────────────
+function myTurn(){
+  const p=PLAYERS[myId];
+  if(p.bankrupt){return;}
+  setHeader(`Your turn ${p.emoji} ${p.name}!`);
   if(p.inJail){
     setActions([
-      {label:'Roll for doubles',cls:'btn-primary',action:()=>humanRollJail()},
-      ...(p.jailCard?[{label:'Use Get Out card',cls:'btn-secondary',action:()=>{ p.jailCard=false; p.inJail=false; addLog('Shark used Get Out of Net card!'); humanRollNormal(); }}]:[]),
-      {label:`Pay 🪙50 bail`,cls:'btn-secondary',disabled:p.money<50,action:()=>{ p.money-=50; p.inJail=false; updateTopPearls(); humanRollNormal(); }},
-    ]);
-    return;
+      {label:'Roll for doubles',cls:'btn-primary',action:()=>sendAction('jailRoll',{})},
+      ...(p.jailCard?[{label:'Use Get Out card',cls:'btn-secondary',action:()=>sendAction('useJailCard',{})}]:[]),
+      {label:'Pay 🪙50 bail',cls:'btn-secondary',disabled:p.money<50,action:()=>sendAction('payBail',{})},
+    ]);return;
   }
-  const buildBtns = getBuildActions();
+  const canBuild=getBuildOptions().length>0;
   setActions([
-    {label:'🎲 Roll Dice',cls:'btn-primary',action:()=>humanRollNormal()},
-    ...(buildBtns.length?[{label:'🪸 Build',cls:'btn-secondary',action:()=>showBuildMenu()}]:[]),
-    {label:'🗺️ Properties',cls:'btn-secondary',action:()=>showPropMenu()},
+    {label:'🎲 Roll Dice',cls:'btn-primary',action:()=>sendAction('roll',{})},
+    ...(canBuild?[{label:'🪸 Build',cls:'btn-secondary',action:()=>showMyBuildMenu()}]:[]),
+    {label:'🗺️ My Props',cls:'btn-secondary',action:()=>showMyProps()},
   ]);
 }
 
-function humanRollJail(){
-  const p=PLAYERS[0];
-  const [d1,d2]=rollDice();
-  const total=d1+d2;
-  animateDice(d1,d2,()=>{
-    if(d1===d2){
-      p.inJail=false;
-      addLog(`Shark rolled doubles ${DICE_EMOJI[d1]}${DICE_EMOJI[d2]} — out of The Net!`);
-      movePlayer(0,total,()=>landOn(0,total,()=>endHumanTurn(false)));
-    } else {
-      p.jailTurns++;
-      addLog(`Shark stayed in The Net (${p.jailTurns}/3)`);
-      if(p.jailTurns>=3){ p.money=Math.max(0,p.money-50); p.inJail=false; addLog('Shark paid 🪙50 bail'); updateTopPearls(); movePlayer(0,total,()=>landOn(0,total,()=>endHumanTurn(false))); }
-      else { updatePlayersBar(); endHumanTurn(false); }
-    }
-  });
-}
-
-function humanRollNormal(){
-  const p=PLAYERS[0];
-  const [d1,d2]=rollDice();
-  const total=d1+d2;
-  const isDoubles=d1===d2;
-  addLog(`Shark rolls ${DICE_EMOJI[d1]}${DICE_EMOJI[d2]} (${total})${isDoubles?' DOUBLES!':''}`);
-  setActions([]);
-  animateDice(d1,d2,()=>{
-    movePlayer(0,total,()=>{
-      landOn(0,total,()=>endHumanTurn(isDoubles));
-    });
-  });
-}
-
-function endHumanTurn(rolledDoubles){
-  updateTopPearls(); updatePlayersBar();
-  if(rolledDoubles && !PLAYERS[0].inJail){
-    addLog('Doubles! Roll again.');
-    humanTurn();
-  } else {
-    nextTurn();
-  }
-}
-
-function nextTurn(){
-  do {
-    currentPlayer=(currentPlayer+1)%4;
-  } while(PLAYERS[currentPlayer].bankrupt && PLAYERS.some(p=>!p.bankrupt));
-
-  const alive=PLAYERS.filter(p=>!p.bankrupt);
-  if(alive.length===1){ showWinner(PLAYERS.indexOf(alive[0])); return; }
-
-  updatePlayersBar();
-  if(currentPlayer===0){
-    humanTurn();
-  } else {
-    setHeader(`${PLAYERS[currentPlayer].emoji} ${PLAYERS[currentPlayer].name}'s turn...`);
-    setActions([]);
-    setTimeout(()=>{
-      aiTakeTurn(currentPlayer,()=>{
-        updatePlayersBar();
-        nextTurn();
-      });
-    },800);
-  }
-}
-
-// ── BUILD MENU ─────────────────────────────────────────────────
-function getBuildActions(){
-  const p=PLAYERS[0];
+function getBuildOptions(){
+  if(myId===null)return[];
+  const p=PLAYERS[myId];
   return SQUARES.map((sq,i)=>{
-    if(sq.type!=='prop'||ownership[i]!==0) return null;
-    if(!ownsGroup(0,sq.group)) return null;
-    if(houses[i]>=5) return null;
-    if(p.money<sq.houseCost) return null;
-    const groupHouses=SQUARES.map((s2,i2)=>s2.type==='prop'&&s2.group===sq.group?houses[i2]:0);
-    const minH=Math.min(...groupHouses);
-    if(houses[i]>minH) return null;
-    return {sq,i};
+    if(sq.type!=='prop'||ownership[i]!==myId||!ownsGroup(myId,sq.group)||houses[i]>=5||p.money<sq.houseCost)return null;
+    const gH=SQUARES.map((s2,i2)=>s2.type==='prop'&&s2.group===sq.group?houses[i2]:0);
+    if(houses[i]>Math.min(...gH))return null;
+    return{sq,i};
   }).filter(Boolean);
 }
 
-function showBuildMenu(){
-  const builds=getBuildActions();
-  if(!builds.length){ addLog('Nothing to build on right now'); return; }
-  const p=PLAYERS[0];
-  const items=builds.map(({sq,i})=>{
-    const label=houses[i]===4?`🪸 Coral Castle on ${sq.emoji} ${sq.name} 🪙${sq.houseCost}`:`🏠 House on ${sq.emoji} ${sq.name} 🪙${sq.houseCost}`;
-    return {label,cls:'btn-primary',action:()=>{
-      p.money-=sq.houseCost; houses[i]++;
-      addLog(`Shark built ${houses[i]===5?'🪸 Coral Castle':'🏠 house'} on ${sq.emoji} ${sq.name}`);
-      updateTopPearls(); drawBoard(); closeModal();
-      humanTurn();
-    }};
-  });
+function showMyBuildMenu(){
+  const builds=getBuildOptions();
+  if(!builds.length)return;
+  const p=PLAYERS[myId];
   showModal('🪸 Build',`Your pearls: 🪙${p.money}\n\nSelect where to build:`,[
-    ...items,
-    {label:'Cancel',cls:'btn-secondary',action:()=>{ closeModal(); humanTurn(); }},
+    ...builds.map(({sq,i})=>({
+      label:(houses[i]===4?`🪸 Castle on ${sq.name}`:`🏠 House on ${sq.name}`)+` 🪙${sq.houseCost}`,
+      cls:'btn-primary',
+      action:()=>{closeModal();sendAction('build',{sqIdx:i});}
+    })),
+    {label:'Cancel',cls:'btn-secondary',action:closeModal},
   ]);
 }
 
-function showPropMenu(){
-  const myProps=SQUARES.map((sq,i)=>({sq,i})).filter(({i})=>ownership[i]===0);
-  if(!myProps.length){ showModal('🗺️ Properties','You own no properties yet!',[{label:'OK',cls:'btn-secondary',action:closeModal}]); return; }
-  const lines=myProps.map(({sq,i})=>`${sq.emoji} ${sq.name}${houses[i]>0?' '+Array(Math.min(houses[i],4)).fill('🏠').join('')+(houses[i]>=5?'🪸':''):''}  Rent:🪙${calcRent(i,7)}`).join('\n');
-  showModal('🗺️ Your Properties',lines,[{label:'Close',cls:'btn-secondary',action:()=>{ closeModal(); humanTurn(); }}]);
+function showMyProps(){
+  const myProps=SQUARES.map((sq,i)=>({sq,i})).filter(({i})=>ownership[i]===myId);
+  if(!myProps.length){showModal('🗺️ Properties','No properties yet!',[{label:'OK',cls:'btn-secondary',action:closeModal}]);return;}
+  const lines=myProps.map(({sq,i})=>`${sq.emoji} ${sq.name}${houses[i]>0?' '+(houses[i]>=5?'🪸':'🏠'.repeat(houses[i])):''} — Rent:🪙${calcRent(i,7)}`).join('\n');
+  showModal('🗺️ Your Properties',lines,[{label:'Close',cls:'btn-secondary',action:closeModal}]);
 }
 
-// ── MODAL ──────────────────────────────────────────────────────
-function showModal(title, body, actions){
-  document.getElementById('modal-title').textContent=title;
-  document.getElementById('modal-body').textContent=body;
-  const actEl=document.getElementById('modal-actions');
-  actEl.innerHTML='';
-  actions.forEach(a=>{
-    const btn=document.createElement('button');
-    btn.className='btn '+(a.cls||'btn-primary');
-    btn.textContent=a.label;
-    if(a.disabled) btn.disabled=true;
-    btn.onclick=a.action;
-    actEl.appendChild(btn);
+// ── HOST GAME LOGIC ───────────────────────────────────────────
+// Only host runs this. Broadcasts state after each action.
+
+const DE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+
+function animateDice(d1,d2,cb){
+  const ov=document.getElementById('dice-overlay'),dp=document.getElementById('dice-display');
+  ov.style.display='flex';let n=0;
+  const iv=setInterval(()=>{
+    dp.textContent=DE[Math.ceil(Math.random()*6)]+' '+DE[Math.ceil(Math.random()*6)];
+    if(++n>8){clearInterval(iv);dp.textContent=DE[d1]+' '+DE[d2];setTimeout(()=>{ov.style.display='none';cb();},600);}
+  },80);
+}
+
+function hostLog(msg){
+  addLog(msg);
+  channel.publish('log',{msg});
+}
+
+function hostDoRoll(pidx){
+  const d1=Math.ceil(Math.random()*6),d2=Math.ceil(Math.random()*6);
+  diceResult=[d1,d2];
+  const total=d1+d2,doubles=d1===d2;
+  hostLog(`${PLAYERS[pidx].emoji} ${PLAYERS[pidx].name}: ${DE[d1]}${DE[d2]} (${total})${doubles?' DOUBLES!':''}`);
+  animateDice(d1,d2,()=>{
+    hostMovePlayer(pidx,total,()=>{
+      hostLandOn(pidx,total,()=>{
+        if(doubles&&!PLAYERS[pidx].inJail){
+          hostLog('Doubles — roll again!');
+          broadcastState();renderMyTurn();
+        } else {
+          hostNextTurn();
+        }
+      });
+    });
   });
-  document.getElementById('modal-bg').style.display='flex';
 }
 
-function closeModal(){
-  document.getElementById('modal-bg').style.display='none';
+function hostJailRoll(pidx){
+  const d1=Math.ceil(Math.random()*6),d2=Math.ceil(Math.random()*6);
+  diceResult=[d1,d2];const total=d1+d2;
+  animateDice(d1,d2,()=>{
+    if(d1===d2){PLAYERS[pidx].inJail=false;hostLog(`${PLAYERS[pidx].emoji} rolled doubles — free from Net!`);hostMovePlayer(pidx,total,()=>hostLandOn(pidx,total,()=>hostNextTurn()));}
+    else{PLAYERS[pidx].jailTurns++;
+      if(PLAYERS[pidx].jailTurns>=3){PLAYERS[pidx].money=Math.max(0,PLAYERS[pidx].money-50);PLAYERS[pidx].inJail=false;hostLog(`${PLAYERS[pidx].emoji} paid 🪙50 bail`);hostMovePlayer(pidx,total,()=>hostLandOn(pidx,total,()=>hostNextTurn()));}
+      else{hostLog(`${PLAYERS[pidx].emoji} stuck in Net (${PLAYERS[pidx].jailTurns}/3)`);broadcastState();renderMyTurn();hostNextTurn();}
+    }
+  });
 }
 
-// ── START ──────────────────────────────────────────────────────
-document.getElementById('start-btn').addEventListener('click',()=>{
-  document.getElementById('splash').style.display='none';
-  document.getElementById('game').style.display='flex';
-  layoutBoard();
-  drawBoard();
-  updatePlayersBar();
-  updateTopPearls();
-  humanTurn();
+function hostPayBail(pidx){PLAYERS[pidx].money-=50;PLAYERS[pidx].inJail=false;hostLog(`${PLAYERS[pidx].emoji} paid 🪙50 bail`);broadcastState();renderMyTurn();}
+function hostUseJailCard(pidx){PLAYERS[pidx].jailCard=false;PLAYERS[pidx].inJail=false;hostLog(`${PLAYERS[pidx].emoji} used Get Out of Net card!`);broadcastState();renderMyTurn();}
+
+function hostMovePlayer(pidx,steps,cb){
+  const p=PLAYERS[pidx],old=p.pos;
+  p.pos=(p.pos+steps)%40;
+  if(p.pos<old&&steps>0){p.money+=200;hostLog(`${p.emoji} passed GO — 🪙200!`);}
+  broadcastState();drawBoard();if(cb)cb();
+}
+
+function hostGoto(pidx,sq,collectGo,cb){
+  const p=PLAYERS[pidx];
+  if(sq<p.pos&&collectGo){p.money+=200;hostLog(`${p.emoji} passed GO!`);}
+  p.pos=sq;broadcastState();drawBoard();if(cb)cb();
+}
+
+function ownsGroup(pidx,group){return SQUARES.map((s,i)=>({s,i})).filter(({s})=>s.type==='prop'&&s.group===group).every(({i})=>ownership[i]===pidx);}
+function countSubs(pidx){return SQUARES.filter((s,i)=>s.type==='sub'&&ownership[i]===pidx).length;}
+function countUtils(pidx){return SQUARES.filter((s,i)=>s.type==='utility'&&ownership[i]===pidx).length;}
+function calcRent(sqIdx,dice){
+  const s=SQUARES[sqIdx],ow=ownership[sqIdx];if(ow===null)return 0;
+  if(s.type==='sub')return s.subRent[countSubs(ow)-1];
+  if(s.type==='utility')return dice*(countUtils(ow)===1?4:10);
+  if(s.type==='prop'){const h=houses[sqIdx];if(h>0)return s.rent[Math.min(h,5)];if(ownsGroup(ow,s.group))return s.rent[0]*2;return s.rent[0];}
+  return 0;
+}
+
+function hostPayRent(from,to,amt,cb){
+  PLAYERS[from].money=Math.max(0,PLAYERS[from].money-amt);PLAYERS[to].money+=amt;
+  hostLog(`${PLAYERS[from].emoji} paid 🪙${amt} rent to ${PLAYERS[to].emoji}`);
+  broadcastState();hostCheckBankruptcy(from,cb);
+}
+
+function hostCheckBankruptcy(pidx,cb){
+  const p=PLAYERS[pidx];
+  if(p.money<=0){
+    p.bankrupt=true;hostLog(`💀 ${p.emoji} ${p.name} is bankrupt!`);
+    SQUARES.forEach((s,i)=>{if(ownership[i]===pidx){ownership[i]=null;houses[i]=0;}});
+    broadcastState();drawBoard();
+    const alive=PLAYERS.filter(pl=>!pl.bankrupt);
+    if(alive.length===1){hostShowWinner(PLAYERS.indexOf(alive[0]));return;}
+  }
+  if(cb)cb();
+}
+
+function hostShowWinner(pidx){
+  const p=PLAYERS[pidx];
+  hostLog(`🏆 ${p.emoji} ${p.name} WINS THE OCEAN!`);
+  broadcastState();
+  showModal(`${p.emoji} ${p.name} WINS!`,`${p.name} dominates the ocean with 🪙${p.money} pearls!\n\nAll others are bankrupt!`,[{label:'Play Again',cls:'btn-primary',action:()=>location.reload()}]);
+}
+
+function hostApplyCard(pidx,card,cb){
+  const p=PLAYERS[pidx];
+  hostLog(`${p.emoji}: "${card.text}"`);
+  switch(card.action){
+    case 'gain':p.money+=card.val;broadcastState();if(cb)cb();break;
+    case 'pay':p.money=Math.max(0,p.money-card.val);broadcastState();hostCheckBankruptcy(pidx,cb);break;
+    case 'goto':hostGoto(pidx,card.val,true,()=>hostLandOn(pidx,diceResult[0]+diceResult[1],cb));break;
+    case 'gonet':p.inJail=true;p.jailTurns=0;p.pos=10;hostLog(`${p.emoji} sent to The Net!`);broadcastState();drawBoard();if(cb)cb();break;
+    case 'jailcard':p.jailCard=true;broadcastState();if(cb)cb();break;
+    case 'back':p.pos=(p.pos-card.val+40)%40;broadcastState();drawBoard();hostLandOn(pidx,diceResult[0]+diceResult[1],cb);break;
+    case 'collectall':PLAYERS.forEach((pl,i)=>{if(i!==pidx&&!pl.bankrupt){pl.money=Math.max(0,pl.money-card.val);p.money+=card.val;}});broadcastState();if(cb)cb();break;
+    case 'payall':PLAYERS.forEach((pl,i)=>{if(i!==pidx&&!pl.bankrupt){pl.money+=card.val;p.money=Math.max(0,p.money-card.val);}});broadcastState();hostCheckBankruptcy(pidx,cb);break;
+    case 'repairs':{let tot=0;SQUARES.forEach((s,i)=>{if(ownership[i]===pidx&&houses[i]>0)tot+=houses[i]<5?houses[i]*card.val[0]:card.val[1];});p.money=Math.max(0,p.money-tot);hostLog(`${p.emoji} paid 🪙${tot} repairs`);broadcastState();hostCheckBankruptcy(pidx,cb);break;}
+    default:if(cb)cb();
+  }
+}
+
+function hostLandOn(pidx,dice,cb){
+  const p=PLAYERS[pidx],sq=SQUARES[p.pos],ow=ownership[p.pos];
+  switch(sq.type){
+    case 'go':case 'jail':case 'freeswim':if(cb)cb();break;
+    case 'gonet':p.inJail=true;p.jailTurns=0;p.pos=10;hostLog(`${p.emoji} sent to The Net!`);broadcastState();drawBoard();if(cb)cb();break;
+    case 'tax':p.money=Math.max(0,p.money-sq.amount);hostLog(`${p.emoji} paid 🪙${sq.amount} tax`);broadcastState();hostCheckBankruptcy(pidx,cb);break;
+    case 'tide':
+      if(!tideDeck.length)tideDeck=shuffle([...Array(12).keys()]);
+      hostApplyCard(pidx,TIDE_CARDS[tideDeck.pop()],cb);break;
+    case 'current':
+      if(!currentDeck.length)currentDeck=shuffle([...Array(12).keys()]);
+      hostApplyCard(pidx,CURRENT_CARDS[currentDeck.pop()],cb);break;
+    case 'prop':case 'sub':case 'utility':
+      if(ow===null){
+        // offer buy — broadcast state, player will send back buy action
+        broadcastState();
+        if(pidx===myId){
+          // I'm the one landing, show buy modal
+          showModal(`Buy ${sq.emoji} ${sq.name}?`,
+            `Price: 🪙${sq.price}\nYour pearls: 🪙${p.money}${sq.type==='prop'?'\nGroup: '+GROUP_NAMES[sq.group]+'\nBase rent: 🪙'+sq.rent[0]:''}`,
+            [{label:`Buy 🪙${sq.price}`,cls:'btn-primary',disabled:p.money<sq.price,action:()=>{closeModal();hostDoBuy(pidx,p.pos,true);}},
+             {label:'Pass',cls:'btn-secondary',action:()=>{closeModal();hostDoBuy(pidx,p.pos,false);}}]);
+        } else {
+          // ask non-host player — wait for their buy action
+          // set a timeout fallback (AI-like: buy if can afford)
+          pendingBuyCallback=cb;
+          setTimeout(()=>{if(pendingBuyCallback){hostDoBuy(pidx,p.pos,false);pendingBuyCallback=null;}},20000);
+        }
+      }
+      else if(ow===pidx){hostLog(`${p.emoji} owns this`);if(cb)cb();}
+      else{const rent=calcRent(p.pos,dice);hostLog(`${p.emoji} owes 🪙${rent}`);hostPayRent(pidx,ow,rent,cb);}
+      break;
+    default:if(cb)cb();
+  }
+}
+
+function hostDoBuy(pidx,sqIdx,confirm){
+  const sq=SQUARES[sqIdx],p=PLAYERS[pidx];
+  if(confirm&&p.money>=sq.price){
+    p.money-=sq.price;ownership[sqIdx]=pidx;
+    hostLog(`${p.emoji} bought ${sq.emoji} ${sq.name} for 🪙${sq.price}`);
+  }else{hostLog(`${p.emoji} passed on ${sq.name}`);}
+  broadcastState();drawBoard();
+  const cb=pendingBuyCallback;pendingBuyCallback=null;
+  if(cb)cb();else hostNextTurn();
+}
+
+function hostDoBuild(pidx,sqIdx){
+  const sq=SQUARES[sqIdx],p=PLAYERS[pidx];
+  if(ownership[sqIdx]!==pidx||p.money<sq.houseCost||houses[sqIdx]>=5)return;
+  p.money-=sq.houseCost;houses[sqIdx]++;
+  hostLog(`${p.emoji} built ${houses[sqIdx]>=5?'🪸 Coral Castle':'🏠 house'} on ${sq.emoji} ${sq.name}`);
+  broadcastState();drawBoard();renderMyTurn();
+}
+
+function hostNextTurn(){
+  do{currentPlayer=(currentPlayer+1)%PLAYERS.length;}while(PLAYERS[currentPlayer].bankrupt&&PLAYERS.some(p=>!p.bankrupt));
+  const alive=PLAYERS.filter(p=>!p.bankrupt);
+  if(alive.length===1){hostShowWinner(PLAYERS.indexOf(alive[0]));return;}
+  broadcastState();renderMyTurn();
+}
+
+// Non-host buy modal
+channel.subscribe&&channel.subscribe('state',msg=>{
+  // When state arrives and it's my turn and there's an unowned square I just landed on
+  // handled in applyState already
 });
 
-window.addEventListener('resize',()=>{ layoutBoard(); drawBoard(); });
+// handle non-host buy offer: if state arrives and I'm currentPlayer on unowned square
+const _origApply=applyState;
+window.applyState=function(s){
+  _origApply(s);
+  if(!isHost&&s.currentPlayer===myId){
+    const p=PLAYERS[myId],sq=SQUARES[p.pos];
+    if((sq.type==='prop'||sq.type==='sub'||sq.type==='utility')&&ownership[p.pos]===null&&p.money>=0){
+      showModal(`Buy ${sq.emoji} ${sq.name}?`,
+        `Price: 🪙${sq.price}\nYour pearls: 🪙${p.money}`,
+        [{label:`Buy 🪙${sq.price}`,cls:'btn-primary',disabled:p.money<sq.price,action:()=>{closeModal();sendAction('buy',{sqIdx:p.pos,confirm:true});}},
+         {label:'Pass',cls:'btn-secondary',action:()=>{closeModal();sendAction('buy',{sqIdx:p.pos,confirm:false});}}]);
+    }
+  }
+};
 
-// tap on square info
-canvas.addEventListener('click', e=>{
-  const rect=canvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+// ── CANVAS TAP ────────────────────────────────────────────────
+canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
   for(let i=0;i<40;i++){
     const sq=squarePos(i);
     if(mx>=sq.x&&mx<=sq.x+sq.w&&my>=sq.y&&my<=sq.y+sq.h){
-      const s=SQUARES[i];
-      const owner=ownership[i];
+      const s=SQUARES[i],ow=ownership[i];
       let body=`${s.emoji} ${s.name}\n`;
-      if(s.price) body+=`Price: 🪙${s.price}\n`;
-      if(owner!==null) body+=`Owner: ${PLAYERS[owner].emoji} ${PLAYERS[owner].name}\n`;
-      if(s.type==='prop'&&s.rent) body+=`Rents: 🪙${s.rent.join(' / ')}\nHouses: ${houses[i]<5?houses[i]:'Coral Castle'}`;
-      if(s.type==='sub') body+=`Submarine — rent by subs owned: 🪙${s.subRent.join('/')}`;
-      showModal(s.name, body, [{label:'Close',cls:'btn-secondary',action:closeModal}]);
-      return;
+      if(s.price)body+=`Price: 🪙${s.price}\n`;
+      if(ow!==null)body+=`Owner: ${PLAYERS[ow].emoji} ${PLAYERS[ow].name}\n`;
+      if(s.type==='prop'&&s.rent)body+=`Rents: 🪙${s.rent.join(' / ')}\nHouses: ${houses[i]>=5?'Coral Castle🪸':houses[i]}`;
+      if(s.type==='sub')body+=`Submarine rent: 🪙${s.subRent.join('/')}`;
+      showModal(s.name,body,[{label:'Close',cls:'btn-secondary',action:closeModal}]);return;
     }
   }
 });
+
+window.addEventListener('resize',()=>{layoutBoard();drawBoard();});
+
+// Host also processes its own actions directly
+if(typeof sendAction!=='undefined'){
+  const _origSend=sendAction;
+  window.sendAction=function(type,data){
+    if(isHost&&data.playerId===undefined){
+      // host acting for themselves — process directly
+      processAction({type,playerId:myId,...data});
+    }else{
+      _origSend(type,data);
+    }
+  };
+}
 </script>
 </body>
 </html>
