@@ -2,1036 +2,576 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pokéopoly</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mosquito.io</title>
 <style>
-:root {
-  --pokered: #e3350d;
-  --pokeyellow: #ffcb05;
-  --pokeblue: #3d7dca;
-  --pokegold: #f7a800;
-  --pokebg: #1a1f2e;
-  --pokepanel: #232840;
-  --pokeborder: #3a4060;
-  --poketext: #f0f0f0;
-  --pokemuted: #8090b0;
-  --pokesuccess: #4CAF50;
-  --pokewarn: #FF9800;
-  --pokecell: 70px;
-}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:#0d1117;font-family:monospace;}
+canvas{display:block;position:fixed;top:0;left:0;}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--pokebg);
-  color: var(--poketext);
-  font-family: 'Nunito', sans-serif;
-  min-height: 100vh;
-  padding: 12px;
-  overflow-x: hidden;
-}
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
 
-h1.logo {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 18px;
-  text-align: center;
-  color: var(--pokeyellow);
-  text-shadow: 3px 3px 0 var(--pokered), 6px 6px 0 #000;
-  margin-bottom: 12px;
-  letter-spacing: 2px;
-}
+.blood-bar-wrap{position:fixed;width:44%;height:22px;top:14px;z-index:10;}
+#bar1-wrap{left:4%;background:rgba(0,0,0,0.5);border-radius:12px;overflow:hidden;border:1.5px solid rgba(220,60,60,0.5);}
+#bar2-wrap{right:4%;background:rgba(0,0,0,0.5);border-radius:12px;overflow:hidden;border:1.5px solid rgba(60,120,255,0.5);}
+.bar-fill{height:100%;transition:width 0.1s;border-radius:10px;}
+#bar1-fill{background:#cc3333;width:50%;}
+#bar2-fill{background:#2255dd;width:50%;margin-left:auto;}
+.bar-label{position:fixed;top:17px;font-size:11px;font-weight:bold;color:#fff;z-index:11;letter-spacing:1px;text-shadow:0 1px 3px #000;}
+#lbl1{left:6%;}
+#lbl2{right:6%;text-align:right;}
 
-.game-layout {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+#vs{position:fixed;top:10px;left:50%;transform:translateX(-50%);font-size:13px;color:#aaa;font-weight:bold;letter-spacing:2px;z-index:11;}
 
-/* BOARD */
-.board-wrap {
-  position: relative;
-  flex: 0 0 auto;
-}
+#overlay{position:fixed;inset:0;background:rgba(13,17,23,0.96);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30;}
+#overlay h1{font-size:48px;color:#cc3333;letter-spacing:3px;margin-bottom:4px;text-shadow:0 0 30px #aa2222;}
+#overlay .sub{color:#555;font-size:12px;margin-bottom:10px;letter-spacing:2px;}
+#overlay .desc{color:#888;font-size:13px;text-align:center;max-width:280px;line-height:1.7;margin-bottom:36px;}
+#overlay .how{color:#666;font-size:11px;text-align:center;max-width:300px;line-height:1.8;margin-bottom:28px;}
+.play-btn{background:#cc3333;color:#fff;font-size:18px;font-weight:bold;padding:14px 56px;border:none;border-radius:30px;cursor:pointer;letter-spacing:2px;}
+.play-btn:active{transform:scale(0.96);}
 
-.board {
-  display: grid;
-  grid-template-columns: repeat(11, var(--pokecell));
-  grid-template-rows: repeat(11, var(--pokecell));
-  border: 3px solid var(--pokeyellow);
-  border-radius: 8px;
-  overflow: hidden;
-  background: #161b2c;
-}
+#winner-overlay{position:fixed;inset:0;background:rgba(13,17,23,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:30;}
+#winner-text{font-size:36px;font-weight:bold;margin-bottom:8px;letter-spacing:2px;}
+#winner-sub{color:#888;font-size:14px;margin-bottom:32px;}
+.retry-btn{background:#333;color:#fff;font-size:16px;font-weight:bold;padding:12px 44px;border:none;border-radius:30px;cursor:pointer;letter-spacing:1px;}
+.retry-btn:active{transform:scale(0.96);}
 
-.cell {
-  width: var(--pokecell);
-  height: var(--pokecell);
-  border: 1px solid var(--pokeborder);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  cursor: default;
-  font-size: 8px;
-  text-align: center;
-  padding: 2px;
-  transition: filter 0.15s;
-  overflow: hidden;
-}
-.cell:hover { filter: brightness(1.2); }
+.joy-zone{position:fixed;pointer-events:all;z-index:8;}
+#joy1-zone{bottom:0;left:0;width:50%;height:46%;}
+#joy2-zone{bottom:0;right:0;width:50%;height:46%;}
+.joy-base{position:absolute;border-radius:50%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);display:none;pointer-events:none;}
+.joy-knob{position:absolute;border-radius:50%;pointer-events:none;}
 
-.cell .color-bar {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 8px;
-  border-radius: 0;
-}
-.cell.bottom .color-bar { top: auto; bottom: 0; }
-.cell.left .color-bar { right: auto; width: 8px; height: 100%; top: 0; }
-.cell.right .color-bar { left: auto; width: 8px; height: 100%; top: 0; }
+#suck1-btn{position:fixed;bottom:28px;left:calc(25% - 32px);width:64px;height:64px;border-radius:50%;background:rgba(200,50,50,0.2);border:2px solid rgba(200,50,50,0.5);color:#ff6666;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;z-index:9;cursor:pointer;letter-spacing:.5px;pointer-events:all;}
+#suck1-btn:active{background:rgba(200,50,50,0.5);}
+#suck2-btn{position:fixed;bottom:28px;right:calc(25% - 32px);width:64px;height:64px;border-radius:50%;background:rgba(50,80,220,0.2);border:2px solid rgba(50,80,220,0.5);color:#6699ff;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;z-index:9;cursor:pointer;letter-spacing:.5px;pointer-events:all;}
+#suck2-btn:active{background:rgba(50,80,220,0.5);}
 
-.cell .cell-name {
-  font-size: 7px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--poketext);
-  margin-top: 10px;
-  z-index: 1;
-}
-.cell .cell-price {
-  font-size: 6px;
-  color: var(--pokeyellow);
-  z-index: 1;
-}
-.cell .cell-emoji {
-  font-size: 18px;
-  line-height: 1;
-  z-index: 1;
-}
-
-.cell.corner {
-  background: #2a1f3d;
-}
-.cell.tax-cell { background: #2d1818; }
-.cell.chance-cell { background: #1a2a1a; }
-.cell.jail-cell { background: #2a2a1a; }
-.cell.railroad { background: #1a2030; }
-.cell.utility { background: #1a2030; }
-
-/* Center area */
-.board-center {
-  grid-column: 2 / 11;
-  grid-row: 2 / 11;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  background: #161b2c;
-  border: 1px solid var(--pokeborder);
-}
-.center-logo {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 11px;
-  color: var(--pokeyellow);
-  text-shadow: 2px 2px 0 var(--pokered);
-  text-align: center;
-  line-height: 1.6;
-}
-.center-pokeball {
-  font-size: 48px;
-  animation: spin 8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Tokens on board */
-.token {
-  position: absolute;
-  font-size: 12px;
-  z-index: 10;
-  pointer-events: none;
-  text-shadow: 0 0 3px #000;
-  transition: all 0.5s ease;
-}
-
-/* SIDE PANEL */
-.panel {
-  flex: 0 0 280px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.pcard {
-  background: var(--pokepanel);
-  border: 1px solid var(--pokeborder);
-  border-radius: 10px;
-  padding: 10px 12px;
-}
-.pcard h3 {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--pokeyellow);
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-}
-
-.player-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  border: 2px solid transparent;
-  background: #1a1f2e;
-  margin-bottom: 5px;
-  transition: border-color 0.2s;
-}
-.player-row.active-player { border-color: var(--pokeyellow); }
-.player-row.bankrupt { opacity: 0.4; text-decoration: line-through; }
-.player-token { font-size: 20px; }
-.player-info { flex: 1; }
-.player-name { font-size: 12px; font-weight: 800; }
-.player-money { font-size: 11px; color: var(--pokeyellow); font-weight: 700; }
-.player-pos-text { font-size: 9px; color: var(--pokemuted); }
-
-.dice-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.dice-row { display: flex; gap: 10px; }
-.die {
-  width: 40px; height: 40px;
-  background: #fff;
-  border-radius: 8px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  padding: 5px;
-  gap: 2px;
-}
-.dp {
-  border-radius: 50%;
-  background: #1a1f2e;
-  width: 8px; height: 8px;
-  align-self: center;
-  justify-self: center;
-  opacity: 0;
-  transition: opacity 0.08s;
-}
-.dp.on { opacity: 1; }
-
-.btn {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: transform 0.1s, filter 0.1s;
-}
-.btn:active { transform: scale(0.96); }
-.btn:disabled { opacity: 0.4; cursor: default; }
-.btn-primary { background: var(--pokered); color: #fff; }
-.btn-primary:hover:not(:disabled) { filter: brightness(1.2); }
-.btn-secondary { background: var(--pokeblue); color: #fff; }
-.btn-secondary:hover:not(:disabled) { filter: brightness(1.2); }
-.btn-warn { background: var(--pokegold); color: #000; }
-.btn-warn:hover:not(:disabled) { filter: brightness(1.1); }
-.btn-sm { font-size: 7px; padding: 5px 10px; }
-
-.turn-label {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: var(--pokemuted);
-  text-align: center;
-}
-
-.log-area {
-  height: 120px;
-  overflow-y: auto;
-  background: #0f1220;
-  border-radius: 8px;
-  padding: 8px;
-  font-size: 10px;
-  line-height: 1.7;
-  border: 1px solid var(--pokeborder);
-}
-.log-line { color: var(--pokemuted); }
-.log-line.action { color: var(--poketext); }
-.log-line.good { color: #66dd66; }
-.log-line.bad { color: #ff6666; }
-.log-line.warn { color: var(--pokeyellow); }
-
-/* Property info panel */
-.prop-panel {
-  background: var(--pokepanel);
-  border: 1px solid var(--pokeborder);
-  border-radius: 10px;
-  padding: 10px 12px;
-}
-.prop-panel h3 {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: var(--pokeyellow);
-  margin-bottom: 6px;
-}
-.prop-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 0;
-  border-bottom: 1px solid var(--pokeborder);
-  font-size: 9px;
-}
-.prop-color-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.prop-item-name { flex: 1; }
-.prop-item-owner { font-size: 9px; }
-.prop-houses { color: var(--pokesuccess); font-size: 9px; }
-
-/* Modal */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-}
-.modal-overlay.show { display: flex; }
-.modal {
-  background: var(--pokepanel);
-  border: 3px solid var(--pokeyellow);
-  border-radius: 14px;
-  padding: 20px;
-  max-width: 340px;
-  width: 90%;
-  text-align: center;
-}
-.modal h2 {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: var(--pokeyellow);
-  margin-bottom: 12px;
-  line-height: 1.6;
-}
-.modal p { font-size: 12px; color: var(--pokemuted); margin-bottom: 14px; line-height: 1.6; }
-.modal .prop-card-color {
-  height: 20px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-}
-.modal-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.modal-big-emoji { font-size: 40px; margin-bottom: 8px; }
-
-/* Win screen */
-.win-screen {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 20px;
-  text-align: center;
-}
-.win-screen.show { display: flex; }
-.win-title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 20px;
-  color: var(--pokeyellow);
-  text-shadow: 4px 4px 0 var(--pokered);
-  animation: bounce 0.5s alternate infinite;
-}
-@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-.win-subtitle { font-size: 14px; color: var(--pokemuted); }
-
+.divider{position:fixed;top:0;left:50%;width:1px;height:100%;background:rgba(255,255,255,0.06);z-index:4;pointer-events:none;}
+.p-label{position:fixed;bottom:105px;font-size:10px;color:#444;letter-spacing:1px;z-index:9;}
+#lbl-p1{left:4%;}
+#lbl-p2{right:4%;text-align:right;}
 </style>
 </head>
 <body>
 
-<h1 class="logo">✦ POKÉOPOLY ✦</h1>
+<canvas id="c"></canvas>
 
-<div class="game-layout">
-  <div class="board-wrap">
-    <div class="board" id="board"></div>
-  </div>
+<div class="divider"></div>
 
-  <div class="panel">
-    <div class="pcard">
-      <h3>⚔ TRAINERS</h3>
-      <div id="player-list"></div>
-    </div>
-
-    <div class="pcard">
-      <h3>🎲 DICE</h3>
-      <div class="dice-area">
-        <div class="dice-row">
-          <div class="die" id="die1">
-            <div class="dp" id="d1p1"></div><div class="dp" id="d1p2"></div><div class="dp" id="d1p3"></div>
-            <div class="dp" id="d1p4"></div><div class="dp" id="d1p5"></div><div class="dp" id="d1p6"></div>
-            <div class="dp" id="d1p7"></div><div class="dp" id="d1p8"></div><div class="dp" id="d1p9"></div>
-          </div>
-          <div class="die" id="die2">
-            <div class="dp" id="d2p1"></div><div class="dp" id="d2p2"></div><div class="dp" id="d2p3"></div>
-            <div class="dp" id="d2p4"></div><div class="dp" id="d2p5"></div><div class="dp" id="d2p6"></div>
-            <div class="dp" id="d2p7"></div><div class="dp" id="d2p8"></div><div class="dp" id="d2p9"></div>
-          </div>
-        </div>
-        <div class="turn-label" id="turn-label">Player 1's Turn</div>
-        <button class="btn btn-primary" id="rollBtn" onclick="rollDice()">ROLL!</button>
-        <button class="btn btn-secondary btn-sm" id="endTurnBtn" onclick="endTurn()" style="display:none">END TURN ▶</button>
-      </div>
-    </div>
-
-    <div class="pcard log-area" id="log"></div>
-
-    <div class="pcard">
-      <h3>🏘 PROPERTIES</h3>
-      <div id="prop-list" style="max-height:160px;overflow-y:auto;"></div>
-    </div>
-
-    <button class="btn btn-warn btn-sm" onclick="newGame()" style="width:100%">↺ NEW GAME</button>
-  </div>
+<div class="blood-bar-wrap" id="bar1-wrap"><div class="bar-fill" id="bar1-fill"></div></div>
+<div class="blood-bar-wrap" id="bar2-wrap"><div class="bar-fill" id="bar2-fill"></div></div>
+<div class="bar-label" id="lbl1">P1 🩸</div>
+<div class="bar-label" id="lbl2">🩸 P2</div>
+<div id="vs">VS</div>
+<div style="position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:50;pointer-events:none;text-align:center;padding-top:42px;white-space:nowrap;">
+  <span style="font-size:13px;font-weight:bold;color:#fff;letter-spacing:2px;text-shadow:0 0 10px #cc3333,0 1px 4px #000;">Created by Ethan Fang · 2026</span>
 </div>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <div class="modal-big-emoji" id="modal-emoji">❓</div>
-    <div class="modal-prop-color prop-card-color" id="modal-color" style="display:none"></div>
-    <h2 id="modal-title">Title</h2>
-    <p id="modal-desc">Description</p>
-    <div class="modal-btns" id="modal-btns"></div>
-  </div>
+<div class="joy-zone" id="joy1-zone">
+  <div class="joy-base" id="joy1-base"><div class="joy-knob" id="joy1-knob"></div></div>
+</div>
+<div class="joy-zone" id="joy2-zone">
+  <div class="joy-base" id="joy2-base"><div class="joy-knob" id="joy2-knob"></div></div>
 </div>
 
-<!-- Win Screen -->
-<div class="win-screen" id="win-screen">
-  <div style="font-size:60px" id="win-emoji">🏆</div>
-  <div class="win-title" id="win-title">WINNER!</div>
-  <div class="win-subtitle" id="win-sub"></div>
-  <button class="btn btn-primary" onclick="newGame()" style="margin-top:12px">PLAY AGAIN</button>
+<button id="suck1-btn">SUCK</button>
+<button id="suck2-btn">SUCK</button>
+<div class="p-label" id="lbl-p1">P1 ZONE</div>
+<div class="p-label" id="lbl-p2">P2 ZONE</div>
+<div style="position:fixed;bottom:8px;left:50%;transform:translateX(-50%);font-size:11px;color:#555;letter-spacing:1px;z-index:50;pointer-events:none;white-space:nowrap;text-shadow:0 1px 4px #000;">Created by Ethan Fang</div>
+
+<div id="overlay">
+  <h1>MOSQUITO</h1>
+  <div class="sub">2 PLAYER BATTLE</div>
+  <div class="desc">Two mosquitoes. One screen. Suck blood from your opponent to grow fatter — drain them dry to win!</div>
+  <div class="how">
+    P1 (left) · P2 (right)<br>
+    Joystick to fly · SUCK to drain blood<br>
+    Get close &amp; hold SUCK to steal HP<br>
+    First to 0% blood loses
+  </div>
+  <button class="play-btn" id="play-btn">PLAY</button>
+</div>
+
+<div id="winner-overlay">
+  <div id="winner-text"></div>
+  <div id="winner-sub"></div>
+  <button class="retry-btn" id="retry-btn">PLAY AGAIN</button>
 </div>
 
 <script>
-// ─── BOARD DATA ───────────────────────────────────────────────
-const COLOR_GROUPS = {
-  brown:   { color: '#795548', rent: [2,10,30,90,160,250] },
-  lblue:   { color: '#81D4FA', rent: [6,30,90,270,400,550] },
-  pink:    { color: '#E91E63', rent: [10,30,90,270,400,550] },
-  orange:  { color: '#FF9800', rent: [14,70,200,550,750,950] },
-  red:     { color: '#F44336', rent: [18,90,250,700,875,1050] },
-  yellow:  { color: '#FFEB3B', rent: [22,110,330,800,975,1150] },
-  green:   { color: '#4CAF50', rent: [26,130,390,900,1100,1275] },
-  dblue:   { color: '#1565C0', rent: [35,175,500,1100,1300,1500] },
-};
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
 
-// Board: 40 spaces, index 0=GO, clockwise
-const SPACES = [
-  {id:0,  type:'go',       name:'GO',          emoji:'⭐', price:0},
-  {id:1,  type:'prop',     name:'Pallet Town', color:'brown', emoji:'🟤', price:60,  housePrice:50},
-  {id:2,  type:'chance',   name:'Pokéball?',   emoji:'⚪', price:0},
-  {id:3,  type:'prop',     name:'Viridian City',color:'brown',emoji:'🟤',price:60,  housePrice:50},
-  {id:4,  type:'tax',      name:'Poké Tax',    emoji:'💸', price:200, taxAmount:200},
-  {id:5,  type:'railroad', name:'Magnet Train', emoji:'🚂', price:200},
-  {id:6,  type:'prop',     name:'Pewter City', color:'lblue',emoji:'🔵',price:100, housePrice:50},
-  {id:7,  type:'chance',   name:'Pokéball?',   emoji:'⚪', price:0},
-  {id:8,  type:'prop',     name:'Cerulean City',color:'lblue',emoji:'🔵',price:100,housePrice:50},
-  {id:9,  type:'prop',     name:'Vermilion City',color:'lblue',emoji:'🔵',price:120,housePrice:50},
-  {id:10, type:'jail',     name:'Jail/Visit',  emoji:'⛓',  price:0},
-  {id:11, type:'prop',     name:'Celadon City',color:'pink',emoji:'🌸',price:140, housePrice:100},
-  {id:12, type:'utility',  name:'Poké Center', emoji:'🏥', price:150},
-  {id:13, type:'prop',     name:'Fuchsia City',color:'pink',emoji:'🌸',price:140, housePrice:100},
-  {id:14, type:'prop',     name:'Saffron City',color:'pink',emoji:'🌸',price:160, housePrice:100},
-  {id:15, type:'railroad', name:'S.S. Anne',   emoji:'🚢', price:200},
-  {id:16, type:'prop',     name:'Cinnabar Island',color:'orange',emoji:'🟠',price:180,housePrice:100},
-  {id:17, type:'chance',   name:'Pokéball?',   emoji:'⚪', price:0},
-  {id:18, type:'prop',     name:'Lavender Town',color:'orange',emoji:'🟠',price:180,housePrice:100},
-  {id:19, type:'prop',     name:'Safari Zone', color:'orange',emoji:'🟠',price:200,housePrice:100},
-  {id:20, type:'free',     name:'Free Heal!',  emoji:'💊', price:0},
-  {id:21, type:'prop',     name:'Mt. Moon',    color:'red',emoji:'🔴',price:220,housePrice:150},
-  {id:22, type:'chance',   name:'Pokéball?',   emoji:'⚪', price:0},
-  {id:23, type:'prop',     name:'Rock Tunnel', color:'red',emoji:'🔴',price:220,housePrice:150},
-  {id:24, type:'prop',     name:'Power Plant', color:'red',emoji:'🔴',price:240,housePrice:150},
-  {id:25, type:'railroad', name:'Lapras Surf', emoji:'🌊', price:200},
-  {id:26, type:'prop',     name:'Pokémon Tower',color:'yellow',emoji:'🟡',price:260,housePrice:150},
-  {id:27, type:'prop',     name:'Victory Road',color:'yellow',emoji:'🟡',price:260,housePrice:150},
-  {id:28, type:'utility',  name:'Elite Four',  emoji:'⚔️', price:150},
-  {id:29, type:'prop',     name:'Pokémon League',color:'yellow',emoji:'🟡',price:280,housePrice:150},
-  {id:30, type:'gotojail', name:'Team Rocket!',emoji:'🚫', price:0},
-  {id:31, type:'prop',     name:'Pokémon Gym 1',color:'green',emoji:'🟢',price:300,housePrice:200},
-  {id:32, type:'prop',     name:'Pokémon Gym 2',color:'green',emoji:'🟢',price:300,housePrice:200},
-  {id:33, type:'chance',   name:'Pokéball?',   emoji:'⚪', price:0},
-  {id:34, type:'prop',     name:'Pokémon Gym 3',color:'green',emoji:'🟢',price:320,housePrice:200},
-  {id:35, type:'railroad', name:'Fly HM',      emoji:'🦅', price:200},
-  {id:36, type:'chance',   name:'Pokéball?',   emoji:'⚪', price:0},
-  {id:37, type:'prop',     name:'Indigo Plateau',color:'dblue',emoji:'🔵',price:350,housePrice:200},
-  {id:38, type:'tax',      name:'Gym Rematch', emoji:'💸', price:100, taxAmount:100},
-  {id:39, type:'prop',     name:'Pokémon Master',color:'dblue',emoji:'🔵',price:400,housePrice:200},
-];
-
-const PLAYERS_DEF = [
-  { name:'Red',    emoji:'🔴', token:'🔴' },
-  { name:'Misty',  emoji:'💧', token:'💧' },
-  { name:'Brock',  emoji:'🪨', token:'🪨' },
-  { name:'Ash',    emoji:'⚡', token:'⚡' },
-];
-
-const CHANCE_CARDS = [
-  { text:'Professor Oak gave you a Rare Candy! Collect ₽200', amount: 200 },
-  { text:'You won the Pokémon Contest! Collect ₽150', amount: 150 },
-  { text:'Pay the Pokémon Center bill: ₽100', amount: -100 },
-  { text:'Your Pikachu used Thunderbolt on Team Rocket. Collect ₽50 from each player!', amount: 50, allPay: true },
-  { text:'Move to GO! Collect ₽200', amount: 200, moveToGo: true },
-  { text:'Caught a rare Pokémon! Collect ₽75', amount: 75 },
-  { text:'Lost a Gym Battle. Pay ₽80', amount: -80 },
-  { text:'Heal at Pokémon Center. Pay ₽50', amount: -50 },
-  { text:'Team Rocket stole your wallet. Pay ₽150', amount: -150 },
-  { text:'Found a hidden TM! Collect ₽100', amount: 100 },
-];
-
-const DICE_PIPS = {1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,2,3,7,8,9]};
-
-// ─── GAME STATE ───────────────────────────────────────────────
-let G = {};
-
-function newGame() {
-  G = {
-    players: PLAYERS_DEF.slice(0, 4).map((p, i) => ({
-      ...p,
-      idx: i,
-      money: 1500,
-      pos: 0,
-      properties: [],
-      jailTurns: 0,
-      inJail: false,
-      bankrupt: false,
-    })),
-    currentPlayer: 0,
-    properties: {}, // id => { owner, houses }
-    phase: 'roll', // roll | action | endturn
-    doublesCount: 0,
-    rolled: false,
-    lastRoll: [1,1],
-  };
-  document.getElementById('win-screen').classList.remove('show');
-  closeModal();
-  renderBoard();
-  updateUI();
-  log('🎮 Pokéopoly started! Good luck, trainers!', 'warn');
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
 }
+resize();
+window.addEventListener('resize', resize);
 
-// ─── BOARD RENDERING ─────────────────────────────────────────
-function renderBoard() {
-  const board = document.getElementById('board');
-  board.innerHTML = '';
+const SPEED = 2.8;
+const SUCK_RANGE = 90;
+const SUCK_RATE = 0.003;
+const DRAIN_BOOST = 1.8;
+const WING_SPEED = 0.38;
+const BLOOD_DROPS = 30;
 
-  // 11x11 grid
-  // Bottom row: spaces 0-10 (right to left)
-  // Left col: spaces 11-20 (bottom to top)
-  // Top row: spaces 21-30 (left to right... actually we do 20-30 reversed)
-  // Right col: spaces 31-39 (top to bottom)
+let running = false;
+let wingT = 0;
 
-  const grid = Array.from({length:11}, () => Array(11).fill(null));
+let players, bloodDrops, particles;
 
-  // Bottom row: col 10..0 => spaces 0..10
-  for (let i = 0; i <= 10; i++) grid[10][10-i] = {space: SPACES[i], side:'bottom'};
-  // Left col: row 9..0 => spaces 11..20
-  for (let i = 0; i <= 9; i++) grid[9-i][0] = {space: SPACES[11+i], side:'left'};
-  // Top row: col 0..10 => spaces 21..30 (but 20 is already placed)
-  // Actually top row col 1..10 => spaces 21..30
-  for (let i = 0; i <= 9; i++) grid[0][i+1] = {space: SPACES[21+i], side:'top'};
-  // Right col: row 1..9 => spaces 39..31
-  for (let i = 0; i <= 8; i++) grid[i+1][10] = {space: SPACES[39-i], side:'right'};
-
-  // Center
-  grid[1][1] = 'center';
-
-  for (let row = 0; row < 11; row++) {
-    for (let col = 0; col < 11; col++) {
-      const item = grid[row][col];
-      if (row >= 1 && row <= 9 && col >= 1 && col <= 9 && item !== 'center') continue;
-      if (item === 'center') {
-        const div = document.createElement('div');
-        div.style.gridColumn = '2 / 11';
-        div.style.gridRow = '2 / 11';
-        div.innerHTML = `<div class="board-center"><div class="center-logo">POKÉOPOLY</div><div class="center-pokeball">⚪</div></div>`;
-        board.appendChild(div);
-        continue;
-      }
-      if (!item) continue;
-      const {space, side} = item;
-      const div = createCell(space, side);
-      div.style.gridColumn = col + 1;
-      div.style.gridRow = row + 1;
-      div.id = `cell-${space.id}`;
-      board.appendChild(div);
+function initGame(){
+  players = [
+    {
+      x: W*0.28, y: H*0.5,
+      vx:0, vy:0,
+      angle: 0,
+      blood: 0.5,
+      color: '#cc3333', darkColor:'#881111', glowColor:'rgba(200,50,50,0.3)',
+      joyDx:0, joyDy:0,
+      sucking: false,
+      size: 22,
+      wingPhase: 0,
+      suckAnim: 0,
+      label: 'P1',
+      alive: true,
+    },
+    {
+      x: W*0.72, y: H*0.5,
+      vx:0, vy:0,
+      angle: Math.PI,
+      blood: 0.5,
+      color: '#2255dd', darkColor:'#112299', glowColor:'rgba(50,80,220,0.3)',
+      joyDx:0, joyDy:0,
+      sucking: false,
+      size: 22,
+      wingPhase: Math.PI,
+      suckAnim: 0,
+      label: 'P2',
+      alive: true,
     }
-  }
-
-  updateTokens();
+  ];
+  bloodDrops = [];
+  particles = [];
+  for(let i=0;i<BLOOD_DROPS;i++) spawnDrop();
 }
 
-function createCell(space, side) {
-  const div = document.createElement('div');
-  div.className = `cell ${side}`;
-  if (['corner','jail','gotojail','free','go'].includes(space.type)) div.classList.add('corner');
-  if (space.type === 'tax') div.classList.add('tax-cell');
-  if (space.type === 'chance') div.classList.add('chance-cell');
-  if (space.type === 'railroad') div.classList.add('railroad');
-  if (space.type === 'utility') div.classList.add('utility');
-
-  const propData = G.properties[space.id];
-  const colorGroup = space.color ? COLOR_GROUPS[space.color] : null;
-
-  let colorBar = '';
-  if (colorGroup) {
-    colorBar = `<div class="color-bar" style="background:${colorGroup.color}"></div>`;
-  }
-
-  let ownerDot = '';
-  if (propData && propData.owner !== undefined) {
-    ownerDot = `<div style="position:absolute;bottom:2px;right:2px;font-size:9px">${G.players[propData.owner].token}</div>`;
-  }
-
-  let houses = '';
-  if (propData && propData.houses > 0) {
-    const h = propData.houses;
-    const houseColor = h === 5 ? '#E53935' : '#4CAF50';
-    const houseEmoji = h === 5 ? '🏨' : '🏠'.repeat(Math.min(h, 4));
-    houses = `<div style="position:absolute;top:${side==='top'?'10':'2'}px;font-size:7px;z-index:2">${houseEmoji}</div>`;
-  }
-
-  let nameText = space.name;
-  let nameStyle = 'margin-top:10px';
-  if (['top'].includes(side)) nameStyle = 'margin-top:2px;margin-bottom:6px';
-
-  div.innerHTML = `
-    ${colorBar}
-    <div class="cell-emoji">${space.emoji}</div>
-    <div class="cell-name" style="${nameStyle}">${nameText}</div>
-    ${space.type === 'prop' ? `<div class="cell-price">₽${space.price}</div>` : ''}
-    ${ownerDot}
-    ${houses}
-  `;
-  div.onclick = () => showPropertyInfo(space.id);
-  return div;
-}
-
-function updateTokens() {
-  // Remove existing tokens
-  document.querySelectorAll('.token').forEach(t => t.remove());
-  const board = document.getElementById('board');
-
-  G.players.forEach((p, pi) => {
-    if (p.bankrupt) return;
-    const cellEl = document.getElementById(`cell-${p.pos}`);
-    if (!cellEl) return;
-    const token = document.createElement('div');
-    token.className = 'token';
-    token.textContent = p.token;
-    const offset = pi * 14;
-    token.style.left = `${4 + (pi % 2) * 16}px`;
-    token.style.top = `${4 + Math.floor(pi / 2) * 16}px`;
-    cellEl.appendChild(token);
+function spawnDrop(){
+  bloodDrops.push({
+    x: 40+Math.random()*(W-80),
+    y: 80+Math.random()*(H-160),
+    r: 4+Math.random()*6,
+    pulse: Math.random()*Math.PI*2,
+    vx: (Math.random()-0.5)*0.3,
+    vy: (Math.random()-0.5)*0.3,
   });
 }
 
-// ─── DICE ─────────────────────────────────────────────────────
-function showDie(dieN, val) {
-  for (let i = 1; i <= 9; i++) {
-    const el = document.getElementById(`d${dieN}p${i}`);
-    if (el) el.classList.toggle('on', DICE_PIPS[val].includes(i));
+function spawnParticle(x,y,color,count){
+  for(let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2;
+    const sp = 1+Math.random()*3;
+    particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,color,r:2+Math.random()*3});
   }
 }
 
-function animateDice(f1, f2, cb) {
-  let c = 0;
-  const iv = setInterval(() => {
-    showDie(1, Math.ceil(Math.random()*6));
-    showDie(2, Math.ceil(Math.random()*6));
-    c++;
-    if (c > 10) { clearInterval(iv); showDie(1,f1); showDie(2,f2); cb(); }
-  }, 60);
+function getSize(p){ return p.size + p.blood*28; }
+
+const BASE_R = 65, KNOB_R = 28;
+
+function setupJoystick(zoneId, baseId, knobId, playerIdx){
+  const zone = document.getElementById(zoneId);
+  const base = document.getElementById(baseId);
+  const knob = document.getElementById(knobId);
+  let origin = null;
+  const p = ()=>players[playerIdx];
+
+  base.style.width = BASE_R*2+'px';
+  base.style.height = BASE_R*2+'px';
+  knob.style.width = KNOB_R*2+'px';
+  knob.style.height = KNOB_R*2+'px';
+  knob.style.background = playerIdx===0 ? 'rgba(200,80,80,0.5)' : 'rgba(60,100,220,0.5)';
+  knob.style.border = '1.5px solid '+(playerIdx===0?'rgba(255,120,120,0.7)':'rgba(100,140,255,0.7)');
+
+  function updateKnob(dx,dy){
+    const len = Math.sqrt(dx*dx+dy*dy);
+    const max = BASE_R - KNOB_R;
+    const sc = len>max ? max/len : 1;
+    knob.style.left = (BASE_R - KNOB_R + dx*sc)+'px';
+    knob.style.top = (BASE_R - KNOB_R + dy*sc)+'px';
+    if(p()) { p().joyDx=dx; p().joyDy=dy; }
+  }
+
+  zone.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    const t=e.changedTouches[0];
+    const rect=zone.getBoundingClientRect();
+    origin={x:t.clientX,y:t.clientY};
+    base.style.display='block';
+    base.style.left=(t.clientX-rect.left-BASE_R)+'px';
+    base.style.top=(t.clientY-rect.top-BASE_R)+'px';
+    updateKnob(0,0);
+  },{passive:false});
+
+  zone.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(!origin) return;
+    const t=e.changedTouches[0];
+    updateKnob(t.clientX-origin.x, t.clientY-origin.y);
+  },{passive:false});
+
+  zone.addEventListener('touchend',e=>{
+    e.preventDefault();
+    origin=null;
+    base.style.display='none';
+    if(p()){p().joyDx=0;p().joyDy=0;}
+  },{passive:false});
 }
 
-// ─── CORE LOGIC ───────────────────────────────────────────────
-function rollDice() {
-  if (G.rolled) return;
-  const p = G.players[G.currentPlayer];
-  const d1 = Math.ceil(Math.random()*6);
-  const d2 = Math.ceil(Math.random()*6);
-  const total = d1 + d2;
-  const doubles = d1 === d2;
-  G.lastRoll = [d1, d2];
-  G.rolled = true;
+function setupSuck(btnId, playerIdx){
+  const btn = document.getElementById(btnId);
+  btn.addEventListener('touchstart',e=>{e.preventDefault();if(players)players[playerIdx].sucking=true;},{passive:false});
+  btn.addEventListener('touchend',e=>{e.preventDefault();if(players)players[playerIdx].sucking=false;},{passive:false});
+  btn.addEventListener('mousedown',()=>{if(players)players[playerIdx].sucking=true;});
+  btn.addEventListener('mouseup',()=>{if(players)players[playerIdx].sucking=false;});
+}
 
-  document.getElementById('rollBtn').disabled = true;
+setupJoystick('joy1-zone','joy1-base','joy1-knob',0);
+setupJoystick('joy2-zone','joy2-base','joy2-knob',1);
+setupSuck('suck1-btn',0);
+setupSuck('suck2-btn',1);
 
-  animateDice(d1, d2, () => {
-    log(`${p.token} ${p.name} rolled ${d1}+${d2}=${total}${doubles?' (DOUBLES! 🎉)':''}`, 'action');
+function update(){
+  wingT += WING_SPEED;
 
-    if (p.inJail) {
-      if (doubles) {
-        p.inJail = false;
-        p.jailTurns = 0;
-        log(`${p.name} rolled doubles and escaped jail!`, 'good');
-        G.doublesCount = 0;
-      } else {
-        p.jailTurns++;
-        if (p.jailTurns >= 3) {
-          p.inJail = false;
-          p.jailTurns = 0;
-          p.money -= 50;
-          log(`${p.name} paid ₽50 bail after 3 turns!`, 'bad');
-        } else {
-          log(`${p.name} is stuck in jail. Turn ${p.jailTurns}/3`, 'bad');
-          showEndTurn();
-          updateUI();
-          return;
-        }
+  players.forEach((p,i)=>{
+    if(!p.alive) return;
+    const dx=p.joyDx, dy=p.joyDy;
+    const len=Math.sqrt(dx*dx+dy*dy);
+    if(len>10){
+      const tx=dx/len, ty=dy/len;
+      p.vx += tx*0.4;
+      p.vy += ty*0.4;
+      const targetAngle = Math.atan2(ty,tx);
+      let da = targetAngle - p.angle;
+      while(da>Math.PI) da-=Math.PI*2;
+      while(da<-Math.PI) da+=Math.PI*2;
+      p.angle += da*0.15;
+    }
+    p.vx *= 0.88;
+    p.vy *= 0.88;
+    const spd = Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+    if(spd>SPEED){ p.vx=p.vx/spd*SPEED; p.vy=p.vy/spd*SPEED; }
+
+    p.x += p.vx; p.y += p.vy;
+    const r=getSize(p);
+    p.x = Math.max(r, Math.min(W-r, p.x));
+    p.y = Math.max(80+r, Math.min(H-r, p.y));
+    p.wingPhase += 0.45;
+
+    // eat blood drops
+    for(let j=bloodDrops.length-1;j>=0;j--){
+      const bd=bloodDrops[j];
+      const dist=Math.hypot(p.x-bd.x,p.y-bd.y);
+      if(dist<r+bd.r+4){
+        const gain = (bd.r/10)*0.04;
+        p.blood = Math.min(1, p.blood+gain);
+        spawnParticle(bd.x,bd.y,p.color,4);
+        bloodDrops.splice(j,1);
+        spawnDrop();
+      }
+    }
+
+    // suck from opponent
+    const opp = players[1-i];
+    if(p.sucking && opp.alive){
+      const dist=Math.hypot(p.x-opp.x, p.y-opp.y);
+      p.suckAnim = Math.min(1, p.suckAnim+0.15);
+      if(dist < SUCK_RANGE + getSize(p) + getSize(opp)){
+        const stolen = SUCK_RATE * DRAIN_BOOST;
+        opp.blood = Math.max(0, opp.blood - stolen);
+        p.blood = Math.min(1, p.blood + stolen*0.8);
+        if(Math.random()<0.3) spawnParticle(
+          (p.x+opp.x)/2,(p.y+opp.y)/2,
+          '#cc2222',3
+        );
+        if(opp.blood<=0){ endGame(i); return; }
       }
     } else {
-      if (doubles) {
-        G.doublesCount++;
-        if (G.doublesCount >= 3) {
-          sendToJail(p);
-          updateUI();
-          return;
-        }
-      } else {
-        G.doublesCount = 0;
+      p.suckAnim = Math.max(0, p.suckAnim-0.1);
+    }
+
+    // natural blood drain
+    p.blood = Math.max(0, p.blood - 0.00008);
+    if(p.blood<=0){ endGame(1-i); return; }
+  });
+
+  bloodDrops.forEach(bd=>{
+    bd.pulse += 0.05;
+    bd.x += bd.vx; bd.y += bd.vy;
+    bd.x = Math.max(20,Math.min(W-20,bd.x));
+    bd.y = Math.max(80,Math.min(H-80,bd.y));
+  });
+
+  particles = particles.filter(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    p.vx*=0.92; p.vy*=0.92;
+    p.life-=0.04;
+    return p.life>0;
+  });
+}
+
+function drawMosquito(p){
+  const r = getSize(p);
+  const ax=p.x, ay=p.y;
+  ctx.save();
+  ctx.translate(ax,ay);
+  ctx.rotate(p.angle);
+
+  // suck beam
+  if(p.suckAnim>0.05){
+    const opp=players[p===players[0]?1:0];
+    if(opp.alive){
+      const dist=Math.hypot(ax-opp.x,ay-opp.y);
+      if(dist < SUCK_RANGE+r+getSize(opp)+40){
+        ctx.save();
+        ctx.rotate(-p.angle);
+        ctx.globalAlpha=p.suckAnim*0.35;
+        ctx.strokeStyle=p.color;
+        ctx.lineWidth=6+p.suckAnim*8;
+        ctx.setLineDash([8,6]);
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(opp.x-ax,opp.y-ay);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.globalAlpha=1;
+        ctx.restore();
       }
     }
+  }
 
-    movePlayer(p, total, doubles);
+  // wings
+  const wflap = Math.sin(p.wingPhase)*0.7;
+  const wflap2 = Math.sin(p.wingPhase+Math.PI)*0.7;
+  ctx.globalAlpha=0.55;
+  ctx.fillStyle='rgba(200,220,255,0.6)';
+  ctx.strokeStyle='rgba(180,200,255,0.4)';
+  ctx.lineWidth=0.5;
+  [[-1,wflap],[1,wflap2]].forEach(([side,flap])=>{
+    ctx.save();
+    ctx.translate(0,-r*0.1);
+    ctx.rotate(side*(0.6+flap*0.5));
+    ctx.beginPath();
+    ctx.ellipse(side*r*0.8, -r*0.5, r*0.75, r*0.35, side*0.3, 0, Math.PI*2);
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
   });
-}
+  ctx.globalAlpha=1;
 
-function movePlayer(p, steps, doubles) {
-  const oldPos = p.pos;
-  const newPos = (p.pos + steps) % 40;
-  if (newPos < oldPos && !p.inJail) {
-    p.money += 200;
-    log(`${p.name} passed GO! Collected ₽200`, 'good');
-  }
-  p.pos = newPos;
-  updateTokens();
-  setTimeout(() => landOn(p, doubles), 400);
-}
+  // body glow
+  ctx.beginPath();
+  ctx.arc(0,0,r+8,0,Math.PI*2);
+  ctx.fillStyle=p.glowColor;
+  ctx.fill();
 
-function landOn(p, doubles) {
-  const space = SPACES[p.pos];
-  log(`${p.token} landed on: ${space.name}`, '');
+  // abdomen (blood sac - scales with blood)
+  const abR = r*0.75 + p.blood*r*0.35;
+  ctx.beginPath();
+  ctx.ellipse(0, r*0.25, abR*0.65, abR, 0, 0, Math.PI*2);
+  ctx.fillStyle=p.darkColor;
+  ctx.fill();
+  ctx.strokeStyle=p.color;
+  ctx.lineWidth=1.5;
+  ctx.stroke();
 
-  if (space.type === 'go') {
-    p.money += 200;
-    log(`Landed on GO! Extra ₽200!`, 'good');
-    showEndTurn(doubles);
-  } else if (space.type === 'jail' || space.type === 'free') {
-    log(`Just visiting / Free Heal!`, '');
-    showEndTurn(doubles);
-  } else if (space.type === 'gotojail') {
-    sendToJail(p);
-    updateUI();
-  } else if (space.type === 'tax') {
-    p.money -= space.taxAmount;
-    log(`${p.name} paid ₽${space.taxAmount} in taxes!`, 'bad');
-    checkBankruptcy(p);
-    showEndTurn(doubles);
-  } else if (space.type === 'chance') {
-    const card = CHANCE_CARDS[Math.floor(Math.random()*CHANCE_CARDS.length)];
-    doChanceCard(p, card, doubles);
-  } else if (space.type === 'railroad' || space.type === 'utility') {
-    handleProperty(p, space.id, space, doubles);
-  } else if (space.type === 'prop') {
-    handleProperty(p, space.id, space, doubles);
-  } else {
-    showEndTurn(doubles);
-  }
-  updateUI();
-}
+  // blood fill inside abdomen
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(0, r*0.25, abR*0.65, abR, 0, 0, Math.PI*2);
+  ctx.clip();
+  const fillY = r*0.25 + abR - p.blood*abR*2;
+  ctx.fillStyle='#cc1111';
+  ctx.fillRect(-abR, fillY, abR*2, abR*2);
+  ctx.restore();
 
-function doChanceCard(p, card, doubles) {
-  showModal('⚪ POKÉBALL', card.text, '⚪', '', [
-    { label:'OK', fn: () => {
-      if (card.moveToGo) {
-        p.pos = 0;
-        p.money += 200 + card.amount;
-        updateTokens();
-        log(`${p.name} moved to GO! +₽${200+card.amount}`, 'good');
-      } else if (card.allPay) {
-        let total = 0;
-        G.players.forEach((other, oi) => {
-          if (oi !== p.idx && !other.bankrupt) {
-            other.money -= card.amount;
-            p.money += card.amount;
-            total += card.amount;
-          }
-        });
-        log(`Each trainer paid ${p.name} ₽${card.amount}! Total: ₽${total}`, card.amount > 0 ? 'good':'bad');
-      } else {
-        p.money += card.amount;
-        log(`Chance: ${card.amount > 0 ? '+':''}₽${card.amount}`, card.amount > 0 ? 'good':'bad');
-      }
-      checkBankruptcy(p);
-      closeModal();
-      showEndTurn(doubles);
-      updateUI();
-    }}
-  ]);
-}
+  // thorax
+  ctx.beginPath();
+  ctx.ellipse(0, -r*0.3, r*0.5, r*0.6, 0, 0, Math.PI*2);
+  ctx.fillStyle=p.color;
+  ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.2)';
+  ctx.lineWidth=1;
+  ctx.stroke();
 
-function handleProperty(p, id, space, doubles) {
-  const propData = G.properties[id];
-  const colorGroup = space.color ? COLOR_GROUPS[space.color] : null;
+  // head
+  ctx.beginPath();
+  ctx.arc(0,-r*0.85,r*0.3,0,Math.PI*2);
+  ctx.fillStyle=p.color;
+  ctx.fill();
 
-  if (!propData) {
-    // Unowned — offer to buy
-    showModal(space.emoji + ' ' + space.name, `Buy for ₽${space.price}?\nYou have ₽${p.money}`,
-      space.emoji, colorGroup ? colorGroup.color : '',
-      [
-        { label:`BUY ₽${space.price}`, fn: () => {
-          if (p.money >= space.price) {
-            p.money -= space.price;
-            G.properties[id] = { owner: p.idx, houses: 0 };
-            p.properties.push(id);
-            log(`${p.name} bought ${space.name} for ₽${space.price}!`, 'good');
-          } else {
-            log(`${p.name} can't afford it!`, 'bad');
-          }
-          closeModal(); renderBoard(); showEndTurn(doubles); updateUI();
-        }},
-        { label:'PASS', fn: () => { closeModal(); showEndTurn(doubles); }}
-      ]
-    );
-  } else if (propData.owner === p.idx) {
-    // Own it — offer to build
-    const ownedInGroup = space.color ? G.players[p.idx].properties.filter(pid => SPACES[pid].color === space.color) : [];
-    const groupSize = space.color ? SPACES.filter(s => s.color === space.color).length : 0;
-    const hasMonopoly = ownedInGroup.length === groupSize;
-    const canBuild = hasMonopoly && space.housePrice && propData.houses < 5;
+  // proboscis (straw)
+  ctx.beginPath();
+  ctx.moveTo(0,-r*1.1);
+  ctx.lineTo(0,-r*1.8);
+  ctx.strokeStyle=p.color;
+  ctx.lineWidth=3;
+  ctx.stroke();
 
-    if (canBuild) {
-      const cost = space.housePrice;
-      showModal(space.emoji + ' ' + space.name, `You own this! Build a house for ₽${cost}? (${propData.houses}/4 houses)`,
-        space.emoji, colorGroup ? colorGroup.color : '',
-        [
-          { label:`BUILD ₽${cost}`, fn: () => {
-            if (p.money >= cost) {
-              p.money -= cost;
-              propData.houses++;
-              log(`${p.name} built a ${propData.houses===5?'HOTEL':'house'} on ${space.name}!`, 'good');
-            }
-            closeModal(); renderBoard(); showEndTurn(doubles); updateUI();
-          }},
-          { label:'SKIP', fn: () => { closeModal(); showEndTurn(doubles); }}
-        ]
-      );
-    } else {
-      log(`${p.name} owns ${space.name}.`, '');
-      showEndTurn(doubles);
-    }
-  } else {
-    // Owned by opponent — pay rent
-    const owner = G.players[propData.owner];
-    let rent;
-    if (space.type === 'railroad') {
-      const railsOwned = owner.properties.filter(pid => SPACES[pid].type === 'railroad').length;
-      rent = 25 * Math.pow(2, railsOwned - 1);
-    } else if (space.type === 'utility') {
-      rent = (G.lastRoll[0] + G.lastRoll[1]) * 4;
-    } else {
-      const rentTable = colorGroup.rent;
-      rent = rentTable[propData.houses] || rentTable[0];
-    }
-    p.money -= rent;
-    owner.money += rent;
-    log(`${p.name} paid ₽${rent} rent to ${owner.name}!`, 'bad');
-    checkBankruptcy(p);
-    showEndTurn(doubles);
-  }
-  updateUI();
-}
-
-function sendToJail(p) {
-  p.pos = 10;
-  p.inJail = true;
-  p.jailTurns = 0;
-  G.doublesCount = 0;
-  log(`${p.name} was sent to JAIL by Team Rocket! 🚫`, 'bad');
-  showModal('🚫 TEAM ROCKET!', `${p.name} is going to jail!`, '🚫', '', [
-    { label:'OK', fn: () => { closeModal(); showEndTurn(false); updateUI(); }}
-  ]);
-  updateTokens();
-}
-
-function checkBankruptcy(p) {
-  if (p.money <= 0) {
-    p.bankrupt = true;
-    p.money = 0;
-    // Return properties
-    p.properties.forEach(pid => { delete G.properties[pid]; });
-    p.properties = [];
-    log(`💀 ${p.name} is BANKRUPT! Out of the game.`, 'bad');
-    checkWin();
-    renderBoard();
-  }
-}
-
-function checkWin() {
-  const alive = G.players.filter(p => !p.bankrupt);
-  if (alive.length === 1) {
-    const w = alive[0];
-    document.getElementById('win-emoji').textContent = w.token;
-    document.getElementById('win-title').textContent = `${w.name} WINS!`;
-    document.getElementById('win-sub').textContent = `The Ultimate Pokémon Trainer with ₽${w.money}!`;
-    document.getElementById('win-screen').classList.add('show');
-  }
-}
-
-function showEndTurn(doubles) {
-  if (doubles) {
-    G.rolled = false;
-    document.getElementById('rollBtn').disabled = false;
-    log(`Doubles! Roll again!`, 'warn');
-  } else {
-    document.getElementById('endTurnBtn').style.display = 'block';
-  }
-}
-
-function endTurn() {
-  document.getElementById('endTurnBtn').style.display = 'none';
-  document.getElementById('rollBtn').disabled = false;
-  G.rolled = false;
-  G.doublesCount = 0;
-
-  let next = (G.currentPlayer + 1) % G.players.length;
-  while (G.players[next].bankrupt) next = (next + 1) % G.players.length;
-  G.currentPlayer = next;
-
-  document.getElementById('turn-label').textContent = `${G.players[next].name}'s Turn`;
-  updateUI();
-}
-
-// ─── MODAL ────────────────────────────────────────────────────
-function showModal(title, desc, emoji, color, btns) {
-  document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-desc').textContent = desc;
-  document.getElementById('modal-emoji').textContent = emoji;
-  const colorEl = document.getElementById('modal-color');
-  if (color) { colorEl.style.background = color; colorEl.style.display = 'block'; }
-  else colorEl.style.display = 'none';
-  const btnsEl = document.getElementById('modal-btns');
-  btnsEl.innerHTML = '';
-  btns.forEach(b => {
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-primary btn-sm';
-    btn.textContent = b.label;
-    btn.onclick = b.fn;
-    btnsEl.appendChild(btn);
-  });
-  document.getElementById('modal').classList.add('show');
-}
-
-function closeModal() {
-  document.getElementById('modal').classList.remove('show');
-}
-
-function showPropertyInfo(id) {
-  const space = SPACES[id];
-  if (space.type !== 'prop' && space.type !== 'railroad' && space.type !== 'utility') return;
-  const propData = G.properties[id];
-  const colorGroup = space.color ? COLOR_GROUPS[space.color] : null;
-  const owner = propData ? G.players[propData.owner] : null;
-  const desc = owner
-    ? `Owner: ${owner.token} ${owner.name}\nHouses: ${propData.houses}/4${propData.houses===5?' (HOTEL)':''}`
-    : `Unowned — Price: ₽${space.price}`;
-  showModal(space.emoji + ' ' + space.name, desc, space.emoji, colorGroup ? colorGroup.color : '', [
-    { label:'CLOSE', fn: closeModal }
-  ]);
-}
-
-// ─── UI UPDATE ────────────────────────────────────────────────
-function updateUI() {
-  const pl = document.getElementById('player-list');
-  pl.innerHTML = '';
-  G.players.forEach((p, i) => {
-    const div = document.createElement('div');
-    div.className = `player-row${i === G.currentPlayer && !p.bankrupt ? ' active-player' : ''}${p.bankrupt ? ' bankrupt' : ''}`;
-    div.innerHTML = `
-      <div class="player-token">${p.token}</div>
-      <div class="player-info">
-        <div class="player-name">${p.name}</div>
-        <div class="player-money">₽${p.money.toLocaleString()}</div>
-        <div class="player-pos-text">${SPACES[p.pos].name}${p.inJail ? ' 🔒' : ''}</div>
-      </div>
-    `;
-    pl.appendChild(div);
+  // eyes
+  [[-0.12,0.1],[0.12,0.1]].forEach(([ex,ey])=>{
+    ctx.beginPath();
+    ctx.arc(ex*r,-r*0.82+ey*r,r*0.1,0,Math.PI*2);
+    ctx.fillStyle='#ff3333';
+    ctx.fill();
   });
 
-  // Update property list
-  const propList = document.getElementById('prop-list');
-  propList.innerHTML = '';
-  SPACES.filter(s => s.type === 'prop' || s.type === 'railroad' || s.type === 'utility').forEach(s => {
-    const pd = G.properties[s.id];
-    const cg = s.color ? COLOR_GROUPS[s.color] : null;
-    const div = document.createElement('div');
-    div.className = 'prop-item';
-    div.innerHTML = `
-      <div class="prop-color-dot" style="background:${cg ? cg.color : '#555'}"></div>
-      <div class="prop-item-name">${s.name}</div>
-      <div class="prop-item-owner">${pd ? G.players[pd.owner].token : '—'}</div>
-      <div class="prop-houses">${pd && pd.houses > 0 ? '🏠'.repeat(Math.min(pd.houses,4))+(pd.houses===5?'🏨':'') : ''}</div>
-    `;
-    propList.appendChild(div);
+  // legs
+  const legAngles=[-0.4,0,0.4];
+  legAngles.forEach(la=>{
+    [-1,1].forEach(side=>{
+      ctx.beginPath();
+      const lx=side*r*0.45, ly=-r*0.1+la*r*0.4;
+      ctx.moveTo(lx,ly);
+      ctx.lineTo(lx+side*r*0.7, ly+r*0.4);
+      ctx.strokeStyle=p.darkColor;
+      ctx.lineWidth=1.5;
+      ctx.stroke();
+    });
   });
 
-  // Cells
-  document.querySelectorAll('.cell').forEach(c => {
-    const id = parseInt(c.id.split('-')[1]);
-    if (isNaN(id)) return;
-    const space = SPACES[id];
-    const propData = G.properties[id];
-    const colorGroup = space.color ? COLOR_GROUPS[space.color] : null;
+  // label
+  ctx.rotate(-p.angle);
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.font=`bold ${Math.round(r*0.6)}px monospace`;
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText(p.label, 0, -r*2.2);
 
-    // Update owner dot
-    let ownerDot = c.querySelector('.owner-dot');
-    if (!ownerDot) {
-      ownerDot = document.createElement('div');
-      ownerDot.className = 'owner-dot';
-      ownerDot.style.cssText = 'position:absolute;bottom:2px;right:2px;font-size:9px;z-index:5';
-      c.appendChild(ownerDot);
-    }
-    ownerDot.textContent = propData ? G.players[propData.owner].token : '';
+  ctx.restore();
+}
+
+function drawBloodDrop(bd){
+  bd.pulse+=0.03;
+  const pulse=0.85+Math.sin(bd.pulse)*0.15;
+  ctx.save();
+  ctx.translate(bd.x,bd.y);
+  ctx.scale(pulse,pulse);
+  ctx.beginPath();
+  ctx.arc(0,0,bd.r,0,Math.PI*2);
+  ctx.fillStyle='#aa1111';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-bd.r*0.25,-bd.r*0.25,bd.r*0.3,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,100,100,0.5)';
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawSuckRange(p){
+  if(!p.sucking||!p.alive) return;
+  const r=getSize(p);
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,SUCK_RANGE+r,0,Math.PI*2);
+  ctx.strokeStyle=p.color;
+  ctx.globalAlpha=0.15+Math.sin(Date.now()*0.01)*0.05;
+  ctx.lineWidth=2;
+  ctx.setLineDash([6,4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha=1;
+}
+
+function drawBG(){
+  ctx.fillStyle='#0d1117';
+  ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.025)';
+  ctx.lineWidth=1;
+  const gs=60;
+  for(let x=0;x<W;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+function drawHUD(){
+  const p0=players[0], p1=players[1];
+  document.getElementById('bar1-fill').style.width=Math.round(p0.blood*100)+'%';
+  document.getElementById('bar2-fill').style.width=Math.round(p1.blood*100)+'%';
+  document.getElementById('lbl1').textContent='P1 '+Math.round(p0.blood*100)+'%';
+  document.getElementById('lbl2').textContent=Math.round(p1.blood*100)+'% P2';
+}
+
+function drawParticles(){
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
+    ctx.fillStyle=p.color;
+    ctx.globalAlpha=p.life*0.8;
+    ctx.fill();
   });
+  ctx.globalAlpha=1;
 }
 
-function log(msg, type) {
-  const lb = document.getElementById('log');
-  const d = document.createElement('div');
-  d.className = `log-line ${type}`;
-  d.textContent = msg;
-  lb.prepend(d);
-  while (lb.children.length > 40) lb.removeChild(lb.lastChild);
+function drawProximityAlert(){
+  const p0=players[0],p1=players[1];
+  const d=Math.hypot(p0.x-p1.x,p0.y-p1.y);
+  const threshold=SUCK_RANGE+getSize(p0)+getSize(p1);
+  if(d<threshold+30){
+    const alpha=(1-(d/threshold))*0.3;
+    ctx.beginPath();
+    ctx.arc((p0.x+p1.x)/2,(p0.y+p1.y)/2,d/2,0,Math.PI*2);
+    ctx.fillStyle=`rgba(200,20,20,${alpha})`;
+    ctx.fill();
+  }
 }
 
-// Start!
-newGame();
+function draw(){
+  drawBG();
+  drawProximityAlert();
+  bloodDrops.forEach(drawBloodDrop);
+  players.forEach(drawSuckRange);
+  drawParticles();
+  players.forEach(p=>{ if(p.alive) drawMosquito(p); });
+  drawHUD();
+}
+
+function endGame(winnerIdx){
+  running=false;
+  players.forEach(p=>p.alive=false);
+  const w=document.getElementById('winner-overlay');
+  const wt=document.getElementById('winner-text');
+  const ws=document.getElementById('winner-sub');
+  wt.textContent = winnerIdx===0 ? 'P1 WINS!' : 'P2 WINS!';
+  wt.style.color = winnerIdx===0 ? '#cc3333' : '#2255dd';
+  ws.textContent = 'drained the opponent dry';
+  w.style.display='flex';
+}
+
+let animId;
+function loop(){
+  if(!running) return;
+  animId=requestAnimationFrame(loop);
+  update();
+  draw();
+}
+
+document.getElementById('play-btn').addEventListener('click',()=>{
+  document.getElementById('overlay').style.display='none';
+  initGame();
+  running=true;
+  loop();
+});
+document.getElementById('retry-btn').addEventListener('click',()=>{
+  document.getElementById('winner-overlay').style.display='none';
+  if(animId) cancelAnimationFrame(animId);
+  initGame();
+  running=true;
+  loop();
+});
 </script>
 </body>
 </html>
