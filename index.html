@@ -3,574 +3,873 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mosquito.io</title>
+<title>Fishnoply</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;overflow:hidden;background:#0d1117;font-family:monospace;}
-canvas{display:block;position:fixed;top:0;left:0;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:'Segoe UI',sans-serif;color:#fff;}
+#splash{position:fixed;inset:0;background:linear-gradient(180deg,#0a1628 0%,#0d2444 50%,#0a1628 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;}
+#splash h1{font-size:52px;color:#00d4ff;text-shadow:0 0 30px #00a8cc,0 0 60px #007799;letter-spacing:4px;margin-bottom:4px;}
+#splash .tagline{color:#4ab8d4;font-size:14px;letter-spacing:3px;margin-bottom:8px;}
+#splash .credit{color:#1a4a6a;font-size:11px;letter-spacing:2px;margin-bottom:40px;}
+#splash .fish-row{font-size:36px;margin-bottom:40px;letter-spacing:8px;}
+#splash .start-btn{background:linear-gradient(135deg,#006688,#00aacc);color:#fff;font-size:20px;font-weight:bold;padding:16px 60px;border:none;border-radius:40px;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 24px rgba(0,170,204,0.4);}
+#splash .start-btn:active{transform:scale(0.97);}
 
-#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
+#game{display:none;position:fixed;inset:0;flex-direction:column;}
+#topbar{background:rgba(0,20,40,0.95);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,200,255,0.15);flex-shrink:0;}
+#topbar .title{font-size:18px;color:#00d4ff;font-weight:bold;letter-spacing:2px;}
+#topbar .pearls{font-size:14px;color:#ffd700;}
+#board-wrap{flex:1;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+#board-canvas{touch-action:none;}
 
-.blood-bar-wrap{position:fixed;width:44%;height:22px;top:14px;z-index:10;}
-#bar1-wrap{left:4%;background:rgba(0,0,0,0.5);border-radius:12px;overflow:hidden;border:1.5px solid rgba(220,60,60,0.5);}
-#bar2-wrap{right:4%;background:rgba(0,0,0,0.5);border-radius:12px;overflow:hidden;border:1.5px solid rgba(60,120,255,0.5);}
-.bar-fill{height:100%;transition:width 0.1s;border-radius:10px;}
-#bar1-fill{background:#cc3333;width:50%;}
-#bar2-fill{background:#2255dd;width:50%;margin-left:auto;}
-.bar-label{position:fixed;top:17px;font-size:11px;font-weight:bold;color:#fff;z-index:11;letter-spacing:1px;text-shadow:0 1px 3px #000;}
-#lbl1{left:6%;}
-#lbl2{right:6%;text-align:right;}
+#panel{background:rgba(0,15,35,0.97);border-top:1px solid rgba(0,200,255,0.2);padding:10px 12px;flex-shrink:0;min-height:180px;max-height:220px;overflow-y:auto;}
+#panel .turn-header{font-size:13px;color:#00d4ff;font-weight:bold;margin-bottom:6px;letter-spacing:1px;}
+#panel .log{font-size:12px;color:#7ab8cc;line-height:1.6;margin-bottom:8px;max-height:60px;overflow-y:auto;}
+#panel .actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{padding:9px 18px;border:none;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer;letter-spacing:1px;}
+.btn-primary{background:#006688;color:#fff;}
+.btn-primary:active{background:#004466;}
+.btn-secondary{background:#1a3a4a;color:#7ab8cc;border:1px solid #2a5a6a;}
+.btn-secondary:active{background:#0a2030;}
+.btn-danger{background:#6a1a1a;color:#ffaaaa;border:1px solid #aa3333;}
+.btn-danger:active{background:#4a0a0a;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
 
-#vs{position:fixed;top:10px;left:50%;transform:translateX(-50%);font-size:13px;color:#aaa;font-weight:bold;letter-spacing:2px;z-index:11;}
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:50;display:none;align-items:center;justify-content:center;padding:16px;}
+#modal{background:#0a1e35;border:1px solid rgba(0,200,255,0.3);border-radius:16px;padding:20px;width:100%;max-width:340px;max-height:80vh;overflow-y:auto;}
+#modal h2{color:#00d4ff;font-size:18px;margin-bottom:10px;letter-spacing:1px;}
+#modal p{color:#7ab8cc;font-size:13px;line-height:1.6;margin-bottom:12px;}
+#modal .modal-actions{display:flex;gap:8px;flex-wrap:wrap;}
 
-#overlay{position:fixed;inset:0;background:rgba(13,17,23,0.96);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30;}
-#overlay h1{font-size:48px;color:#cc3333;letter-spacing:3px;margin-bottom:4px;text-shadow:0 0 30px #aa2222;}
-#overlay .sub{color:#555;font-size:12px;margin-bottom:10px;letter-spacing:2px;}
-#overlay .desc{color:#888;font-size:13px;text-align:center;max-width:280px;line-height:1.7;margin-bottom:36px;}
-#overlay .how{color:#666;font-size:11px;text-align:center;max-width:300px;line-height:1.8;margin-bottom:28px;}
-.play-btn{background:#cc3333;color:#fff;font-size:18px;font-weight:bold;padding:14px 56px;border:none;border-radius:30px;cursor:pointer;letter-spacing:2px;}
-.play-btn:active{transform:scale(0.96);}
+#dice-overlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;pointer-events:none;}
+#dice-display{font-size:80px;text-align:center;text-shadow:0 0 30px #fff;}
 
-#winner-overlay{position:fixed;inset:0;background:rgba(13,17,23,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:30;}
-#winner-text{font-size:36px;font-weight:bold;margin-bottom:8px;letter-spacing:2px;}
-#winner-sub{color:#888;font-size:14px;margin-bottom:32px;}
-.retry-btn{background:#333;color:#fff;font-size:16px;font-weight:bold;padding:12px 44px;border:none;border-radius:30px;cursor:pointer;letter-spacing:1px;}
-.retry-btn:active{transform:scale(0.96);}
+#players-bar{background:rgba(0,10,25,0.9);padding:6px 8px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid rgba(0,200,255,0.1);}
+.player-chip{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border-radius:20px;padding:4px 10px;font-size:11px;white-space:nowrap;border:1px solid transparent;}
+.player-chip.active{border-color:rgba(0,200,255,0.5);background:rgba(0,200,255,0.1);}
+.player-chip.bankrupt{opacity:0.35;}
+.chip-token{font-size:16px;}
+.chip-name{color:#ccc;font-weight:bold;}
+.chip-pearls{color:#ffd700;}
 
-.joy-zone{position:fixed;pointer-events:all;z-index:8;}
-#joy1-zone{bottom:0;left:0;width:50%;height:46%;}
-#joy2-zone{bottom:0;right:0;width:50%;height:46%;}
-.joy-base{position:absolute;border-radius:50%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);display:none;pointer-events:none;}
-.joy-knob{position:absolute;border-radius:50%;pointer-events:none;}
-
-#suck1-btn{position:fixed;bottom:28px;left:calc(25% - 32px);width:64px;height:64px;border-radius:50%;background:rgba(200,50,50,0.2);border:2px solid rgba(200,50,50,0.5);color:#ff6666;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;z-index:9;cursor:pointer;letter-spacing:.5px;pointer-events:all;}
-#suck1-btn:active{background:rgba(200,50,50,0.5);}
-#suck2-btn{position:fixed;bottom:28px;right:calc(25% - 32px);width:64px;height:64px;border-radius:50%;background:rgba(50,80,220,0.2);border:2px solid rgba(50,80,220,0.5);color:#6699ff;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;z-index:9;cursor:pointer;letter-spacing:.5px;pointer-events:all;}
-#suck2-btn:active{background:rgba(50,80,220,0.5);}
-
-.divider{position:fixed;top:0;left:50%;width:1px;height:100%;background:rgba(255,255,255,0.06);z-index:4;pointer-events:none;}
-.p-label{position:fixed;bottom:105px;font-size:10px;color:#444;letter-spacing:1px;z-index:9;}
-#lbl-p1{left:4%;}
-#lbl-p2{right:4%;text-align:right;}
+#prop-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:55;display:none;align-items:flex-end;justify-content:center;}
+#prop-modal{background:#0a1e35;border-top:2px solid rgba(0,200,255,0.3);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:400px;max-height:70vh;overflow-y:auto;}
 </style>
 </head>
 <body>
 
-<canvas id="c"></canvas>
-
-<div class="divider"></div>
-
-<div class="blood-bar-wrap" id="bar1-wrap"><div class="bar-fill" id="bar1-fill"></div></div>
-<div class="blood-bar-wrap" id="bar2-wrap"><div class="bar-fill" id="bar2-fill"></div></div>
-<div class="bar-label" id="lbl1">P1 🩸</div>
-<div class="bar-label" id="lbl2">🩸 P2</div>
-<div id="vs">VS</div>
-<div style="position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:50;pointer-events:none;text-align:center;padding-top:42px;white-space:nowrap;">
-  <span style="font-size:13px;font-weight:bold;color:#fff;letter-spacing:2px;text-shadow:0 0 10px #cc3333,0 1px 4px #000;">Created by Ethan Fang · 2026</span>
+<div id="splash">
+  <div class="fish-row">🐟🦀🦑🦈</div>
+  <h1>FISHNOPLY</h1>
+  <div class="tagline">THE OCEAN PROPERTY GAME</div>
+  <div class="credit">Created by Ethan & Elroy Fang · 2026</div>
+  <button class="start-btn" id="start-btn">DIVE IN 🌊</button>
 </div>
 
-<div class="joy-zone" id="joy1-zone">
-  <div class="joy-base" id="joy1-base"><div class="joy-knob" id="joy1-knob"></div></div>
-</div>
-<div class="joy-zone" id="joy2-zone">
-  <div class="joy-base" id="joy2-base"><div class="joy-knob" id="joy2-knob"></div></div>
-</div>
-
-<button id="suck1-btn">SUCK</button>
-<button id="suck2-btn">SUCK</button>
-<div class="p-label" id="lbl-p1">P1 ZONE</div>
-<div class="p-label" id="lbl-p2">P2 ZONE</div>
-<div style="position:fixed;bottom:8px;left:50%;transform:translateX(-50%);font-size:11px;color:#555;letter-spacing:1px;z-index:50;pointer-events:none;white-space:nowrap;text-shadow:0 1px 4px #000;">Created by Ethan Fang</div>
-
-<div id="overlay">
-  <h1>MOSQUITO</h1>
-  <div class="sub">2 PLAYER BATTLE</div>
-  <div class="desc">Two mosquitoes. One screen. Suck blood from your opponent to grow fatter — drain them dry to win!</div>
-  <div class="how">
-    P1 (left) · P2 (right)<br>
-    Joystick to fly · SUCK to drain blood<br>
-    Get close &amp; hold SUCK to steal HP<br>
-    First to 0% blood loses
+<div id="game">
+  <div id="topbar">
+    <div class="title">🌊 FISHNOPLY</div>
+    <div class="pearls" id="top-pearls">🪙 1500</div>
   </div>
-  <button class="play-btn" id="play-btn">PLAY</button>
+  <div id="players-bar" id="players-bar"></div>
+  <div id="board-wrap">
+    <canvas id="board-canvas"></canvas>
+  </div>
+  <div id="panel">
+    <div class="turn-header" id="turn-header">Your turn, Shark!</div>
+    <div class="log" id="log"></div>
+    <div class="actions" id="actions"></div>
+  </div>
 </div>
 
-<div id="winner-overlay">
-  <div id="winner-text"></div>
-  <div id="winner-sub"></div>
-  <button class="retry-btn" id="retry-btn">PLAY AGAIN</button>
+<div id="modal-bg">
+  <div id="modal">
+    <h2 id="modal-title"></h2>
+    <p id="modal-body"></p>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<div id="dice-overlay">
+  <div id="dice-display"></div>
+</div>
+
+<div id="prop-modal-bg" id="prop-modal-bg">
+  <div id="prop-modal">
+    <h2 id="pm-title"></h2>
+    <p id="pm-body"></p>
+    <div id="pm-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;"></div>
+  </div>
 </div>
 
 <script>
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-let W, H;
+const SQUARES = [
+  {type:'go',name:'GO',emoji:'🌊'},
+  {type:'prop',name:'Plankton',emoji:'🦠',group:0,price:60,rent:[2,10,30,90,160,250],houseCost:50},
+  {type:'tide',name:'Tide Card',emoji:'🌊'},
+  {type:'prop',name:'Brine Shrimp',emoji:'🦐',group:0,price:60,rent:[4,20,60,180,320,450],houseCost:50},
+  {type:'tax',name:'Crab Tax',emoji:'💸',amount:200},
+  {type:'sub',name:'Submarine 1',emoji:'🚢',price:200,subRent:[25,50,100,200]},
+  {type:'prop',name:'Sardine',emoji:'🐟',group:1,price:100,rent:[6,30,90,270,400,550],houseCost:50},
+  {type:'current',name:'Current Card',emoji:'🌀'},
+  {type:'prop',name:'Anchovy',emoji:'🐡',group:1,price:100,rent:[6,30,90,270,400,550],houseCost:50},
+  {type:'prop',name:'Herring',emoji:'🐠',group:1,price:120,rent:[8,40,100,300,450,600],houseCost:50},
+  {type:'jail',name:'The Net',emoji:'🕸️'},
+  {type:'prop',name:'Mackerel',emoji:'🐟',group:2,price:140,rent:[10,50,150,450,625,750],houseCost:100},
+  {type:'utility',name:'Lighthouse',emoji:'💡',price:150},
+  {type:'prop',name:'Snapper',emoji:'🐠',group:2,price:140,rent:[10,50,150,450,625,750],houseCost:100},
+  {type:'prop',name:'Grouper',emoji:'🐡',group:2,price:160,rent:[12,60,180,500,700,900],houseCost:100},
+  {type:'sub',name:'Submarine 2',emoji:'🚢',price:200,subRent:[25,50,100,200]},
+  {type:'prop',name:'Barracuda',emoji:'🐊',group:3,price:180,rent:[14,70,200,550,750,950],houseCost:100},
+  {type:'tide',name:'Tide Card',emoji:'🌊'},
+  {type:'prop',name:'Mahi-Mahi',emoji:'🐬',group:3,price:180,rent:[14,70,200,550,750,950],houseCost:100},
+  {type:'prop',name:'Swordfish',emoji:'⚔️',group:3,price:200,rent:[16,80,220,600,800,1000],houseCost:100},
+  {type:'freeswim',name:'Free Swim',emoji:'🏊'},
+  {type:'prop',name:'Giant Squid',emoji:'🦑',group:4,price:220,rent:[18,90,250,700,875,1050],houseCost:150},
+  {type:'current',name:'Current Card',emoji:'🌀'},
+  {type:'prop',name:'Manta Ray',emoji:'🦅',group:4,price:220,rent:[18,90,250,700,875,1050],houseCost:150},
+  {type:'prop',name:'Hammerhead',emoji:'🔨',group:4,price:240,rent:[20,100,300,750,925,1100],houseCost:150},
+  {type:'sub',name:'Submarine 3',emoji:'🚢',price:200,subRent:[25,50,100,200]},
+  {type:'prop',name:'Orca',emoji:'🐳',group:5,price:260,rent:[22,110,330,800,975,1150],houseCost:150},
+  {type:'prop',name:'Humpback Whale',emoji:'🐋',group:5,price:260,rent:[22,110,330,800,975,1150],houseCost:150},
+  {type:'utility',name:'Sonar Station',emoji:'📡',price:150},
+  {type:'prop',name:'Sperm Whale',emoji:'🐋',group:5,price:280,rent:[24,120,360,850,1025,1200],houseCost:150},
+  {type:'gonet',name:'Go to Net',emoji:'🕸️'},
+  {type:'prop',name:'Colossal Squid',emoji:'🦑',group:6,price:300,rent:[26,130,390,900,1100,1275],houseCost:200},
+  {type:'prop',name:'Megalodon',emoji:'🦷',group:6,price:300,rent:[26,130,390,900,1100,1275],houseCost:200},
+  {type:'tide',name:'Tide Card',emoji:'🌊'},
+  {type:'prop',name:'Blue Whale',emoji:'🐋',group:6,price:320,rent:[28,150,450,1000,1200,1400],houseCost:200},
+  {type:'sub',name:'Submarine 4',emoji:'🚢',price:200,subRent:[25,50,100,200]},
+  {type:'current',name:'Current Card',emoji:'🌀'},
+  {type:'prop',name:'Kraken',emoji:'🐙',group:7,price:350,rent:[35,175,500,1100,1300,1500],houseCost:200},
+  {type:'tax',name:'Pearl Tax',emoji:'💸',amount:100},
+  {type:'prop',name:'Leviathan',emoji:'🐉',group:7,price:400,rent:[50,200,600,1400,1700,2000],houseCost:200},
+];
 
-function resize(){
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
+const GROUP_COLORS = ['#8B4513','#87CEEB','#FF69B4','#FFA500','#FF4444','#FFFF00','#228B22','#00008B'];
+const GROUP_NAMES = ['Brown','Sky Blue','Pink','Orange','Red','Yellow','Green','Dark Blue'];
+
+const TIDE_CARDS = [
+  {text:'The current carries you to GO. Collect 🪙200!',action:'goto',val:0,gain:200},
+  {text:'Pearl bonus from the deep! Collect 🪙50.',action:'gain',val:50},
+  {text:'Collect 🪙200 salary as you pass GO.',action:'gain',val:200},
+  {text:'Pearl dividend! Collect 🪙50 from each player.',action:'collectall',val:50},
+  {text:'Bank error in your favour! Collect 🪙200.',action:'gain',val:200},
+  {text:'You found a pearl treasure chest! Collect 🪙100.',action:'gain',val:100},
+  {text:'Pay 🪙150 for deep sea repairs.',action:'pay',val:150},
+  {text:'Pay 🪙100 to the pearl doctor.',action:'pay',val:100},
+  {text:'Go directly to The Net! Do not pass GO.',action:'gonet',val:0},
+  {text:'Get out of The Net free!',action:'jailcard',val:0},
+  {text:'You are elected Ocean Mayor! Pay 🪙50 to each player.',action:'payall',val:50},
+  {text:'Advance to Kraken! Pay rent if needed.',action:'goto',val:37,gain:0},
+];
+
+const CURRENT_CARDS = [
+  {text:'Ride the current to GO! Collect 🪙200.',action:'goto',val:0,gain:200},
+  {text:'You win the Ocean Beauty Contest! Collect 🪙10.',action:'gain',val:10},
+  {text:'Pearl income tax refund! Collect 🪙20.',action:'gain',val:20},
+  {text:'Go to The Net. Go directly to The Net.',action:'gonet',val:0},
+  {text:'Get out of The Net free!',action:'jailcard',val:0},
+  {text:'Advance to Submarine 1! Pay rent if needed.',action:'goto',val:5,gain:0},
+  {text:'Go back 3 squares.',action:'back',val:3},
+  {text:'Pay 🪙15 for poor fin maintenance.',action:'pay',val:15},
+  {text:'Pay 🪙100 for sonar repairs.',action:'pay',val:100},
+  {text:'Collect 🪙25 from each player for fishing them out of The Net.',action:'collectall',val:25},
+  {text:'Advance to Leviathan! Pay rent if needed.',action:'goto',val:39,gain:0},
+  {text:'Make general repairs — 🪙40 per fish, 🪙115 per coral castle.',action:'repairs',val:[40,115]},
+];
+
+const PLAYERS = [
+  {name:'Shark',emoji:'🦈',color:'#00aaff',isHuman:true,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
+  {name:'Clownfish',emoji:'🐠',color:'#ff6600',isHuman:false,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
+  {name:'Crab',emoji:'🦀',color:'#cc2222',isHuman:false,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
+  {name:'Pufferfish',emoji:'🐡',color:'#228B22',isHuman:false,money:1500,pos:0,inJail:false,jailTurns:0,jailCard:false,bankrupt:false,props:[],doubles:0},
+];
+
+const ownership = new Array(40).fill(null);
+const houses = new Array(40).fill(0);
+let currentPlayer = 0;
+let gamePhase = 'roll';
+let tideDeck = shuffle([...TIDE_CARDS]);
+let currentDeck = shuffle([...CURRENT_CARDS]);
+let logLines = [];
+let diceResult = [1,1];
+let pendingAction = null;
+let gameOver = false;
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
 }
-resize();
-window.addEventListener('resize', resize);
 
-const SPEED = 2.8;
-const SUCK_RANGE = 90;
-const SUCK_RATE = 0.003;
-const DRAIN_BOOST = 1.8;
-const WING_SPEED = 0.38;
-const BLOOD_DROPS = 30;
-
-let running = false;
-let wingT = 0;
-
-let players, bloodDrops, particles;
-
-function initGame(){
-  players = [
-    {
-      x: W*0.28, y: H*0.5,
-      vx:0, vy:0,
-      angle: 0,
-      blood: 0.5,
-      color: '#cc3333', darkColor:'#881111', glowColor:'rgba(200,50,50,0.3)',
-      joyDx:0, joyDy:0,
-      sucking: false,
-      size: 22,
-      wingPhase: 0,
-      suckAnim: 0,
-      label: 'P1',
-      alive: true,
-    },
-    {
-      x: W*0.72, y: H*0.5,
-      vx:0, vy:0,
-      angle: Math.PI,
-      blood: 0.5,
-      color: '#2255dd', darkColor:'#112299', glowColor:'rgba(50,80,220,0.3)',
-      joyDx:0, joyDy:0,
-      sucking: false,
-      size: 22,
-      wingPhase: Math.PI,
-      suckAnim: 0,
-      label: 'P2',
-      alive: true,
-    }
-  ];
-  bloodDrops = [];
-  particles = [];
-  for(let i=0;i<BLOOD_DROPS;i++) spawnDrop();
+function addLog(msg){
+  logLines.unshift(msg);
+  if(logLines.length>30) logLines.pop();
+  document.getElementById('log').innerHTML = logLines.slice(0,5).map(l=>`<div>${l}</div>`).join('');
 }
 
-function spawnDrop(){
-  bloodDrops.push({
-    x: 40+Math.random()*(W-80),
-    y: 80+Math.random()*(H-160),
-    r: 4+Math.random()*6,
-    pulse: Math.random()*Math.PI*2,
-    vx: (Math.random()-0.5)*0.3,
-    vy: (Math.random()-0.5)*0.3,
+function updateTopPearls(){
+  document.getElementById('top-pearls').textContent = '🪙 '+PLAYERS[0].money;
+}
+
+function updatePlayersBar(){
+  const bar = document.getElementById('players-bar');
+  bar.innerHTML = PLAYERS.map((p,i)=>`
+    <div class="player-chip ${i===currentPlayer?'active':''} ${p.bankrupt?'bankrupt':''}">
+      <span class="chip-token">${p.emoji}</span>
+      <span class="chip-name">${p.name}</span>
+      <span class="chip-pearls">🪙${p.money}</span>
+      ${p.inJail?'<span style="font-size:10px;color:#ff8888;">NET</span>':''}
+    </div>
+  `).join('');
+}
+
+// ── BOARD DRAWING ──────────────────────────────────────────────
+const canvas = document.getElementById('board-canvas');
+const bctx = canvas.getContext('2d');
+let CELL, BOARD_SIZE, OFFSET_X, OFFSET_Y;
+
+function layoutBoard(){
+  const wrap = document.getElementById('board-wrap');
+  const size = Math.min(wrap.clientWidth, wrap.clientHeight) - 8;
+  canvas.width = size; canvas.height = size;
+  BOARD_SIZE = size;
+  CELL = size / 11;
+  OFFSET_X = 0; OFFSET_Y = 0;
+}
+
+function squarePos(idx){
+  // 40 squares around the board
+  // bottom row: 0-10 (right to left), right col: 11-19 (bottom to top), top row: 20-30 (left to right), left col: 31-39 (top to bottom)
+  const C = CELL, S = BOARD_SIZE;
+  if(idx<=10){ // bottom row, right to left
+    return {x: S - (idx+1)*C, y: S - C*1.6, w: idx===0||idx===10?C*1.6:C, h:C*1.6, corner:idx===0||idx===10};
+  } else if(idx<=19){ // right col, bottom to top
+    const r=idx-10;
+    return {x: S - C*1.6, y: S - C*1.6 - r*C, w:C*1.6, h:C, corner:false};
+  } else if(idx<=30){ // top row, left to right
+    const r=idx-20;
+    return {x: r*C, y: 0, w: idx===20||idx===30?C*1.6:C, h:C*1.6, corner:idx===20||idx===30};
+  } else { // left col, top to bottom
+    const r=idx-30;
+    return {x: 0, y: C*1.6 + (r-1)*C, w:C*1.6, h:C, corner:false};
+  }
+}
+
+function drawBoard(){
+  const C=CELL, S=BOARD_SIZE;
+  bctx.clearRect(0,0,S,S);
+
+  // background
+  bctx.fillStyle='#0a1628';
+  bctx.fillRect(0,0,S,S);
+
+  // center area
+  bctx.fillStyle='#0d2040';
+  bctx.fillRect(C*1.6,C*1.6,S-C*3.2,S-C*3.2);
+
+  // center title
+  bctx.fillStyle='#00d4ff';
+  bctx.font=`bold ${Math.round(C*0.55)}px sans-serif`;
+  bctx.textAlign='center';
+  bctx.textBaseline='middle';
+  bctx.fillText('🌊 FISHNOPLY',S/2,S/2-C*0.4);
+  bctx.fillStyle='#4ab8d4';
+  bctx.font=`${Math.round(C*0.28)}px sans-serif`;
+  bctx.fillText('Created by Ethan & Elroy Fang · 2026',S/2,S/2+C*0.2);
+
+  // draw all squares
+  for(let i=0;i<40;i++) drawSquare(i);
+
+  // draw tokens
+  PLAYERS.forEach((p,pi)=>{
+    if(p.bankrupt) return;
+    const sq = squarePos(p.pos);
+    const cx = sq.x + sq.w/2 + (pi%2===0?-6:6);
+    const cy = sq.y + sq.h/2 + (pi<2?-5:5);
+    bctx.font=`${Math.round(C*0.32)}px sans-serif`;
+    bctx.textAlign='center';
+    bctx.textBaseline='middle';
+    bctx.fillText(p.emoji, cx, cy);
   });
 }
 
-function spawnParticle(x,y,color,count){
-  for(let i=0;i<count;i++){
-    const a = Math.random()*Math.PI*2;
-    const sp = 1+Math.random()*3;
-    particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,color,r:2+Math.random()*3});
+function drawSquare(i){
+  const sq=squarePos(i);
+  const s=SQUARES[i];
+  const C=CELL;
+
+  // border
+  bctx.strokeStyle='rgba(0,200,255,0.25)';
+  bctx.lineWidth=0.5;
+  bctx.strokeRect(sq.x,sq.y,sq.w,sq.h);
+
+  // color strip for properties
+  if(s.type==='prop'){
+    const col=GROUP_COLORS[s.group];
+    // determine strip position based on board side
+    bctx.fillStyle=col;
+    if(i<=10){ // bottom
+      bctx.fillRect(sq.x,sq.y+sq.h-8,sq.w,8);
+    } else if(i<=19){ // right
+      bctx.fillRect(sq.x,sq.y,8,sq.h);
+    } else if(i<=30){ // top
+      bctx.fillRect(sq.x,sq.y,sq.w,8);
+    } else { // left
+      bctx.fillRect(sq.x+sq.w-8,sq.y,8,sq.h);
+    }
+  }
+
+  // owner highlight
+  if(ownership[i]!==null){
+    const owner=PLAYERS[ownership[i]];
+    bctx.fillStyle=owner.color+'33';
+    bctx.fillRect(sq.x+1,sq.y+1,sq.w-2,sq.h-2);
+  }
+
+  // houses/castles
+  if(houses[i]>0){
+    const hCount=Math.min(houses[i],4);
+    const isHotel=houses[i]>=5;
+    bctx.fillStyle=isHotel?'#ff4444':'#00cc44';
+    if(!sq.corner){
+      for(let h=0;h<(isHotel?1:hCount);h++){
+        bctx.fillRect(sq.x+2+h*5, sq.y+2, 4, 4);
+      }
+    }
+  }
+
+  // emoji & text
+  const fontSize = sq.corner ? C*0.38 : C*0.28;
+  bctx.font=`${Math.round(fontSize)}px sans-serif`;
+  bctx.textAlign='center';
+  bctx.textBaseline='middle';
+  const cx=sq.x+sq.w/2, cy=sq.y+sq.h/2;
+
+  if(sq.corner){
+    bctx.fillText(s.emoji, cx, cy-6);
+    bctx.fillStyle='#7ab8cc';
+    bctx.font=`${Math.round(C*0.18)}px sans-serif`;
+    bctx.fillText(s.name, cx, cy+10);
+  } else {
+    // rotate text for sides
+    bctx.save();
+    if(i>=11&&i<=19){ bctx.translate(cx,cy); bctx.rotate(-Math.PI/2); bctx.translate(-cx,-cy); }
+    else if(i>=31&&i<=39){ bctx.translate(cx,cy); bctx.rotate(Math.PI/2); bctx.translate(-cx,-cy); }
+    bctx.fillText(s.emoji, cx, cy-4);
+    bctx.fillStyle='#5a9aaa';
+    bctx.font=`${Math.round(C*0.15)}px sans-serif`;
+    const shortName = s.name.length>9?s.name.substring(0,9):s.name;
+    bctx.fillText(shortName, cx, cy+8);
+    if(s.price){
+      bctx.fillStyle='#ffd700';
+      bctx.font=`${Math.round(C*0.14)}px sans-serif`;
+      bctx.fillText('🪙'+s.price, cx, cy+18);
+    }
+    bctx.restore();
   }
 }
 
-function getSize(p){ return p.size + p.blood*28; }
+// ── GAME LOGIC ─────────────────────────────────────────────────
 
-const BASE_R = 65, KNOB_R = 28;
+function rollDice(){
+  const d1=Math.floor(Math.random()*6)+1;
+  const d2=Math.floor(Math.random()*6)+1;
+  diceResult=[d1,d2];
+  return [d1,d2];
+}
 
-function setupJoystick(zoneId, baseId, knobId, playerIdx){
-  const zone = document.getElementById(zoneId);
-  const base = document.getElementById(baseId);
-  const knob = document.getElementById(knobId);
-  let origin = null;
-  const p = ()=>players[playerIdx];
+const DICE_EMOJI=['','⚀','⚁','⚂','⚃','⚄','⚅'];
 
-  base.style.width = BASE_R*2+'px';
-  base.style.height = BASE_R*2+'px';
-  knob.style.width = KNOB_R*2+'px';
-  knob.style.height = KNOB_R*2+'px';
-  knob.style.background = playerIdx===0 ? 'rgba(200,80,80,0.5)' : 'rgba(60,100,220,0.5)';
-  knob.style.border = '1.5px solid '+(playerIdx===0?'rgba(255,120,120,0.7)':'rgba(100,140,255,0.7)');
+function animateDice(d1,d2,cb){
+  const overlay=document.getElementById('dice-overlay');
+  const display=document.getElementById('dice-display');
+  overlay.style.display='flex';
+  let count=0;
+  const interval=setInterval(()=>{
+    const r1=Math.floor(Math.random()*6)+1;
+    const r2=Math.floor(Math.random()*6)+1;
+    display.textContent=DICE_EMOJI[r1]+' '+DICE_EMOJI[r2];
+    count++;
+    if(count>8){
+      clearInterval(interval);
+      display.textContent=DICE_EMOJI[d1]+' '+DICE_EMOJI[d2];
+      setTimeout(()=>{ overlay.style.display='none'; cb(); },600);
+    }
+  },80);
+}
 
-  function updateKnob(dx,dy){
-    const len = Math.sqrt(dx*dx+dy*dy);
-    const max = BASE_R - KNOB_R;
-    const sc = len>max ? max/len : 1;
-    knob.style.left = (BASE_R - KNOB_R + dx*sc)+'px';
-    knob.style.top = (BASE_R - KNOB_R + dy*sc)+'px';
-    if(p()) { p().joyDx=dx; p().joyDy=dy; }
+function movePlayer(pidx, steps, cb){
+  const p=PLAYERS[pidx];
+  const oldPos=p.pos;
+  p.pos=(p.pos+steps)%40;
+  if(p.pos<oldPos && steps>0){ // passed GO
+    p.money+=200;
+    addLog(`${p.emoji} passed GO — collected 🪙200!`);
+  }
+  updateTopPearls();
+  drawBoard();
+  if(cb) cb();
+}
+
+function gotoSquare(pidx, sq, collectGo, cb){
+  const p=PLAYERS[pidx];
+  if(sq<p.pos && collectGo){ p.money+=200; addLog(`${p.emoji} passed GO — 🪙200!`); }
+  p.pos=sq;
+  updateTopPearls();
+  drawBoard();
+  if(cb) cb();
+}
+
+function countPlayerSubs(pidx){
+  return SQUARES.filter((s,i)=>s.type==='sub'&&ownership[i]===pidx).length;
+}
+
+function countPlayerUtils(pidx){
+  return SQUARES.filter((s,i)=>s.type==='utility'&&ownership[i]===pidx).length;
+}
+
+function ownsGroup(pidx, group){
+  const groupProps=SQUARES.map((s,i)=>({s,i})).filter(({s})=>s.type==='prop'&&s.group===group);
+  return groupProps.every(({i})=>ownership[i]===pidx);
+}
+
+function calcRent(sqIdx, diceTotal){
+  const s=SQUARES[sqIdx];
+  const owner=ownership[sqIdx];
+  if(owner===null) return 0;
+  if(s.type==='sub'){
+    const count=countPlayerSubs(owner);
+    return s.subRent[count-1];
+  }
+  if(s.type==='utility'){
+    const count=countPlayerUtils(owner);
+    return diceTotal*(count===1?4:10);
+  }
+  if(s.type==='prop'){
+    const h=houses[sqIdx];
+    if(h>0) return s.rent[Math.min(h,5)];
+    if(ownsGroup(owner,s.group)) return s.rent[0]*2;
+    return s.rent[0];
+  }
+  return 0;
+}
+
+function payRent(from, to, amount, cb){
+  PLAYERS[from].money=Math.max(0,PLAYERS[from].money-amount);
+  PLAYERS[to].money+=amount;
+  addLog(`${PLAYERS[from].emoji} paid 🪙${amount} rent to ${PLAYERS[to].emoji}`);
+  updateTopPearls();
+  updatePlayersBar();
+  checkBankruptcy(from, cb);
+}
+
+function checkBankruptcy(pidx, cb){
+  const p=PLAYERS[pidx];
+  if(p.money<=0){
+    p.bankrupt=true;
+    addLog(`💀 ${p.emoji} ${p.name} is bankrupt! Game over for them.`);
+    // return all properties
+    SQUARES.forEach((s,i)=>{ if(ownership[i]===pidx){ ownership[i]=null; houses[i]=0; } });
+    updatePlayersBar();
+    drawBoard();
+    const alive=PLAYERS.filter(pl=>!pl.bankrupt);
+    if(alive.length===1){
+      showWinner(PLAYERS.indexOf(alive[0]));
+      return;
+    }
+  }
+  if(cb) cb();
+}
+
+function showWinner(pidx){
+  gameOver=true;
+  const p=PLAYERS[pidx];
+  showModal(`${p.emoji} ${p.name} WINS!`,`${p.name} dominates the ocean with 🪙${p.money} pearls!\n\nAll other creatures are bankrupt.`,[
+    {label:'Play Again',cls:'btn-primary',action:()=>location.reload()}
+  ]);
+}
+
+function drawTideCard(){
+  if(tideDeck.length===0) tideDeck=shuffle([...TIDE_CARDS]);
+  return tideDeck.pop();
+}
+function drawCurrentCard(){
+  if(currentDeck.length===0) currentDeck=shuffle([...CURRENT_CARDS]);
+  return currentDeck.pop();
+}
+
+function applyCard(pidx, card, cb){
+  const p=PLAYERS[pidx];
+  addLog(`${p.emoji} draws: "${card.text}"`);
+  switch(card.action){
+    case 'gain':
+      p.money+=card.val;
+      updateTopPearls(); updatePlayersBar();
+      if(cb) cb(); break;
+    case 'pay':
+      p.money=Math.max(0,p.money-card.val);
+      updateTopPearls(); updatePlayersBar();
+      checkBankruptcy(pidx,cb); break;
+    case 'goto':
+      gotoSquare(pidx,card.val,true,()=>landOn(pidx,diceResult[0]+diceResult[1],cb)); break;
+    case 'gonet':
+      p.inJail=true; p.jailTurns=0; p.pos=10;
+      drawBoard(); updatePlayersBar();
+      if(cb) cb(); break;
+    case 'jailcard':
+      p.jailCard=true;
+      if(cb) cb(); break;
+    case 'back':
+      p.pos=(p.pos-card.val+40)%40;
+      drawBoard();
+      landOn(pidx,diceResult[0]+diceResult[1],cb); break;
+    case 'collectall':
+      PLAYERS.forEach((pl,i)=>{ if(i!==pidx&&!pl.bankrupt){ pl.money=Math.max(0,pl.money-card.val); p.money+=card.val; } });
+      updateTopPearls(); updatePlayersBar();
+      if(cb) cb(); break;
+    case 'payall':
+      PLAYERS.forEach((pl,i)=>{ if(i!==pidx&&!pl.bankrupt){ pl.money+=card.val; p.money=Math.max(0,p.money-card.val); } });
+      updateTopPearls(); updatePlayersBar();
+      checkBankruptcy(pidx,cb); break;
+    case 'repairs':
+      let total=0;
+      SQUARES.forEach((s,i)=>{ if(ownership[i]===pidx&&houses[i]>0){ total+=houses[i]<5?houses[i]*card.val[0]:card.val[1]; } });
+      p.money=Math.max(0,p.money-total);
+      addLog(`${p.emoji} paid 🪙${total} for repairs`);
+      updateTopPearls(); updatePlayersBar();
+      checkBankruptcy(pidx,cb); break;
+    default:
+      if(cb) cb();
+  }
+}
+
+function landOn(pidx, diceTotal, cb){
+  const p=PLAYERS[pidx];
+  const sq=SQUARES[p.pos];
+  const owner=ownership[p.pos];
+
+  switch(sq.type){
+    case 'go':
+      if(cb) cb(); break;
+    case 'jail': case 'freeswim':
+      if(cb) cb(); break;
+    case 'gonet':
+      p.inJail=true; p.jailTurns=0; p.pos=10;
+      addLog(`${p.emoji} sent to The Net!`);
+      drawBoard(); updatePlayersBar();
+      if(cb) cb(); break;
+    case 'tax':
+      p.money=Math.max(0,p.money-sq.amount);
+      addLog(`${p.emoji} paid 🪙${sq.amount} tax`);
+      updateTopPearls(); updatePlayersBar();
+      checkBankruptcy(pidx,cb); break;
+    case 'tide':
+      const tc=drawTideCard();
+      applyCard(pidx,tc,cb); break;
+    case 'current':
+      const cc=drawCurrentCard();
+      applyCard(pidx,cc,cb); break;
+    case 'prop': case 'sub': case 'utility':
+      if(owner===null){
+        // unowned
+        if(p.isHuman){
+          offerBuy(pidx, p.pos, cb);
+        } else {
+          aiDecideBuy(pidx, p.pos, cb);
+        }
+      } else if(owner===pidx){
+        addLog(`${p.emoji} landed on own property`);
+        if(cb) cb();
+      } else {
+        const rent=calcRent(p.pos, diceTotal);
+        addLog(`${p.emoji} owes 🪙${rent} to ${PLAYERS[owner].emoji}`);
+        payRent(pidx, owner, rent, cb);
+      }
+      break;
+    default:
+      if(cb) cb();
+  }
+}
+
+function offerBuy(pidx, sqIdx, cb){
+  const sq=SQUARES[sqIdx];
+  const p=PLAYERS[pidx];
+  showModal(`Buy ${sq.emoji} ${sq.name}?`,
+    `Price: 🪙${sq.price}\nYour pearls: 🪙${p.money}\n\n${sq.type==='prop'?`Group: ${GROUP_NAMES[sq.group]}\nBase rent: 🪙${sq.rent[0]}`:''}`,
+    [
+      {label:`Buy 🪙${sq.price}`,cls:'btn-primary',disabled:p.money<sq.price,action:()=>{
+        p.money-=sq.price; ownership[sqIdx]=pidx;
+        addLog(`${p.emoji} bought ${sq.emoji} ${sq.name} for 🪙${sq.price}`);
+        updateTopPearls(); updatePlayersBar(); drawBoard();
+        closeModal(); if(cb) cb();
+      }},
+      {label:'Pass',cls:'btn-secondary',action:()=>{ closeModal(); if(cb) cb(); }},
+    ]
+  );
+}
+
+function aiDecideBuy(pidx, sqIdx, cb){
+  const sq=SQUARES[sqIdx];
+  const p=PLAYERS[pidx];
+  const willBuy = p.money>sq.price*1.2 && Math.random()>0.25;
+  if(willBuy){
+    p.money-=sq.price; ownership[sqIdx]=pidx;
+    addLog(`${p.emoji} ${p.name} bought ${sq.emoji} ${sq.name} for 🪙${sq.price}`);
+    updateTopPearls(); updatePlayersBar(); drawBoard();
+  } else {
+    addLog(`${p.emoji} ${p.name} passed on ${sq.name}`);
+  }
+  setTimeout(cb,600);
+}
+
+function aiTakeTurn(pidx, cb){
+  const p=PLAYERS[pidx];
+  const [d1,d2]=rollDice();
+  const total=d1+d2;
+  const isDoubles=d1===d2;
+  addLog(`${p.emoji} ${p.name} rolls ${DICE_EMOJI[d1]}${DICE_EMOJI[d2]} (${total})`);
+
+  if(p.inJail){
+    if(isDoubles){ p.inJail=false; addLog(`${p.emoji} rolled doubles — out of The Net!`); }
+    else{
+      p.jailTurns++;
+      if(p.jailTurns>=3){
+        p.money=Math.max(0,p.money-50); p.inJail=false;
+        addLog(`${p.emoji} paid 🪙50 bail`);
+      } else {
+        addLog(`${p.emoji} stuck in The Net (turn ${p.jailTurns})`);
+        updatePlayersBar();
+        setTimeout(cb,800); return;
+      }
+    }
   }
 
-  zone.addEventListener('touchstart',e=>{
-    e.preventDefault();
-    const t=e.changedTouches[0];
-    const rect=zone.getBoundingClientRect();
-    origin={x:t.clientX,y:t.clientY};
-    base.style.display='block';
-    base.style.left=(t.clientX-rect.left-BASE_R)+'px';
-    base.style.top=(t.clientY-rect.top-BASE_R)+'px';
-    updateKnob(0,0);
-  },{passive:false});
-
-  zone.addEventListener('touchmove',e=>{
-    e.preventDefault();
-    if(!origin) return;
-    const t=e.changedTouches[0];
-    updateKnob(t.clientX-origin.x, t.clientY-origin.y);
-  },{passive:false});
-
-  zone.addEventListener('touchend',e=>{
-    e.preventDefault();
-    origin=null;
-    base.style.display='none';
-    if(p()){p().joyDx=0;p().joyDy=0;}
-  },{passive:false});
+  setTimeout(()=>{
+    movePlayer(pidx, total, ()=>{
+      setTimeout(()=>landOn(pidx, total, ()=>{
+        // AI build houses
+        aiMaybeBuilds(pidx);
+        updatePlayersBar();
+        setTimeout(cb, 600);
+      }),400);
+    });
+  },400);
 }
 
-function setupSuck(btnId, playerIdx){
-  const btn = document.getElementById(btnId);
-  btn.addEventListener('touchstart',e=>{e.preventDefault();if(players)players[playerIdx].sucking=true;},{passive:false});
-  btn.addEventListener('touchend',e=>{e.preventDefault();if(players)players[playerIdx].sucking=false;},{passive:false});
-  btn.addEventListener('mousedown',()=>{if(players)players[playerIdx].sucking=true;});
-  btn.addEventListener('mouseup',()=>{if(players)players[playerIdx].sucking=false;});
+function aiMaybeBuilds(pidx){
+  const p=PLAYERS[pidx];
+  SQUARES.forEach((sq,i)=>{
+    if(sq.type==='prop' && ownership[i]===pidx && ownsGroup(pidx,sq.group) && p.money>sq.houseCost*2 && houses[i]<5 && Math.random()>0.55){
+      const maxInGroup=Math.max(...SQUARES.map((s2,i2)=>s2.type==='prop'&&s2.group===sq.group?houses[i2]:0));
+      if(houses[i]<=maxInGroup){
+        p.money-=sq.houseCost; houses[i]++;
+        addLog(`${p.emoji} built on ${sq.emoji} ${sq.name}`);
+      }
+    }
+  });
 }
 
-setupJoystick('joy1-zone','joy1-base','joy1-knob',0);
-setupJoystick('joy2-zone','joy2-base','joy2-knob',1);
-setupSuck('suck1-btn',0);
-setupSuck('suck2-btn',1);
+// ── HUMAN TURN UI ──────────────────────────────────────────────
+function setActions(btns){
+  const el=document.getElementById('actions');
+  el.innerHTML='';
+  btns.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='btn '+(b.cls||'btn-primary');
+    btn.textContent=b.label;
+    if(b.disabled) btn.disabled=true;
+    btn.onclick=b.action;
+    el.appendChild(btn);
+  });
+}
 
-function update(){
-  wingT += WING_SPEED;
+function setHeader(txt){
+  document.getElementById('turn-header').textContent=txt;
+}
 
-  players.forEach((p,i)=>{
-    if(!p.alive) return;
-    const dx=p.joyDx, dy=p.joyDy;
-    const len=Math.sqrt(dx*dx+dy*dy);
-    if(len>10){
-      const tx=dx/len, ty=dy/len;
-      p.vx += tx*0.4;
-      p.vy += ty*0.4;
-      const targetAngle = Math.atan2(ty,tx);
-      let da = targetAngle - p.angle;
-      while(da>Math.PI) da-=Math.PI*2;
-      while(da<-Math.PI) da+=Math.PI*2;
-      p.angle += da*0.15;
-    }
-    p.vx *= 0.88;
-    p.vy *= 0.88;
-    const spd = Math.sqrt(p.vx*p.vx+p.vy*p.vy);
-    if(spd>SPEED){ p.vx=p.vx/spd*SPEED; p.vy=p.vy/spd*SPEED; }
+function humanTurn(){
+  const p=PLAYERS[0];
+  if(p.bankrupt){ nextTurn(); return; }
+  setHeader(`Your turn, ${p.emoji} Shark!`);
 
-    p.x += p.vx; p.y += p.vy;
-    const r=getSize(p);
-    p.x = Math.max(r, Math.min(W-r, p.x));
-    p.y = Math.max(80+r, Math.min(H-r, p.y));
-    p.wingPhase += 0.45;
+  if(p.inJail){
+    setActions([
+      {label:'Roll for doubles',cls:'btn-primary',action:()=>humanRollJail()},
+      ...(p.jailCard?[{label:'Use Get Out card',cls:'btn-secondary',action:()=>{ p.jailCard=false; p.inJail=false; addLog('Shark used Get Out of Net card!'); humanRollNormal(); }}]:[]),
+      {label:`Pay 🪙50 bail`,cls:'btn-secondary',disabled:p.money<50,action:()=>{ p.money-=50; p.inJail=false; updateTopPearls(); humanRollNormal(); }},
+    ]);
+    return;
+  }
+  const buildBtns = getBuildActions();
+  setActions([
+    {label:'🎲 Roll Dice',cls:'btn-primary',action:()=>humanRollNormal()},
+    ...(buildBtns.length?[{label:'🪸 Build',cls:'btn-secondary',action:()=>showBuildMenu()}]:[]),
+    {label:'🗺️ Properties',cls:'btn-secondary',action:()=>showPropMenu()},
+  ]);
+}
 
-    // eat blood drops
-    for(let j=bloodDrops.length-1;j>=0;j--){
-      const bd=bloodDrops[j];
-      const dist=Math.hypot(p.x-bd.x,p.y-bd.y);
-      if(dist<r+bd.r+4){
-        const gain = (bd.r/10)*0.04;
-        p.blood = Math.min(1, p.blood+gain);
-        spawnParticle(bd.x,bd.y,p.color,4);
-        bloodDrops.splice(j,1);
-        spawnDrop();
-      }
-    }
-
-    // suck from opponent
-    const opp = players[1-i];
-    if(p.sucking && opp.alive){
-      const dist=Math.hypot(p.x-opp.x, p.y-opp.y);
-      p.suckAnim = Math.min(1, p.suckAnim+0.15);
-      if(dist < SUCK_RANGE + getSize(p) + getSize(opp)){
-        const stolen = SUCK_RATE * DRAIN_BOOST;
-        opp.blood = Math.max(0, opp.blood - stolen);
-        p.blood = Math.min(1, p.blood + stolen*0.8);
-        if(Math.random()<0.3) spawnParticle(
-          (p.x+opp.x)/2,(p.y+opp.y)/2,
-          '#cc2222',3
-        );
-        if(opp.blood<=0){ endGame(i); return; }
-      }
+function humanRollJail(){
+  const p=PLAYERS[0];
+  const [d1,d2]=rollDice();
+  const total=d1+d2;
+  animateDice(d1,d2,()=>{
+    if(d1===d2){
+      p.inJail=false;
+      addLog(`Shark rolled doubles ${DICE_EMOJI[d1]}${DICE_EMOJI[d2]} — out of The Net!`);
+      movePlayer(0,total,()=>landOn(0,total,()=>endHumanTurn(false)));
     } else {
-      p.suckAnim = Math.max(0, p.suckAnim-0.1);
+      p.jailTurns++;
+      addLog(`Shark stayed in The Net (${p.jailTurns}/3)`);
+      if(p.jailTurns>=3){ p.money=Math.max(0,p.money-50); p.inJail=false; addLog('Shark paid 🪙50 bail'); updateTopPearls(); movePlayer(0,total,()=>landOn(0,total,()=>endHumanTurn(false))); }
+      else { updatePlayersBar(); endHumanTurn(false); }
     }
-
-    // natural blood drain
-    p.blood = Math.max(0, p.blood - 0.00008);
-    if(p.blood<=0){ endGame(1-i); return; }
-  });
-
-  bloodDrops.forEach(bd=>{
-    bd.pulse += 0.05;
-    bd.x += bd.vx; bd.y += bd.vy;
-    bd.x = Math.max(20,Math.min(W-20,bd.x));
-    bd.y = Math.max(80,Math.min(H-80,bd.y));
-  });
-
-  particles = particles.filter(p=>{
-    p.x+=p.vx; p.y+=p.vy;
-    p.vx*=0.92; p.vy*=0.92;
-    p.life-=0.04;
-    return p.life>0;
   });
 }
 
-function drawMosquito(p){
-  const r = getSize(p);
-  const ax=p.x, ay=p.y;
-  ctx.save();
-  ctx.translate(ax,ay);
-  ctx.rotate(p.angle);
-
-  // suck beam
-  if(p.suckAnim>0.05){
-    const opp=players[p===players[0]?1:0];
-    if(opp.alive){
-      const dist=Math.hypot(ax-opp.x,ay-opp.y);
-      if(dist < SUCK_RANGE+r+getSize(opp)+40){
-        ctx.save();
-        ctx.rotate(-p.angle);
-        ctx.globalAlpha=p.suckAnim*0.35;
-        ctx.strokeStyle=p.color;
-        ctx.lineWidth=6+p.suckAnim*8;
-        ctx.setLineDash([8,6]);
-        ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(opp.x-ax,opp.y-ay);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.globalAlpha=1;
-        ctx.restore();
-      }
-    }
-  }
-
-  // wings
-  const wflap = Math.sin(p.wingPhase)*0.7;
-  const wflap2 = Math.sin(p.wingPhase+Math.PI)*0.7;
-  ctx.globalAlpha=0.55;
-  ctx.fillStyle='rgba(200,220,255,0.6)';
-  ctx.strokeStyle='rgba(180,200,255,0.4)';
-  ctx.lineWidth=0.5;
-  [[-1,wflap],[1,wflap2]].forEach(([side,flap])=>{
-    ctx.save();
-    ctx.translate(0,-r*0.1);
-    ctx.rotate(side*(0.6+flap*0.5));
-    ctx.beginPath();
-    ctx.ellipse(side*r*0.8, -r*0.5, r*0.75, r*0.35, side*0.3, 0, Math.PI*2);
-    ctx.fill(); ctx.stroke();
-    ctx.restore();
-  });
-  ctx.globalAlpha=1;
-
-  // body glow
-  ctx.beginPath();
-  ctx.arc(0,0,r+8,0,Math.PI*2);
-  ctx.fillStyle=p.glowColor;
-  ctx.fill();
-
-  // abdomen (blood sac - scales with blood)
-  const abR = r*0.75 + p.blood*r*0.35;
-  ctx.beginPath();
-  ctx.ellipse(0, r*0.25, abR*0.65, abR, 0, 0, Math.PI*2);
-  ctx.fillStyle=p.darkColor;
-  ctx.fill();
-  ctx.strokeStyle=p.color;
-  ctx.lineWidth=1.5;
-  ctx.stroke();
-
-  // blood fill inside abdomen
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(0, r*0.25, abR*0.65, abR, 0, 0, Math.PI*2);
-  ctx.clip();
-  const fillY = r*0.25 + abR - p.blood*abR*2;
-  ctx.fillStyle='#cc1111';
-  ctx.fillRect(-abR, fillY, abR*2, abR*2);
-  ctx.restore();
-
-  // thorax
-  ctx.beginPath();
-  ctx.ellipse(0, -r*0.3, r*0.5, r*0.6, 0, 0, Math.PI*2);
-  ctx.fillStyle=p.color;
-  ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.2)';
-  ctx.lineWidth=1;
-  ctx.stroke();
-
-  // head
-  ctx.beginPath();
-  ctx.arc(0,-r*0.85,r*0.3,0,Math.PI*2);
-  ctx.fillStyle=p.color;
-  ctx.fill();
-
-  // proboscis (straw)
-  ctx.beginPath();
-  ctx.moveTo(0,-r*1.1);
-  ctx.lineTo(0,-r*1.8);
-  ctx.strokeStyle=p.color;
-  ctx.lineWidth=3;
-  ctx.stroke();
-
-  // eyes
-  [[-0.12,0.1],[0.12,0.1]].forEach(([ex,ey])=>{
-    ctx.beginPath();
-    ctx.arc(ex*r,-r*0.82+ey*r,r*0.1,0,Math.PI*2);
-    ctx.fillStyle='#ff3333';
-    ctx.fill();
-  });
-
-  // legs
-  const legAngles=[-0.4,0,0.4];
-  legAngles.forEach(la=>{
-    [-1,1].forEach(side=>{
-      ctx.beginPath();
-      const lx=side*r*0.45, ly=-r*0.1+la*r*0.4;
-      ctx.moveTo(lx,ly);
-      ctx.lineTo(lx+side*r*0.7, ly+r*0.4);
-      ctx.strokeStyle=p.darkColor;
-      ctx.lineWidth=1.5;
-      ctx.stroke();
+function humanRollNormal(){
+  const p=PLAYERS[0];
+  const [d1,d2]=rollDice();
+  const total=d1+d2;
+  const isDoubles=d1===d2;
+  addLog(`Shark rolls ${DICE_EMOJI[d1]}${DICE_EMOJI[d2]} (${total})${isDoubles?' DOUBLES!':''}`);
+  setActions([]);
+  animateDice(d1,d2,()=>{
+    movePlayer(0,total,()=>{
+      landOn(0,total,()=>endHumanTurn(isDoubles));
     });
   });
-
-  // label
-  ctx.rotate(-p.angle);
-  ctx.fillStyle='rgba(255,255,255,0.9)';
-  ctx.font=`bold ${Math.round(r*0.6)}px monospace`;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText(p.label, 0, -r*2.2);
-
-  ctx.restore();
 }
 
-function drawBloodDrop(bd){
-  bd.pulse+=0.03;
-  const pulse=0.85+Math.sin(bd.pulse)*0.15;
-  ctx.save();
-  ctx.translate(bd.x,bd.y);
-  ctx.scale(pulse,pulse);
-  ctx.beginPath();
-  ctx.arc(0,0,bd.r,0,Math.PI*2);
-  ctx.fillStyle='#aa1111';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(-bd.r*0.25,-bd.r*0.25,bd.r*0.3,0,Math.PI*2);
-  ctx.fillStyle='rgba(255,100,100,0.5)';
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawSuckRange(p){
-  if(!p.sucking||!p.alive) return;
-  const r=getSize(p);
-  ctx.beginPath();
-  ctx.arc(p.x,p.y,SUCK_RANGE+r,0,Math.PI*2);
-  ctx.strokeStyle=p.color;
-  ctx.globalAlpha=0.15+Math.sin(Date.now()*0.01)*0.05;
-  ctx.lineWidth=2;
-  ctx.setLineDash([6,4]);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.globalAlpha=1;
-}
-
-function drawBG(){
-  ctx.fillStyle='#0d1117';
-  ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(255,255,255,0.025)';
-  ctx.lineWidth=1;
-  const gs=60;
-  for(let x=0;x<W;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-}
-
-function drawHUD(){
-  const p0=players[0], p1=players[1];
-  document.getElementById('bar1-fill').style.width=Math.round(p0.blood*100)+'%';
-  document.getElementById('bar2-fill').style.width=Math.round(p1.blood*100)+'%';
-  document.getElementById('lbl1').textContent='P1 '+Math.round(p0.blood*100)+'%';
-  document.getElementById('lbl2').textContent=Math.round(p1.blood*100)+'% P2';
-}
-
-function drawParticles(){
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
-    ctx.fillStyle=p.color;
-    ctx.globalAlpha=p.life*0.8;
-    ctx.fill();
-  });
-  ctx.globalAlpha=1;
-}
-
-function drawProximityAlert(){
-  const p0=players[0],p1=players[1];
-  const d=Math.hypot(p0.x-p1.x,p0.y-p1.y);
-  const threshold=SUCK_RANGE+getSize(p0)+getSize(p1);
-  if(d<threshold+30){
-    const alpha=(1-(d/threshold))*0.3;
-    ctx.beginPath();
-    ctx.arc((p0.x+p1.x)/2,(p0.y+p1.y)/2,d/2,0,Math.PI*2);
-    ctx.fillStyle=`rgba(200,20,20,${alpha})`;
-    ctx.fill();
+function endHumanTurn(rolledDoubles){
+  updateTopPearls(); updatePlayersBar();
+  if(rolledDoubles && !PLAYERS[0].inJail){
+    addLog('Doubles! Roll again.');
+    humanTurn();
+  } else {
+    nextTurn();
   }
 }
 
-function draw(){
-  drawBG();
-  drawProximityAlert();
-  bloodDrops.forEach(drawBloodDrop);
-  players.forEach(drawSuckRange);
-  drawParticles();
-  players.forEach(p=>{ if(p.alive) drawMosquito(p); });
-  drawHUD();
+function nextTurn(){
+  do {
+    currentPlayer=(currentPlayer+1)%4;
+  } while(PLAYERS[currentPlayer].bankrupt && PLAYERS.some(p=>!p.bankrupt));
+
+  const alive=PLAYERS.filter(p=>!p.bankrupt);
+  if(alive.length===1){ showWinner(PLAYERS.indexOf(alive[0])); return; }
+
+  updatePlayersBar();
+  if(currentPlayer===0){
+    humanTurn();
+  } else {
+    setHeader(`${PLAYERS[currentPlayer].emoji} ${PLAYERS[currentPlayer].name}'s turn...`);
+    setActions([]);
+    setTimeout(()=>{
+      aiTakeTurn(currentPlayer,()=>{
+        updatePlayersBar();
+        nextTurn();
+      });
+    },800);
+  }
 }
 
-function endGame(winnerIdx){
-  running=false;
-  players.forEach(p=>p.alive=false);
-  const w=document.getElementById('winner-overlay');
-  const wt=document.getElementById('winner-text');
-  const ws=document.getElementById('winner-sub');
-  wt.textContent = winnerIdx===0 ? 'P1 WINS!' : 'P2 WINS!';
-  wt.style.color = winnerIdx===0 ? '#cc3333' : '#2255dd';
-  ws.textContent = 'drained the opponent dry';
-  w.style.display='flex';
+// ── BUILD MENU ─────────────────────────────────────────────────
+function getBuildActions(){
+  const p=PLAYERS[0];
+  return SQUARES.map((sq,i)=>{
+    if(sq.type!=='prop'||ownership[i]!==0) return null;
+    if(!ownsGroup(0,sq.group)) return null;
+    if(houses[i]>=5) return null;
+    if(p.money<sq.houseCost) return null;
+    const groupHouses=SQUARES.map((s2,i2)=>s2.type==='prop'&&s2.group===sq.group?houses[i2]:0);
+    const minH=Math.min(...groupHouses);
+    if(houses[i]>minH) return null;
+    return {sq,i};
+  }).filter(Boolean);
 }
 
-let animId;
-function loop(){
-  if(!running) return;
-  animId=requestAnimationFrame(loop);
-  update();
-  draw();
+function showBuildMenu(){
+  const builds=getBuildActions();
+  if(!builds.length){ addLog('Nothing to build on right now'); return; }
+  const p=PLAYERS[0];
+  const items=builds.map(({sq,i})=>{
+    const label=houses[i]===4?`🪸 Coral Castle on ${sq.emoji} ${sq.name} 🪙${sq.houseCost}`:`🏠 House on ${sq.emoji} ${sq.name} 🪙${sq.houseCost}`;
+    return {label,cls:'btn-primary',action:()=>{
+      p.money-=sq.houseCost; houses[i]++;
+      addLog(`Shark built ${houses[i]===5?'🪸 Coral Castle':'🏠 house'} on ${sq.emoji} ${sq.name}`);
+      updateTopPearls(); drawBoard(); closeModal();
+      humanTurn();
+    }};
+  });
+  showModal('🪸 Build',`Your pearls: 🪙${p.money}\n\nSelect where to build:`,[
+    ...items,
+    {label:'Cancel',cls:'btn-secondary',action:()=>{ closeModal(); humanTurn(); }},
+  ]);
 }
 
-document.getElementById('play-btn').addEventListener('click',()=>{
-  document.getElementById('overlay').style.display='none';
-  initGame();
-  running=true;
-  loop();
+function showPropMenu(){
+  const myProps=SQUARES.map((sq,i)=>({sq,i})).filter(({i})=>ownership[i]===0);
+  if(!myProps.length){ showModal('🗺️ Properties','You own no properties yet!',[{label:'OK',cls:'btn-secondary',action:closeModal}]); return; }
+  const lines=myProps.map(({sq,i})=>`${sq.emoji} ${sq.name}${houses[i]>0?' '+Array(Math.min(houses[i],4)).fill('🏠').join('')+(houses[i]>=5?'🪸':''):''}  Rent:🪙${calcRent(i,7)}`).join('\n');
+  showModal('🗺️ Your Properties',lines,[{label:'Close',cls:'btn-secondary',action:()=>{ closeModal(); humanTurn(); }}]);
+}
+
+// ── MODAL ──────────────────────────────────────────────────────
+function showModal(title, body, actions){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').textContent=body;
+  const actEl=document.getElementById('modal-actions');
+  actEl.innerHTML='';
+  actions.forEach(a=>{
+    const btn=document.createElement('button');
+    btn.className='btn '+(a.cls||'btn-primary');
+    btn.textContent=a.label;
+    if(a.disabled) btn.disabled=true;
+    btn.onclick=a.action;
+    actEl.appendChild(btn);
+  });
+  document.getElementById('modal-bg').style.display='flex';
+}
+
+function closeModal(){
+  document.getElementById('modal-bg').style.display='none';
+}
+
+// ── START ──────────────────────────────────────────────────────
+document.getElementById('start-btn').addEventListener('click',()=>{
+  document.getElementById('splash').style.display='none';
+  document.getElementById('game').style.display='flex';
+  layoutBoard();
+  drawBoard();
+  updatePlayersBar();
+  updateTopPearls();
+  humanTurn();
 });
-document.getElementById('retry-btn').addEventListener('click',()=>{
-  document.getElementById('winner-overlay').style.display='none';
-  if(animId) cancelAnimationFrame(animId);
-  initGame();
-  running=true;
-  loop();
+
+window.addEventListener('resize',()=>{ layoutBoard(); drawBoard(); });
+
+// tap on square info
+canvas.addEventListener('click', e=>{
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  for(let i=0;i<40;i++){
+    const sq=squarePos(i);
+    if(mx>=sq.x&&mx<=sq.x+sq.w&&my>=sq.y&&my<=sq.y+sq.h){
+      const s=SQUARES[i];
+      const owner=ownership[i];
+      let body=`${s.emoji} ${s.name}\n`;
+      if(s.price) body+=`Price: 🪙${s.price}\n`;
+      if(owner!==null) body+=`Owner: ${PLAYERS[owner].emoji} ${PLAYERS[owner].name}\n`;
+      if(s.type==='prop'&&s.rent) body+=`Rents: 🪙${s.rent.join(' / ')}\nHouses: ${houses[i]<5?houses[i]:'Coral Castle'}`;
+      if(s.type==='sub') body+=`Submarine — rent by subs owned: 🪙${s.subRent.join('/')}`;
+      showModal(s.name, body, [{label:'Close',cls:'btn-secondary',action:closeModal}]);
+      return;
+    }
+  }
 });
 </script>
 </body>
