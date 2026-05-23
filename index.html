@@ -88,7 +88,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 #round-info{font-size:10px;color:#8a9a7a;letter-spacing:1px;text-align:center;}
 
 /* JOYSTICK */
-#joy-zone{position:fixed;bottom:0;left:0;width:100%;height:46%;z-index:8;touch-action:none;}
+#joy-zone{position:fixed;bottom:0;left:0;width:100%;height:38%;z-index:8;touch-action:none;}
 #joy-base{position:absolute;border-radius:50%;background:rgba(40,100,40,0.08);border:1.5px solid rgba(40,100,40,0.2);display:none;pointer-events:none;}
 #joy-knob{position:absolute;border-radius:50%;background:rgba(40,150,40,0.35);border:1.5px solid rgba(40,180,40,0.6);pointer-events:none;}
 #credit-game{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:9px;color:#c8d8b8;letter-spacing:1px;z-index:9;pointer-events:none;white-space:nowrap;}
@@ -99,15 +99,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 .ov-icon{font-size:52px;margin-bottom:6px;}
 .ov-title{font-size:30px;font-weight:bold;margin-bottom:4px;letter-spacing:2px;}
 .ov-sub{font-size:12px;color:#6a8a6a;margin-bottom:10px;letter-spacing:.5px;text-align:center;max-width:260px;}
-.ov-scorecard{width:100%;max-width:280px;background:#fff;border-radius:14px;border:1.5px solid #d8e8c8;padding:12px 16px;margin-bottom:10px;}
-.ov-sc-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.ov-sc-row:last-child{margin-bottom:0;}
-.ov-sc-name{font-size:12px;font-weight:bold;color:#2a4a2a;width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ov-sc-pts{font-size:13px;font-weight:bold;width:22px;text-align:right;color:#2a6a2a;}
-.ov-sc-bar-wrap{flex:1;height:10px;background:#e8f0e0;border-radius:5px;overflow:hidden;}
-.ov-sc-bar{display:block;height:100%;border-radius:5px;transition:width 0.6s ease;}
-.ov-sc-bar-me{background:linear-gradient(90deg,#2a8a2a,#4acc4a);}
-.ov-sc-bar-opp{background:linear-gradient(90deg,#8a2a2a,#cc4a4a);}
+
+
+
+
+
+
+
+
+
 .ov-tally{font-size:26px;font-weight:bold;color:#2a6a2a;letter-spacing:4px;margin:4px 0 1px;}
 .ov-tally-lbl{font-size:9px;color:#8a9a7a;letter-spacing:2px;margin-bottom:12px;}
 .ov-ready-status{font-size:11px;color:#6a8a6a;min-height:18px;margin-bottom:6px;letter-spacing:.5px;}
@@ -127,7 +127,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   <div class="l-credit">Created by Ethan &amp; Elroy Fang · 2026</div>
 
   <div class="l-section">
-    <div class="l-label">Choose your snake</div>
+    <div class="l-label" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>Choose your snake</span>
+      <button id="random-btn" style="font-size:11px;padding:3px 10px;border:1.5px solid #c8ddb8;border-radius:12px;background:#fff;color:#4a7a4a;cursor:pointer;font-weight:bold;letter-spacing:.5px;">🎲 Random</button>
+    </div>
     <div id="species-grid"></div>
   </div>
   <div id="sp-detail">
@@ -160,7 +163,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
     <input id="pname" placeholder="Enter your name" maxlength="12" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
   </div>
 
-  <button class="l-btn l-btn-host" id="host-btn">🐍 Host Game</button>
+  <button class="l-btn" id="ai-btn" style="background:linear-gradient(135deg,#5a2a7a,#9a4acc);color:#fff;box-shadow:0 4px 16px rgba(120,50,200,0.3);">🤖 Play vs AI</button>
+  <button class="l-btn l-btn-host" id="host-btn">🌐 Host Multiplayer</button>
   <div class="l-or">— OR JOIN —</div>
   <div class="l-section">
     <div class="l-label">Room code</div>
@@ -218,22 +222,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   <div class="ov-title" id="win-title">YOU WIN!</div>
   <div class="ov-sub" id="win-sub"></div>
 
-  <!-- Score card -->
-  <div class="ov-scorecard">
-    <div class="ov-sc-row">
-      <span class="ov-sc-name" id="ov-me-name">You</span>
-      <span class="ov-sc-pts" id="ov-me-pts">0</span>
-      <span class="ov-sc-bar-wrap"><span class="ov-sc-bar ov-sc-bar-me" id="ov-me-bar"></span></span>
-    </div>
-    <div class="ov-sc-row">
-      <span class="ov-sc-name" id="ov-opp-name">Opponent</span>
-      <span class="ov-sc-pts" id="ov-opp-pts">0</span>
-      <span class="ov-sc-bar-wrap"><span class="ov-sc-bar ov-sc-bar-opp" id="ov-opp-bar"></span></span>
-    </div>
-  </div>
 
   <div class="ov-tally" id="win-tally">0—0</div>
-  <div class="ov-tally-lbl">TOTAL WINS</div>
+  <div class="ov-tally-lbl" id="ov-tally-lbl">ROUND WINS (first to 5)</div>
 
   <!-- Ready state (for 2-player) -->
   <div id="ov-ready-section" style="margin-top:4px;text-align:center;">
@@ -250,18 +241,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   <div class="ov-title" id="wait-title" style="font-size:26px;"></div>
   <div class="ov-sub" id="wait-sub"></div>
 
-  <div class="ov-scorecard">
-    <div class="ov-sc-row">
-      <span class="ov-sc-name" id="ov-wait-me-name">You</span>
-      <span class="ov-sc-pts" id="ov-wait-me-pts">0</span>
-      <span class="ov-sc-bar-wrap"><span class="ov-sc-bar ov-sc-bar-me" id="ov-wait-me-bar"></span></span>
-    </div>
-    <div class="ov-sc-row">
-      <span class="ov-sc-name" id="ov-wait-opp-name">Host</span>
-      <span class="ov-sc-pts" id="ov-wait-opp-pts">0</span>
-      <span class="ov-sc-bar-wrap"><span class="ov-sc-bar ov-sc-bar-opp" id="ov-wait-opp-bar"></span></span>
-    </div>
-  </div>
 
   <div class="ov-tally" id="wait-tally">0—0</div>
   <div class="ov-tally-lbl">TOTAL WINS</div>
@@ -326,14 +305,14 @@ const ABLY_KEY='S4V2Tw.1ozI7g:9FOhAo1Uej8UubN3zVgWSnswcXAJ6wiSzHC2jBq2dZ4';
 
 // ── SPECIES ───────────────────────────────────────────────────
 const SPECIES=[
-  {id:'cobra',    name:'Cobra',     emoji:'🐍', head:'#1a6b1a', body:['#2d8b2d','#1a6b1a'], pattern:'solid',  speed:3.2, turnSpeed:0.076, spd:3, agi:3, siz:4, tip:'Balanced all-rounder'},
-  {id:'viper',    name:'Viper',     emoji:'🟡', head:'#8b7200', body:['#d4a800','#a87e00'], pattern:'zigzag', speed:3.8, turnSpeed:0.088, spd:4, agi:4, siz:2, tip:'Fast and nimble but fragile'},
-  {id:'mamba',    name:'Mamba',     emoji:'🟢', head:'#006b2a', body:['#00aa44','#007733'], pattern:'solid',  speed:4.6, turnSpeed:0.058, spd:5, agi:3, siz:2, tip:'Blazing speed, slim profile'},
-  {id:'rattler',  name:'Rattler',   emoji:'🔴', head:'#7a2800', body:['#c44000','#7a2800'], pattern:'rattle', speed:2.8, turnSpeed:0.096, spd:2, agi:5, siz:3, tip:'Tightest turns of any snake'},
-  {id:'anaconda', name:'Anaconda',  emoji:'🟤', head:'#3a2800', body:['#7a5500','#5a3d00'], pattern:'blotch', speed:1.8, turnSpeed:0.052, spd:1, agi:2, siz:7, tip:'Enormous — hard to avoid'},
-  {id:'kingsnake',name:'King Snake',emoji:'⚫', head:'#111111', body:['#222222','#cc2222'], pattern:'bands',  speed:3.2, turnSpeed:0.100, spd:3, agi:5, siz:2, tip:'Ultra-agile, razor thin'},
-  {id:'boa',      name:'Boa',       emoji:'🟠', head:'#6b3800', body:['#c06010','#8b4400'], pattern:'blotch', speed:3.6, turnSpeed:0.064, spd:4, agi:2, siz:4, tip:'Fast and stocky — hard to dodge'},
-  {id:'python',   name:'Python',    emoji:'⚪', head:'#c8b870', body:['#e8d898','#b89850'], pattern:'blotch', speed:2.4, turnSpeed:0.078, spd:2, agi:3, siz:5, tip:'Large and steady, hard to kill'},
+  {id:'cobra',    name:'Cobra',     emoji:'🐍', head:'#1a7a1a', body:['#2aaa2a','#1a6b1a','#157015'], pattern:'solid',  hood:'#1a5a1a', speed:1.28, turnSpeed:0.076, spd:3, agi:3, siz:4, tip:'Balanced all-rounder'},
+  {id:'viper',    name:'Viper',     emoji:'🟡', head:'#c4a000', body:['#d4b800','#a88000','#c4a000'], pattern:'zigzag', speed:1.6, turnSpeed:0.088, spd:4, agi:4, siz:2, tip:'Fast and nimble but fragile'},
+  {id:'mamba',    name:'Mamba',     emoji:'🟢', head:'#007a30', body:['#00aa44','#007733','#006628'], pattern:'solid',  speed:1.92, turnSpeed:0.058, spd:5, agi:3, siz:2, tip:'Blazing speed, slim profile'},
+  {id:'rattler',  name:'Rattler',   emoji:'🔴', head:'#c44000', body:['#d45010','#a43000','#888888'], pattern:'rattle', speed:1.12, turnSpeed:0.096, spd:2, agi:5, siz:3, tip:'Tightest turns of any snake'},
+  {id:'anaconda', name:'Anaconda',  emoji:'🟤', head:'#5a3d00', body:['#7a5500','#3a2800','#5a3d00'], pattern:'blotch', speed:0.72, turnSpeed:0.052, spd:1, agi:2, siz:7, tip:'Enormous — hard to avoid'},
+  {id:'kingsnake',name:'King Snake',emoji:'⚫', head:'#111111', body:['#222222','#cc2222','#eeeeee'], pattern:'bands',  speed:1.28, turnSpeed:0.100, spd:3, agi:5, siz:2, tip:'Ultra-agile, razor thin'},
+  {id:'boa',      name:'Boa',       emoji:'🟠', head:'#8b4400', body:['#c06010','#6b3000','#ffaa00'], pattern:'blotch', speed:1.44, turnSpeed:0.064, spd:4, agi:2, siz:4, tip:'Fast and stocky — hard to dodge'},
+  {id:'python',   name:'Python',    emoji:'⚪', head:'#b89850', body:['#e8d898','#8a6830','#d4aa20'], pattern:'blotch', speed:0.96, turnSpeed:0.078, spd:2, agi:3, siz:5, tip:'Large and steady, hard to kill'},
 ];
 
 // ── HABITATS ──────────────────────────────────────────────────
@@ -400,10 +379,21 @@ SPECIES.forEach(sp=>{
 });
 showDetail(SPECIES[0]);
 
+document.getElementById('random-btn').onclick=()=>{
+  const sp=SPECIES[Math.floor(Math.random()*SPECIES.length)];
+  document.querySelectorAll('.sp-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.sp-card').forEach(c=>{
+    if(c.querySelector('.sp-name')&&c.querySelector('.sp-name').textContent===sp.name) c.classList.add('sel');
+  });
+  mySpeciesId=sp.id;
+  showDetail(sp);
+};
+
 // ── LOBBY STATE ───────────────────────────────────────────────
 let ably=null,channel=null;
 let myId=null,isHost=false,roomCode=null;
 let myName='Player',vsAI=false;
+let matchMySpecies=null,matchOppSpecies=null; // locked for whole match
 let lobbyGuest=null;
 let tally=[0,0],round=1;
 let hostReady=false,guestReady=false;
@@ -419,6 +409,16 @@ function initAbly(cb){
   ably.connection.on('failed',s=>setStatus('❌ '+(s.reason&&s.reason.message||'Connection failed')));
   ably.connection.on('disconnected',()=>{if(!done)setStatus('🔄 Retrying...');});
 }
+
+document.getElementById('ai-btn').onclick=()=>{
+  myName=document.getElementById('pname').value.trim()||'Player';
+  isHost=true; myId=0; vsAI=true;
+  tally=[0,0]; round=1;
+  matchMySpecies=mySpeciesId;
+  matchOppSpecies=SPECIES[Math.floor(Math.random()*SPECIES.length)].id;
+  const state=buildState();
+  launchGame(state);
+};
 
 document.getElementById('host-btn').onclick=()=>{
   myName=document.getElementById('pname').value.trim()||'Host';
@@ -465,6 +465,9 @@ function updatePlayerList(){
 document.getElementById('start-btn').onclick=()=>{
   if(!isHost)return;
   vsAI=!lobbyGuest;
+  tally=[0,0];round=1; // fresh match
+  matchMySpecies=mySpeciesId;
+  matchOppSpecies=lobbyGuest?lobbyGuest.species:SPECIES[Math.floor(Math.random()*SPECIES.length)].id;
   const state=buildState();
   if(!vsAI) channel.publish('start',{state,tally,round});
   launchGame(state);
@@ -487,6 +490,8 @@ function onMsg(msg){
   else if(t==='start'){
     if(isHost)return;
     tally=d.tally||[0,0];round=d.round||1;
+    matchMySpecies=mySpeciesId;
+    matchOppSpecies=d.state.meSpec; // host's species
     launchGame(d.state);
   }
   else if(t==='pos'){
@@ -495,7 +500,6 @@ function onMsg(msg){
     const s=isHost?G.opp:G.opp;
     s.headX=d.x;s.headY=d.y;s.angle=d.a;
     if(d.segs) s.segs=d.segs;
-    s.score=d.sc;
     updateHUD();
   }
   else if(t==='pellet'){
@@ -509,7 +513,7 @@ function onMsg(msg){
     G.running=false;
     cancelAnimationFrame(G.animId);clearInterval(G.syncTimer);
     tally=d.tally;round=d.round;
-    const wIsDraw=d.winner==='draw'; showWaitOverlay(wIsDraw?false:d.winner==='opp',d.tally,d.msg,d.rme||0,d.ropp||0);
+    const wIsDraw=d.winner==='draw'; showWaitOverlay(wIsDraw?false:d.winner==='opp',d.tally,d.msg,d.matchOver||false);
   }
   else if(t==='replay'){
     if(isHost)return;
@@ -543,17 +547,26 @@ function onMsg(msg){
 
 // ── GAME STATE ────────────────────────────────────────────────
 const W=window.innerWidth,H=window.innerHeight;
-const WORLD=275;
-const CELL=14;
-const PELLET_COUNT=60;
-const WIN_SCORE=5;
-const ROUND_TIME=90;
+const HUD_H=48;
+const GAME_W=W;
+const GAME_H=H-HUD_H;
+// Portrait world: narrow width, tall height — fills phone screen vertically
+const WORLD_W=200;   // world is narrow (portrait)
+const WORLD_H=Math.round(WORLD_W*(GAME_H/GAME_W)); // tall to match phone aspect
+const SCALE_X=GAME_W/WORLD_W;  // scale to fill screen width
+const SCALE_Y=GAME_H/WORLD_H;  // scale to fill screen height
+const SCALE=SCALE_X; // uniform scale (same in both axes)
+const CELL=6;
+const PELLET_COUNT=25;
+const WIN_SCORE=5;    // round wins to end the match
+const MATCH_WIN=5;    // same — first to 5 round wins
+const ROUND_TIME=60;
 const BASE_R=68,KNOB_R=28;
 const SYNC_MS=50;
 
 const PELLET_COLORS=['#e74c3c','#f39c12','#27ae60','#2980b9','#8e44ad','#e67e22','#16a085','#d35400'];
 
-let G={running:false,animId:null,syncTimer:null,timerInterval:null,me:null,opp:null,pellets:[],cam:{x:0,y:0},timeLeft:ROUND_TIME};
+let G={running:false,animId:null,syncTimer:null,timerInterval:null,me:null,opp:null,pellets:[],timeLeft:ROUND_TIME};
 let joyDx=0,joyDy=0,joyActive=false,joyOrigin={x:0,y:0};
 
 function getSp(id){return SPECIES.find(s=>s.id===id)||SPECIES[0];}
@@ -563,24 +576,24 @@ function buildState(){
   const pellets=[];
   for(let i=0;i<PELLET_COUNT;i++) pellets.push(mkPellet(hab));
   return {
-    meSpec:mySpeciesId,
-    oppSpec:lobbyGuest?lobbyGuest.species:'cobra',
+    meSpec:matchMySpecies||mySpeciesId,
+    oppSpec:matchOppSpecies||(lobbyGuest?lobbyGuest.species:SPECIES[0].id),
     meName:myName,
     oppName:lobbyGuest?lobbyGuest.name:'AI',
     pellets,
     habitatId:hab.id,
-    meStart:{x:WORLD*0.28,y:WORLD/2,angle:0},
-    oppStart:{x:WORLD*0.72,y:WORLD/2,angle:Math.PI},
+    meStart:{x:WORLD_W*0.15,y:WORLD_H*0.15,angle:Math.PI*0.25},
+    oppStart:{x:WORLD_W*0.85,y:WORLD_H*0.85,angle:Math.PI*1.25},
   };
 }
-function mkPellet(hab){const colors=(hab||activeHabitat).pellet;return{x:60+Math.random()*(WORLD-120),y:60+Math.random()*(WORLD-120),r:5+Math.random()*4,c:colors[0|Math.random()*colors.length],pulse:Math.random()*Math.PI*2};}
+function mkPellet(hab){const colors=(hab||activeHabitat).pellet;const mg=12;return{x:mg+Math.random()*(WORLD_W-mg*2),y:mg+Math.random()*(WORLD_H-mg*2),r:3+Math.random()*3,c:colors[0|Math.random()*colors.length],pulse:Math.random()*Math.PI*2};}
 
 function mkSnake(x,y,angle,sp,name,isMe){
-  // base 36 segs (3x original 12), scaled by size stat
-  const baseSeg=Math.round(36*(sp.siz/4));
+  const baseSeg=sp.siz*sp.siz; // siz:1→1,2→4,3→9,4→16,5→25,7→49 segs
+  const spacing=CELL*0.85;
   const segs=[];
-  for(let i=0;i<baseSeg;i++) segs.push({x:x-Math.cos(angle)*i*CELL*0.7,y:y-Math.sin(angle)*i*CELL*0.7});
-  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle,aiTimer:0};
+  for(let i=0;i<baseSeg;i++) segs.push({x:x-Math.cos(angle)*i*spacing,y:y-Math.sin(angle)*i*spacing});
+  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle+0.8,aiTimer:0,graceTicks:90};
 }
 
 // ── LAUNCH ────────────────────────────────────────────────────
@@ -590,7 +603,8 @@ function launchGame(state){
   hideOverlays();
 
   const canvas=document.getElementById('gc');
-  canvas.width=W;canvas.height=H;
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  canvas.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;';
 
   const meSp=getSp(state.meSpec);
   const oppSp=getSp(state.oppSpec);
@@ -605,7 +619,6 @@ function launchGame(state){
   }
 
   G.pellets=state.pellets.map(p=>({...p}));
-  G.cam={x:G.me.headX-W/2,y:G.me.headY-H/2};
   G.running=true;
   activeHabitat=HABITATS.find(h=>h.id===state.habitatId)||HABITATS[0];
   applyHabitatHUD();
@@ -613,8 +626,8 @@ function launchGame(state){
   // update emoji displays
   document.getElementById('me-emoji').textContent=G.me.sp.emoji;
   document.getElementById('opp-emoji').textContent=G.opp.sp.emoji;
-  document.getElementById('me-name').textContent=G.me.name;
-  document.getElementById('opp-name').textContent=G.opp.name;
+  document.getElementById('me-name').textContent=G.me.name+' ('+G.me.sp.name+')';
+  document.getElementById('opp-name').textContent=G.opp.name+' ('+G.opp.sp.name+')';
   document.getElementById('me-name').style.color=G.me.sp.head;
   document.getElementById('opp-name').style.color=G.opp.sp.head;
 
@@ -627,7 +640,7 @@ function launchGame(state){
   updateTimerDisplay();
   gameLoop();
   G.syncTimer=setInterval(syncPos,SYNC_MS);
-  if(isHost){
+  if(isHost||vsAI){
     G.timerInterval=setInterval(()=>{
       if(!G.running){clearInterval(G.timerInterval);return;}
       G.timeLeft--;
@@ -657,10 +670,15 @@ function gameLoop(){
   if(!G.running)return;
   G.animId=requestAnimationFrame(gameLoop);
   updateMe();
-  if(vsAI&&isHost) updateAI();
-  G.cam.x+=(G.me.headX-W/2-G.cam.x)*0.1;
-  G.cam.y+=(G.me.headY-H/2-G.cam.y)*0.1;
+  if(vsAI) updateAI();
   draw();
+  // grace period flash on HUD
+  const gt=G.me.graceTicks||0;
+  const timerEl=document.getElementById('timer-display');
+  if(gt>0&&timerEl){
+    const sec=Math.ceil(gt/60);
+    timerEl.style.color=sec<=1?'#cc2222':'#2a6a2a';
+  }
 }
 
 function updateMe(){
@@ -671,126 +689,171 @@ function updateMe(){
     while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
     G.me.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed);
   }
-  const nx=G.me.headX+Math.cos(G.me.angle)*sp.speed;
-  const ny=G.me.headY+Math.sin(G.me.angle)*sp.speed;
-  G.me.headX=Math.max(20,Math.min(WORLD-20,nx));
-  G.me.headY=Math.max(20,Math.min(WORLD-20,ny));
+  const WB=4;
+  let nx=G.me.headX+Math.cos(G.me.angle)*sp.speed;
+  let ny=G.me.headY+Math.sin(G.me.angle)*sp.speed;
+  // Wall follow: slide along wall if heading into it
+  if(nx<WB){nx=WB; if(Math.cos(G.me.angle)<0) G.me.angle=Math.sin(G.me.angle)>=0?Math.PI/2:-Math.PI/2;}
+  if(nx>WORLD_W-WB){nx=WORLD_W-WB; if(Math.cos(G.me.angle)>0) G.me.angle=Math.sin(G.me.angle)>=0?Math.PI/2:-Math.PI/2;}
+  if(ny<WB){ny=WB; if(Math.sin(G.me.angle)<0) G.me.angle=Math.cos(G.me.angle)>=0?0:Math.PI;}
+  if(ny>WORLD_H-WB){ny=WORLD_H-WB; if(Math.sin(G.me.angle)>0) G.me.angle=Math.cos(G.me.angle)>=0?0:Math.PI;}
+  G.me.headX=nx; G.me.headY=ny;
   G.me.segs.unshift({x:G.me.headX,y:G.me.headY});
   G.me.segs.pop();
 
   // eat pellets
-  const hr=headR(G.me)+6;
+  const eatR=headR(G.me)*0.7;
+  const colR=headR(G.me);
   for(let i=G.pellets.length-1;i>=0;i--){
     const p=G.pellets[i];
     const dx=G.me.headX-p.x,dy=G.me.headY-p.y;
-    if(dx*dx+dy*dy<(hr+p.r)*(hr+p.r)){
-      G.me.score++;
-      // grow
-      for(let k=0;k<4;k++) G.me.segs.push({...G.me.segs[G.me.segs.length-1]});
+    if(dx*dx+dy*dy<(eatR+p.r)*(eatR+p.r)){
+      G.me.segs.push({...G.me.segs[G.me.segs.length-1]});
       G.pellets.splice(i,1);
       G.pellets.push(mkPellet());
       if(isHost&&!vsAI) channel.publish('pellet',{pellets:G.pellets});
-      updateHUD();
-      if(G.me.score>=WIN_SCORE){endGame('me','Reached '+WIN_SCORE+' points!');return;}
     }
   }
 
-  // collision with opp body (skip first 5 segs of opp head area)
-  if(isHost){
-    const oppSegs=G.opp.segs.slice(5);
-    for(let i=0;i<oppSegs.length;i++){
-      const s=oppSegs[i];
-      const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
-      const br=bodyR(G.opp,i+5);
-      if(dx*dx+dy*dy<(hr*.7+br*.7)*(hr*.7+br*.7)){
-        endGame('opp',G.opp.name+' wins — '+G.me.name+' crashed!');return;
+  // collision checks
+  if(isHost||vsAI){
+    if(G.me.graceTicks>0) G.me.graceTicks--;
+    if(G.opp.graceTicks>0) G.opp.graceTicks--;
+    if(vsAI){
+      const meGrace=(G.me.graceTicks||0)>0;
+      const oppGrace=(G.opp.graceTicks||0)>0;
+      // Player head into AI body → player LOSES
+      if(!meGrace){
+        for(let i=4;i<G.opp.segs.length;i++){
+          const s=G.opp.segs[i];
+          const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
+          const br=bodyR(G.opp,i);
+          if(dx*dx+dy*dy<(colR+br)*(colR+br)){
+            endGame('opp','You crashed into AI!');return;
+          }
+        }
+      }
+      // AI head into player body → player WINS
+      if(!oppGrace){
+        const oppColR=headR(G.opp);
+        for(let i=4;i<G.me.segs.length;i++){
+          const s=G.me.segs[i];
+          const dx=G.opp.headX-s.x,dy=G.opp.headY-s.y;
+          const br=bodyR(G.me,i);
+          if(dx*dx+dy*dy<(oppColR+br)*(oppColR+br)){
+            endGame('me','AI crashed into you!');return;
+          }
+        }
+      }
+    } else {
+      // 2-player
+      if((G.me.graceTicks||0)===0){
+        for(let i=4;i<G.opp.segs.length;i++){
+          const s=G.opp.segs[i];
+          const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
+          if(dx*dx+dy*dy<(colR+bodyR(G.opp,i))*(colR+bodyR(G.opp,i))){
+            endGame('opp','You crashed into AI body!');return;
+          }
+        }
+      }
+      if((G.opp.graceTicks||0)===0){
+        const oppColR=headR(G.opp);
+        for(let i=4;i<G.me.segs.length;i++){
+          const s=G.me.segs[i];
+          const dx=G.opp.headX-s.x,dy=G.opp.headY-s.y;
+          if(dx*dx+dy*dy<(oppColR+bodyR(G.me,i))*(oppColR+bodyR(G.me,i))){
+            endGame('me','Opponent crashed into your body!');return;
+          }
+        }
       }
     }
-    // check opp head into me body
-    if(!vsAI){
-      const oh=headR(G.opp)+4;
-      G.me.segs.slice(5).forEach((s,i)=>{
-        const dx=G.opp.headX-s.x,dy=G.opp.headY-s.y;
-        const br=bodyR(G.me,i+5);
-        if(dx*dx+dy*dy<(oh*.7+br*.7)*(oh*.7+br*.7)){
-          endGame('me',G.me.name+' wins — '+G.opp.name+' crashed!');
-        }
-      });
-    }
   }
+}
+
+
+function aiMove(headX,headY,angle,speed){
+  // Move and wall-follow, return {x,y,angle}
+  const WB=5;
+  let nx=headX+Math.cos(angle)*speed;
+  let ny=headY+Math.sin(angle)*speed;
+  if(nx<WB){nx=WB; angle=Math.sin(angle)>=0?Math.PI/2:-Math.PI/2;}
+  else if(nx>WORLD_W-WB){nx=WORLD_W-WB; angle=Math.sin(angle)>=0?Math.PI/2:-Math.PI/2;}
+  if(ny<WB){ny=WB; angle=Math.cos(angle)>=0?0:Math.PI;}
+  else if(ny>WORLD_H-WB){ny=WORLD_H-WB; angle=Math.cos(angle)>=0?0:Math.PI;}
+  return{x:Math.max(WB,Math.min(WORLD_W-WB,nx)),y:Math.max(WB,Math.min(WORLD_H-WB,ny)),angle};
 }
 
 function updateAI(){
+  if(!G.opp||!G.running)return;
   const sp=G.opp.sp;
-  const WALL=80; // danger zone distance from wall
-
-  // ── Wall avoidance (every frame, overrides target) ──────────
   const ox=G.opp.headX, oy=G.opp.headY;
-  const nearLeft=ox<WALL, nearRight=ox>WORLD-WALL;
-  const nearTop=oy<WALL, nearBottom=oy>WORLD-WALL;
-  let wallAvoid=false;
-  if(nearLeft||nearRight||nearTop||nearBottom){
-    wallAvoid=true;
-    // steer toward centre
-    const cx=WORLD/2, cy=WORLD/2;
-    const toCenter=Math.atan2(cy-oy,cx-ox);
-    // add small random deviation so it doesn't oscillate
-    G.opp.aiTarget=toCenter+(Math.random()-.5)*0.3;
-    G.opp.aiTimer=5; // recheck soon
-  }
+  const WALL=18; // stay this far from walls
 
-  // ── Target selection ────────────────────────────────────────
-  if(!wallAvoid){
-    G.opp.aiTimer--;
-    if(G.opp.aiTimer<=0){
-      G.opp.aiTimer=15+Math.random()*35;
-      // find nearest pellet not near a wall
-      let best=null,bestD=9999;
+  // ── Choose target every N frames ─────────────────────────
+  if(G.opp.aiTimer>0) G.opp.aiTimer--;
+  if(G.opp.aiTimer<=0){
+    G.opp.aiTimer=12+0|Math.random()*15;
+    const meX=G.me?G.me.headX:WORLD_W/2;
+    const meY=G.me?G.me.headY:WORLD_H/2;
+    const distToPlayer=Math.hypot(ox-meX,oy-meY);
+
+    // Hunt player if close enough AND not near a wall ourselves
+    const safeFromWall=ox>WALL&&ox<WORLD_W-WALL&&oy>WALL&&oy<WORLD_H-WALL;
+    if(safeFromWall && distToPlayer<WORLD_H*0.5 && Math.random()<0.55){
+      // Try to cut in front of player (intercept)
+      const playerFutureX=meX+Math.cos(G.me.angle)*sp.speed*15;
+      const playerFutureY=meY+Math.sin(G.me.angle)*sp.speed*15;
+      const fx=Math.max(WALL,Math.min(WORLD_W-WALL,playerFutureX));
+      const fy=Math.max(WALL,Math.min(WORLD_H-WALL,playerFutureY));
+      G.opp.aiTarget=Math.atan2(fy-oy,fx-ox);
+    } else {
+      // Go to nearest safe pellet
+      let best=null,bestScore=9999;
       G.pellets.forEach(p=>{
-        if(p.x<WALL||p.x>WORLD-WALL||p.y<WALL||p.y>WORLD-WALL)return;
-        const dx=ox-p.x,dy=oy-p.y;
-        const d=Math.sqrt(dx*dx+dy*dy);
-        if(d<bestD){bestD=d;best=p;}
+        if(p.x<WALL||p.x>WORLD_W-WALL||p.y<WALL||p.y>WORLD_H-WALL)return;
+        const d=Math.hypot(ox-p.x,oy-p.y);
+        if(d<bestScore){bestScore=d;best=p;}
       });
-      if(!best) G.pellets.forEach(p=>{
-        const dx=ox-p.x,dy=oy-p.y;
-        const d=Math.sqrt(dx*dx+dy*dy);
-        if(d<bestD){bestD=d;best=p;}
-      });
-      if(best) G.opp.aiTarget=Math.atan2(best.y-oy,best.x-ox)+(Math.random()-.5)*.25;
-      else G.opp.aiTarget=Math.atan2(WORLD/2-oy,WORLD/2-ox); // default: go to centre
+      if(!best){// fallback any pellet
+        G.pellets.forEach(p=>{const d=Math.hypot(ox-p.x,oy-p.y);if(d<bestScore){bestScore=d;best=p;}});
+      }
+      G.opp.aiTarget=best
+        ? Math.atan2(best.y-oy,best.x-ox)
+        : Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
     }
   }
 
-  // ── Steer toward target ─────────────────────────────────────
+  // ── Wall avoidance: hard override every frame ─────────────
+  const ox2=G.opp.headX,oy2=G.opp.headY;
+  if(ox2<WALL||ox2>WORLD_W-WALL||oy2<WALL||oy2>WORLD_H-WALL){
+    G.opp.aiTarget=Math.atan2(WORLD_H/2-oy2,WORLD_W/2-ox2);
+    G.opp.aiTimer=0; // recheck immediately next frame
+  }
+
+  // ── Steer toward target ───────────────────────────────────
   let da=G.opp.aiTarget-G.opp.angle;
   while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
-  G.opp.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed*0.9);
+  G.opp.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed*1.3);
 
-  // ── Move, hard-clamp from wall ──────────────────────────────
-  const nx=G.opp.headX+Math.cos(G.opp.angle)*sp.speed*0.9;
-  const ny=G.opp.headY+Math.sin(G.opp.angle)*sp.speed*0.9;
-  G.opp.headX=Math.max(30,Math.min(WORLD-30,nx));
-  G.opp.headY=Math.max(30,Math.min(WORLD-30,ny));
-  // if clamped, deflect angle away from wall
-  if(nx<30||nx>WORLD-30) G.opp.angle=Math.PI-G.opp.angle;
-  if(ny<30||ny>WORLD-30) G.opp.angle=-G.opp.angle;
+  // ── Move ─────────────────────────────────────────────────
+  const mv=aiMove(G.opp.headX,G.opp.headY,G.opp.angle,sp.speed*0.95);
+  G.opp.headX=mv.x; G.opp.headY=mv.y; G.opp.angle=mv.angle;
 
-  G.opp.segs.unshift({x:G.opp.headX,y:G.opp.headY});G.opp.segs.pop();
+  G.opp.segs.unshift({x:G.opp.headX,y:G.opp.headY});
+  G.opp.segs.pop();
+  if(G.opp.graceTicks>0) G.opp.graceTicks--;
 
-  // ── Eat pellets ─────────────────────────────────────────────
-  const hr=headR(G.opp)+6;
+  // ── Eat pellets ───────────────────────────────────────────
+  const eatR=headR(G.opp)*0.7;
   for(let i=G.pellets.length-1;i>=0;i--){
     const p=G.pellets[i];
-    const dx=G.opp.headX-p.x,dy=G.opp.headY-p.y;
-    if(dx*dx+dy*dy<(hr+p.r)*(hr+p.r)){
-      G.opp.score++;for(let k=0;k<4;k++) G.opp.segs.push({...G.opp.segs[G.opp.segs.length-1]});
+    if(Math.hypot(G.opp.headX-p.x,G.opp.headY-p.y)<eatR+p.r){
+      G.opp.segs.push({...G.opp.segs[G.opp.segs.length-1]});
       G.pellets.splice(i,1);G.pellets.push(mkPellet());
-      updateHUD();
-      if(G.opp.score>=WIN_SCORE){endGame('opp',G.opp.name+' reached '+WIN_SCORE+' points!');return;}
     }
   }
 }
+
 
 // ── DRAW ──────────────────────────────────────────────────────
 const canvas2=document.getElementById('gc');
@@ -798,7 +861,7 @@ const ctx=canvas2.getContext('2d');
 
 function drawHabitatDecor(hab){
   ctx.save();ctx.globalAlpha=0.12;
-  const d=hab.decor,W2=WORLD;
+  const d=hab.decor,W2=WORLD_W,H2=WORLD_H;
   if(d==='desert'){
     ctx.fillStyle='#c8a44a';
     // dunes
@@ -808,10 +871,10 @@ function drawHabitatDecor(hab){
     for(let i=0;i<20;i++){ctx.beginPath();ctx.arc(80+i*95,(100+i*87)%W2,6,0,Math.PI*2);ctx.fill();}
   } else if(d==='jungle'||d==='rainforest'){
     ctx.fillStyle='#2a7a2a';
-    for(let i=0;i<30;i++){ctx.beginPath();ctx.arc((i*137)%W2,(i*191)%W2,20+i%15,0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<30;i++){ctx.beginPath();ctx.arc((i*137)%W2,(i*191)%H2,20+i%15,0,Math.PI*2);ctx.fill();}
   } else if(d==='mangrove'){
     ctx.fillStyle='#3a6a3a';
-    for(let i=0;i<20;i++){ctx.beginPath();ctx.arc((i*173)%W2,(i*211)%W2,15+i%12,0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<20;i++){ctx.beginPath();ctx.arc((i*173)%W2,(i*211)%H2,15+i%12,0,Math.PI*2);ctx.fill();}
     ctx.strokeStyle='#2a4a6a';ctx.lineWidth=2;
     for(let i=0;i<10;i++){ctx.beginPath();ctx.moveTo((i*200)%W2,0);ctx.lineTo((i*200+100)%W2,W2);ctx.stroke();}
   } else if(d==='beach'){
@@ -848,19 +911,23 @@ function drawHabitatDecor(hab){
 
 function draw(){
   ctx.clearRect(0,0,W,H);
-  ctx.save();ctx.translate(-G.cam.x,-G.cam.y);
+  // fill area above HUD with lobby bg
+  ctx.fillStyle='#f5f0e4';ctx.fillRect(0,0,W,HUD_H);
+  ctx.save();
+  ctx.translate(0,HUD_H);
+  ctx.scale(SCALE_X,SCALE_Y); // fill entire game area
 
   // background
   const hab=activeHabitat;
-  ctx.fillStyle=hab.bg;ctx.fillRect(0,0,WORLD,WORLD);
+  ctx.fillStyle=hab.bg;ctx.fillRect(0,0,WORLD_W,WORLD_H);
   drawHabitatDecor(hab);
-  // grid
-  ctx.strokeStyle=hab.grid;ctx.lineWidth=1;
-  const gs=80;
-  for(let x=0;x<WORLD;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD);ctx.stroke();}
-  for(let y=0;y<WORLD;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD,y);ctx.stroke();}
+  // grid (in world coords)
+  ctx.strokeStyle=hab.grid;ctx.lineWidth=1/SCALE_X;
+  const gs=40;
+  for(let x=0;x<WORLD_W;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD_H);ctx.stroke();}
+  for(let y=0;y<WORLD_H;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD_W,y);ctx.stroke();}
   // border
-  ctx.strokeStyle=hab.border;ctx.lineWidth=3;ctx.strokeRect(0,0,WORLD,WORLD);
+  ctx.strokeStyle=hab.border;ctx.lineWidth=2/SCALE_X;ctx.strokeRect(0,0,WORLD_W,WORLD_H);
 
   // pellets
   G.pellets.forEach(p=>{
@@ -873,81 +940,119 @@ function draw(){
   });
 
   // snakes
-  drawSnake(G.opp);drawSnake(G.me);
+  if(G.opp&&G.opp.segs) drawSnake(G.opp);
+  if(G.me&&G.me.segs) drawSnake(G.me);
+  // AI indicator ring (always visible)
+  if(vsAI&&G.opp&&G.opp.segs){
+    const oh=G.opp.segs[0],ohr=headR(G.opp);
+    ctx.beginPath();ctx.arc(oh.x,oh.y,ohr+3,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,50,50,0.7)';ctx.lineWidth=1.5/SCALE_X;ctx.stroke();
+  }
 
-  ctx.restore();
+  ctx.restore(); // end SCALE transform
 
-  // minimap
+  // minimap drawn in screen coords
   drawMinimap();
 }
 
-function headR(snake){return (CELL/2)*(0.6+snake.sp.siz*0.12)+snake.segs.length*.03;}
+function headR(snake){return CELL*(0.3+snake.sp.siz*0.06)+snake.segs.length*0.01;}
 function bodyR(snake,i){const h=headR(snake);return Math.max(h*.5+h*.5*(1-i/snake.segs.length),h*.4);}
 
 function drawSnake(snake){
   const sp=snake.sp;
-  // body
-  for(let i=snake.segs.length-1;i>0;i--){
+  const total=snake.segs.length;
+  // body — 3-color pattern matching species icons
+  for(let i=total-1;i>0;i--){
     const seg=snake.segs[i];
     const r=bodyR(snake,i);
-    ctx.beginPath();ctx.arc(seg.x,seg.y,r,0,Math.PI*2);
-    // pattern colouring
     let col;
-    if(sp.pattern==='bands') col=sp.body[i%2];
-    else if(sp.pattern==='rattle'&&i>snake.segs.length-5) col='#888888';
-    else col=sp.body[i%2];
-    ctx.fillStyle=col;ctx.fill();
+    if(sp.pattern==='bands') col=sp.body[i%3];
+    else if(sp.pattern==='rattle') col=i>total-4?'#aaaaaa':(i%2===0?sp.body[0]:sp.body[1]);
+    else if(sp.pattern==='blotch') col=i%3===0?sp.body[1]:sp.body[0];
+    else if(sp.pattern==='zigzag') col=Math.floor(i/2)%2===0?sp.body[0]:sp.body[1];
+    else col=i%2===0?sp.body[0]:sp.body[1];
+    ctx.beginPath();ctx.arc(seg.x,seg.y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
   }
-  // head
   const h=snake.segs[0],hr=headR(snake);
-  ctx.beginPath();ctx.arc(h.x,h.y,hr,0,Math.PI*2);ctx.fillStyle=sp.head;ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=2;ctx.stroke();
-  // eyes
   const ea=snake.angle;
+  // cobra hood
+  if(sp.id==='cobra'&&sp.hood){
+    ctx.beginPath();ctx.ellipse(h.x,h.y,hr*2.2,hr*1.4,ea,0,Math.PI*2);
+    ctx.fillStyle=sp.hood;ctx.globalAlpha=0.85;ctx.fill();ctx.globalAlpha=1;
+    ctx.beginPath();ctx.ellipse(h.x,h.y,hr*1.7,hr*1.0,ea,0,Math.PI*2);
+    ctx.fillStyle=sp.body[0];ctx.globalAlpha=0.6;ctx.fill();ctx.globalAlpha=1;
+  }
+  // viper triangle head
+  if(sp.pattern==='zigzag'){
+    const a1=ea+Math.PI/2,a2=ea-Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(h.x+Math.cos(ea)*hr*1.2,h.y+Math.sin(ea)*hr*1.2);
+    ctx.lineTo(h.x+Math.cos(a1)*hr,h.y+Math.sin(a1)*hr);
+    ctx.lineTo(h.x+Math.cos(a2)*hr,h.y+Math.sin(a2)*hr);
+    ctx.closePath();ctx.fillStyle=sp.head;ctx.fill();
+  } else {
+    ctx.beginPath();ctx.arc(h.x,h.y,hr,0,Math.PI*2);ctx.fillStyle=sp.head;ctx.fill();
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=0.8/SCALE_X;ctx.stroke();
+  // king snake bands on head
+  if(sp.pattern==='bands'){
+    ctx.beginPath();ctx.ellipse(h.x,h.y,hr*0.9,hr*0.35,ea+Math.PI/2,0,Math.PI*2);
+    ctx.fillStyle=sp.body[1];ctx.fill();
+    ctx.beginPath();ctx.ellipse(h.x+Math.cos(ea)*hr*0.4,h.y+Math.sin(ea)*hr*0.4,hr*0.9,hr*0.28,ea+Math.PI/2,0,Math.PI*2);
+    ctx.fillStyle=sp.body[2];ctx.fill();
+  }
+  // eyes
   const ex=h.x+Math.cos(ea)*hr*.5,ey=h.y+Math.sin(ea)*hr*.5;
-  [-.35,.35].forEach(o=>{
+  [-.4,.4].forEach(o=>{
     const a2=ea+o;
-    ctx.beginPath();ctx.arc(ex+Math.cos(a2)*hr*.35,ey+Math.sin(a2)*hr*.35,hr*.22,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
-    ctx.beginPath();ctx.arc(ex+Math.cos(a2)*hr*.38,ey+Math.sin(a2)*hr*.38,hr*.1,0,Math.PI*2);
-    ctx.fillStyle=sp.pattern==='rattle'?'#ff0000':'#1a1a1a';ctx.fill();
+    ctx.beginPath();ctx.arc(ex+Math.cos(a2)*hr*.32,ey+Math.sin(a2)*hr*.32,hr*.2,0,Math.PI*2);
+    ctx.fillStyle='#fff';ctx.fill();
+    ctx.beginPath();ctx.arc(ex+Math.cos(a2)*hr*.34,ey+Math.sin(a2)*hr*.34,hr*.09,0,Math.PI*2);
+    ctx.fillStyle=sp.pattern==='rattle'?'#cc0000':'#111';ctx.fill();
   });
   // tongue
-  ctx.beginPath();
-  const tx=h.x+Math.cos(ea)*hr*1.1,ty=h.y+Math.sin(ea)*hr*1.1;
+  const tx=h.x+Math.cos(ea)*hr*1.15,ty=h.y+Math.sin(ea)*hr*1.15;
+  ctx.beginPath();ctx.moveTo(h.x+Math.cos(ea)*hr,h.y+Math.sin(ea)*hr);
+  ctx.lineTo(tx,ty);
+  ctx.lineTo(tx+Math.cos(ea-.35)*hr*.5,ty+Math.sin(ea-.35)*hr*.5);
   ctx.moveTo(tx,ty);
-  ctx.lineTo(tx+Math.cos(ea-0.3)*hr*.55,ty+Math.sin(ea-0.3)*hr*.55);
-  ctx.moveTo(tx,ty);
-  ctx.lineTo(tx+Math.cos(ea+0.3)*hr*.55,ty+Math.sin(ea+0.3)*hr*.55);
-  ctx.strokeStyle='#cc2222';ctx.lineWidth=1.5;ctx.stroke();
-  // name label
-  ctx.fillStyle=sp.head;ctx.font=`bold ${Math.round(hr*.9)}px sans-serif`;
+  ctx.lineTo(tx+Math.cos(ea+.35)*hr*.5,ty+Math.sin(ea+.35)*hr*.5);
+  ctx.strokeStyle='#cc2222';ctx.lineWidth=0.8;ctx.stroke();
+  // name + score label
+  ctx.fillStyle=sp.head;ctx.font=`bold ${Math.round(Math.max(hr*.85,4))}px sans-serif`;
   ctx.textAlign='center';ctx.textBaseline='bottom';
-  ctx.fillText((snake.isMe?'★ ':'')+snake.name+' ('+snake.score+')',h.x,h.y-hr-3);
-  // score bubble
-  ctx.beginPath();ctx.arc(h.x+hr+6,h.y-hr,hr*.55,0,Math.PI*2);
-  ctx.fillStyle=snake.isMe?'#2a7a2a':'#7a2a2a';ctx.fill();
-  ctx.fillStyle='#fff';ctx.font=`bold ${Math.round(hr*.55)}px sans-serif`;
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(snake.score,h.x+hr+6,h.y-hr);
+  ctx.fillText((snake.isMe?'★ ':'')+snake.name,h.x,h.y-hr-1.5);
 }
 
 function drawMinimap(){
-  const mw=80,mh=80,mx=W-mw-10,my=H-mh-10,scale=mw/WORLD;
-  ctx.fillStyle=activeHabitat?(activeHabitat.bg+'dd'):'rgba(240,235,220,0.85)';
+  // minimap drawn in screen coords (outside SCALE transform)
+  const aspect=WORLD_W/WORLD_H;
+  const mh=80,mw=Math.round(mh*aspect);
+  const mx=W-mw-8,my=HUD_H+8; // top-right corner, inside game area
+  const sx=mw/WORLD_W,sy=mh/WORLD_H;
+  ctx.fillStyle=activeHabitat?(activeHabitat.bg+'ee'):'rgba(240,235,220,0.9)';
   ctx.strokeStyle='rgba(140,120,80,0.4)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.roundRect(mx,my,mw,mh,6);ctx.fill();ctx.stroke();
-  G.pellets.forEach(p=>{ctx.fillStyle=p.c;ctx.globalAlpha=.5;ctx.fillRect(mx+p.x*scale,my+p.y*scale,1.5,1.5);});
+  ctx.beginPath();ctx.roundRect(mx,my,mw,mh,5);ctx.fill();ctx.stroke();
+  G.pellets.forEach(p=>{ctx.fillStyle=p.c;ctx.globalAlpha=.5;ctx.fillRect(mx+p.x*sx,my+p.y*sy,2,2);});
   ctx.globalAlpha=1;
   [G.opp,G.me].forEach(s=>{
-    ctx.beginPath();ctx.arc(mx+s.headX*scale,my+s.headY*scale,s.isMe?3.5:2.5,0,Math.PI*2);
+    if(!s)return;
+    ctx.beginPath();ctx.arc(mx+s.headX*sx,my+s.headY*sy,s.isMe?4:3,0,Math.PI*2);
     ctx.fillStyle=s.sp.head;ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
   });
+  // debug: show world dims
+  ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(8,H-22,180,16);
+  ctx.fillStyle='#fff';ctx.font='10px monospace';
+  ctx.fillText('W:'+WORLD_W+' H:'+WORLD_H+' S:'+SCALE_X.toFixed(1)+(G.opp?' AI:('+G.opp.headX.toFixed(0)+','+G.opp.headY.toFixed(0)+')':''),10,H-10);
 }
 
 // ── HUD ───────────────────────────────────────────────────────
 function updateHUD(){
-  document.getElementById('me-pts').textContent=G.me.score+' / '+WIN_SCORE+' pts';
-  document.getElementById('opp-pts').textContent=G.opp.score+' / '+WIN_SCORE+' pts';
+  const meLen=G.me?G.me.segs.length:0;
+  const oppLen=G.opp?G.opp.segs.length:0;
+  document.getElementById('me-pts').textContent='🐍 '+meLen;
+  document.getElementById('opp-pts').textContent='🐍 '+oppLen;
 }
 function updateTimerDisplay(){
   const el=document.getElementById('timer-display');
@@ -959,12 +1064,13 @@ function updateTimerDisplay(){
 }
 function updateTally(){
   document.getElementById('tally-disp').textContent=tally[0]+'—'+tally[1];
-  document.getElementById('round-info').textContent='ROUND '+round+' · First to '+WIN_SCORE;
+  document.getElementById('round-info').textContent='ROUND '+round+' · First to '+WIN_SCORE+' wins';
 }
 
 // ── END ───────────────────────────────────────────────────────
 function endGame(winner,msg){
   if(!G.running)return;
+  console.log('endGame:',winner,msg,'me.score:',G.me?G.me.score:0,'opp.score:',G.opp?G.opp.score:0,'timeLeft:',G.timeLeft);
   G.running=false;
   cancelAnimationFrame(G.animId);clearInterval(G.syncTimer);clearInterval(G.timerInterval);
   const isDraw=winner==='draw';
@@ -972,56 +1078,91 @@ function endGame(winner,msg){
   if(isDraw){/* no tally change */}
   else if(iWin)tally[0]++;else tally[1]++;
   round++;
-  const roundMeScore=G.me?G.me.score:0;
-  const roundOppScore=G.opp?G.opp.score:0;
-  if(!vsAI&&isHost) channel.publish('end',{winner:isDraw?'draw':(iWin?'opp':'me'),tally:[tally[1],tally[0]],round,msg,rme:roundOppScore,ropp:roundMeScore});
-  showWinOverlay(iWin,msg,isDraw,roundMeScore,roundOppScore);
+  // check if match is over (someone hit WIN_SCORE wins)
+  const matchOver=tally[0]>=MATCH_WIN||tally[1]>=MATCH_WIN;
+  if(!vsAI&&isHost&&channel) channel.publish('end',{winner:isDraw?'draw':(iWin?'opp':'me'),tally:[tally[1],tally[0]],round,msg,matchOver});
+  showWinOverlay(iWin,msg,isDraw,matchOver);
 }
 
-function fillScorecard(meNameEl,oppNameEl,mePtsEl,oppPtsEl,meBarEl,oppBarEl,roundMeScore,roundOppScore){
-  const maxPts=Math.max(roundMeScore,roundOppScore,1);
-  if(meNameEl) document.getElementById(meNameEl).textContent=G.me?G.me.name:'You';
-  if(oppNameEl) document.getElementById(oppNameEl).textContent=G.opp?G.opp.name:'Opp';
-  document.getElementById(mePtsEl).textContent=roundMeScore+' pts';
-  document.getElementById(oppPtsEl).textContent=roundOppScore+' pts';
-  document.getElementById(meBarEl).style.width=(roundMeScore/WIN_SCORE*100)+'%';
-  document.getElementById(oppBarEl).style.width=(roundOppScore/WIN_SCORE*100)+'%';
-}
+function fillScorecard(){} // no length display needed
 
-function showWinOverlay(iWin,msg,isDraw,roundMeScore,roundOppScore){
+function showWinOverlay(iWin,msg,isDraw,matchOver){
   hostReady=false;guestReady=false;
-  document.getElementById('ov-round-badge').textContent='ROUND '+(round-1)+' RESULT';
-  document.getElementById('win-icon').textContent=isDraw?'🤝':(iWin?'🏆':'💀');
-  document.getElementById('win-title').textContent=isDraw?'DRAW!':(iWin?'YOU WIN!':'YOU LOST');
-  document.getElementById('win-title').style.color=isDraw?'#6a6a2a':(iWin?'#2a6a2a':'#8a2a2a');
-  document.getElementById('win-sub').textContent=msg||'';
+  const badge=matchOver?'MATCH OVER':'ROUND '+(round-1)+' RESULT';
+  document.getElementById('ov-round-badge').textContent=badge;
+  if(matchOver){
+    const iMatchWin=tally[0]>=MATCH_WIN;
+    document.getElementById('win-icon').textContent=iMatchWin?'🏆':'💀';
+    document.getElementById('win-title').textContent=iMatchWin?'YOU WIN THE MATCH!':'OPPONENT WINS!';
+    document.getElementById('win-title').style.color=iMatchWin?'#2a6a2a':'#8a2a2a';
+    document.getElementById('win-sub').textContent='Final tally: '+tally[0]+' — '+tally[1]+' rounds';
+  } else {
+    document.getElementById('win-icon').textContent=isDraw?'🤝':(iWin?'🏆':'💀');
+    document.getElementById('win-title').textContent=isDraw?'DRAW!':(iWin?'YOU WIN!':'YOU LOST');
+    document.getElementById('win-title').style.color=isDraw?'#6a6a2a':(iWin?'#2a6a2a':'#8a2a2a');
+    document.getElementById('win-sub').textContent=(msg||'')+(G.opp?' · Opponent: '+G.opp.sp.name:'');
+  }
   document.getElementById('win-tally').textContent=tally[0]+'—'+tally[1];
-  fillScorecard('ov-me-name','ov-opp-name','ov-me-pts','ov-opp-pts','ov-me-bar','ov-opp-bar',roundMeScore||0,roundOppScore||0);
-  // If vs AI, no need to wait for guest — just show Play Again directly
-  if(vsAI){
+  document.getElementById('ov-tally-lbl').textContent='ROUND WINS (first to '+WIN_SCORE+')';
+  fillScorecard();
+  if(matchOver){
+    document.getElementById('ov-ready-status').textContent='';
+    document.getElementById('replay-btn').style.display='none';
+    document.getElementById('quit-btn').textContent='New Game';
+    document.getElementById('quit-btn').style.background='#2a7a2a';
+    document.getElementById('quit-btn').style.color='#fff';
+  } else if(vsAI){
+    document.getElementById('replay-btn').style.display='';
     document.getElementById('ov-ready-status').textContent='';
     document.getElementById('replay-btn').disabled=false;
     document.getElementById('replay-btn').textContent='▶ Next Round';
+    document.getElementById('quit-btn').textContent='Quit';
+    document.getElementById('quit-btn').style.background='';
+    document.getElementById('quit-btn').style.color='';
   } else {
+    document.getElementById('replay-btn').style.display='';
     document.getElementById('ov-ready-status').textContent='Waiting for opponent...';
     document.getElementById('replay-btn').disabled=false;
     document.getElementById('replay-btn').textContent='✓ Ready for Next Round';
+    document.getElementById('quit-btn').textContent='Quit';
+    document.getElementById('quit-btn').style.background='';
+    document.getElementById('quit-btn').style.color='';
   }
   document.getElementById('win-overlay').style.display='flex';
   updateTally();
 }
 
-function showWaitOverlay(iWin,t,msg,roundMeScore,roundOppScore){
-  document.getElementById('ov-wait-round-badge').textContent='ROUND '+(round-1)+' RESULT';
-  document.getElementById('wait-icon').textContent=iWin?'🏆':'💀';
-  document.getElementById('wait-title').textContent=iWin?'YOU WIN!':'YOU LOST';
-  document.getElementById('wait-title').style.color=iWin?'#2a6a2a':'#8a2a2a';
-  document.getElementById('wait-sub').textContent=msg||'';
+function showWaitOverlay(iWin,t,msg,matchOver){
+  const badge=matchOver?'MATCH OVER':'ROUND '+(round-1)+' RESULT';
+  document.getElementById('ov-wait-round-badge').textContent=badge;
+  if(matchOver){
+    const iMatchWin=t[0]>=MATCH_WIN;
+    document.getElementById('wait-icon').textContent=iMatchWin?'🏆':'💀';
+    document.getElementById('wait-title').textContent=iMatchWin?'YOU WIN THE MATCH!':'OPPONENT WINS!';
+    document.getElementById('wait-title').style.color=iMatchWin?'#2a6a2a':'#8a2a2a';
+    document.getElementById('wait-sub').textContent='Final tally: '+t[0]+' — '+t[1]+' rounds';
+  } else {
+    document.getElementById('wait-icon').textContent=iWin?'🏆':'💀';
+    document.getElementById('wait-title').textContent=iWin?'YOU WIN!':'YOU LOST';
+    document.getElementById('wait-title').style.color=iWin?'#2a6a2a':'#8a2a2a';
+    document.getElementById('wait-sub').textContent=msg||'';
+  }
   document.getElementById('wait-tally').textContent=t[0]+'—'+t[1];
-  fillScorecard('ov-wait-me-name','ov-wait-opp-name','ov-wait-me-pts','ov-wait-opp-pts','ov-wait-me-bar','ov-wait-opp-bar',roundMeScore||0,roundOppScore||0);
-  document.getElementById('ov-guest-ready-status').textContent='';
-  document.getElementById('guest-ready-btn').disabled=false;
-  document.getElementById('guest-ready-btn').textContent='✓ Ready for Next Round';
+  fillScorecard();
+  if(matchOver){
+    document.getElementById('guest-ready-btn').style.display='none';
+    document.getElementById('guest-quit-btn').textContent='New Game';
+    document.getElementById('guest-quit-btn').style.background='#2a7a2a';
+    document.getElementById('guest-quit-btn').style.color='#fff';
+  } else {
+    document.getElementById('guest-ready-btn').style.display='';
+    document.getElementById('ov-guest-ready-status').textContent='';
+    document.getElementById('guest-ready-btn').disabled=false;
+    document.getElementById('guest-ready-btn').textContent='✓ Ready for Next Round';
+    document.getElementById('guest-quit-btn').textContent='Quit';
+    document.getElementById('guest-quit-btn').style.background='';
+    document.getElementById('guest-quit-btn').style.color='';
+  }
   document.getElementById('wait-overlay').style.display='flex';
   updateTally();
 }
@@ -1032,7 +1173,7 @@ function startNextRound(){
   hostReady=false;guestReady=false;
   hideOverlays();
   const state=buildState();
-  if(!vsAI) channel.publish('replay',{state,tally,round});
+  if(!vsAI&&channel) channel.publish('replay',{state,tally,round});
   launchGame(state);
 }
 
@@ -1049,7 +1190,8 @@ document.getElementById('replay-btn').onclick=()=>{
   }
 };
 document.getElementById('quit-btn').onclick=()=>{
-  if(!vsAI) channel.publish('hostAborted',{});
+  if(!vsAI&&channel) channel.publish('hostAborted',{});
+  tally=[0,0];round=1;
   location.reload();
 };
 document.getElementById('guest-ready-btn').onclick=()=>{
@@ -1065,8 +1207,8 @@ document.getElementById('guest-quit-btn').onclick=()=>{
 
 // ── SYNC ──────────────────────────────────────────────────────
 function syncPos(){
-  if(!channel||!G.running)return;
-  channel.publish('pos',{x:G.me.headX,y:G.me.headY,a:G.me.angle,segs:G.me.segs.filter((_,i)=>i%3===0),sc:G.me.score});
+  if(!channel||!G.running||vsAI)return;
+  channel.publish('pos',{x:G.me.headX,y:G.me.headY,a:G.me.angle,segs:G.me.segs.filter((_,i)=>i%3===0)});
 }
 
 // ── JOYSTICK ──────────────────────────────────────────────────
@@ -1083,7 +1225,8 @@ jz.addEventListener('touchend',e=>{e.preventDefault();joyActive=false;joyDx=0;jo
 // mouse fallback for desktop
 canvas2.addEventListener('mousemove',e=>{
   if(!G.running||!G.me)return;
-  const ta=Math.atan2(e.clientY+G.cam.y-G.me.headY,e.clientX+G.cam.x-G.me.headX);
+  const worldX=(e.clientX)/SCALE, worldY=(e.clientY-HUD_H)/SCALE;
+  const ta=Math.atan2(worldY-G.me.headY,worldX-G.me.headX);
   let da=ta-G.me.angle;
   while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
   G.me.angle+=Math.sign(da)*Math.min(Math.abs(da),G.me.sp.turnSpeed);
