@@ -88,9 +88,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 #round-info{font-size:10px;color:#8a9a7a;letter-spacing:1px;text-align:center;}
 
 /* JOYSTICK */
-#joy-zone{position:fixed;bottom:0;left:0;width:100%;height:38%;z-index:8;touch-action:none;}
-#joy-base{position:absolute;border-radius:50%;background:rgba(40,100,40,0.08);border:1.5px solid rgba(40,100,40,0.2);display:none;pointer-events:none;}
-#joy-knob{position:absolute;border-radius:50%;background:rgba(40,150,40,0.35);border:1.5px solid rgba(40,180,40,0.6);pointer-events:none;}
+
+
+
 #credit-game{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:9px;color:#c8d8b8;letter-spacing:1px;z-index:9;pointer-events:none;white-space:nowrap;}
 
 /* OVERLAYS */
@@ -209,9 +209,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
       </div>
     </div>
   </div>
-  <div id="joy-zone">
-    <div id="joy-base"><div id="joy-knob"></div></div>
-  </div>
+
   <div id="credit-game">Created by Ethan &amp; Elroy Fang · 2026</div>
 </div>
 
@@ -561,13 +559,11 @@ const PELLET_COUNT=25;
 const WIN_SCORE=5;    // round wins to end the match
 const MATCH_WIN=5;    // same — first to 5 round wins
 const ROUND_TIME=60;
-const BASE_R=68,KNOB_R=28;
 const SYNC_MS=50;
 
 const PELLET_COLORS=['#e74c3c','#f39c12','#27ae60','#2980b9','#8e44ad','#e67e22','#16a085','#d35400'];
 
-let G={running:false,animId:null,syncTimer:null,timerInterval:null,me:null,opp:null,pellets:[],timeLeft:ROUND_TIME};
-let joyDx=0,joyDy=0,joyActive=false,joyOrigin={x:0,y:0};
+let G={running:false,animId:null,syncTimer:null,timerInterval:null,me:null,opp:null,pellets:[],timeLeft:ROUND_TIME,touchTarget:null};
 
 function getSp(id){return SPECIES.find(s=>s.id===id)||SPECIES[0];}
 
@@ -683,11 +679,16 @@ function gameLoop(){
 
 function updateMe(){
   const sp=G.me.sp;
-  if(joyActive&&(Math.abs(joyDx)>10||Math.abs(joyDy)>10)){
-    const ta=Math.atan2(joyDy,joyDx);
-    let da=ta-G.me.angle;
-    while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
-    G.me.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed);
+  if(G.touchTarget){
+    const tx=(G.touchTarget.x)/SCALE_X;
+    const ty=(G.touchTarget.y-HUD_H)/SCALE_Y;
+    const dx=tx-G.me.headX, dy=ty-G.me.headY;
+    if(dx*dx+dy*dy>4){
+      const ta=Math.atan2(dy,dx);
+      let da=ta-G.me.angle;
+      while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
+      G.me.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed);
+    }
   }
   const WB=4;
   let nx=G.me.headX+Math.cos(G.me.angle)*sp.speed;
@@ -1212,25 +1213,24 @@ function syncPos(){
 }
 
 // ── JOYSTICK ──────────────────────────────────────────────────
-const jz=document.getElementById('joy-zone');
-const jbase=document.getElementById('joy-base');
-const jknob=document.getElementById('joy-knob');
-jbase.style.width=BASE_R*2+'px';jbase.style.height=BASE_R*2+'px';
-jknob.style.width=KNOB_R*2+'px';jknob.style.height=KNOB_R*2+'px';
-
-jz.addEventListener('touchstart',e=>{e.preventDefault();const t=e.changedTouches[0];joyOrigin={x:t.clientX,y:t.clientY};joyDx=0;joyDy=0;joyActive=true;jbase.style.display='block';const rect=jz.getBoundingClientRect();jbase.style.left=(t.clientX-rect.left-BASE_R)+'px';jbase.style.top=(t.clientY-rect.top-BASE_R)+'px';jknob.style.left=(BASE_R-KNOB_R)+'px';jknob.style.top=(BASE_R-KNOB_R)+'px';},{passive:false});
-jz.addEventListener('touchmove',e=>{e.preventDefault();const t=e.changedTouches[0];joyDx=t.clientX-joyOrigin.x;joyDy=t.clientY-joyOrigin.y;const len=Math.sqrt(joyDx*joyDx+joyDy*joyDy);const max=BASE_R-KNOB_R;const sc=len>max?max/len:1;jknob.style.left=(BASE_R-KNOB_R+joyDx*sc)+'px';jknob.style.top=(BASE_R-KNOB_R+joyDy*sc)+'px';},{passive:false});
-jz.addEventListener('touchend',e=>{e.preventDefault();joyActive=false;joyDx=0;joyDy=0;jbase.style.display='none';},{passive:false});
+// Follow-finger touch controls
+const gc=document.getElementById('gc');
+function setTouch(e){
+  e.preventDefault();
+  if(!G.running)return;
+  const t=e.touches[0];
+  G.touchTarget={x:t.clientX,y:t.clientY};
+}
+gc.addEventListener('touchstart',setTouch,{passive:false});
+gc.addEventListener('touchmove',setTouch,{passive:false});
+gc.addEventListener('touchend',e=>{e.preventDefault();G.touchTarget=null;},{passive:false});
 
 // mouse fallback for desktop
 canvas2.addEventListener('mousemove',e=>{
   if(!G.running||!G.me)return;
-  const worldX=(e.clientX)/SCALE, worldY=(e.clientY-HUD_H)/SCALE;
-  const ta=Math.atan2(worldY-G.me.headY,worldX-G.me.headX);
-  let da=ta-G.me.angle;
-  while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
-  G.me.angle+=Math.sign(da)*Math.min(Math.abs(da),G.me.sp.turnSpeed);
+  G.touchTarget={x:e.clientX,y:e.clientY};
 });
+canvas2.addEventListener('mouseleave',()=>{G.touchTarget=null;});
 </script>
 </body>
 </html>
