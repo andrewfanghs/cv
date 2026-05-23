@@ -163,7 +163,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
     <input id="pname" placeholder="Enter your name" maxlength="12" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
   </div>
 
-  <button class="l-btn" id="ai-btn" style="background:linear-gradient(135deg,#5a2a7a,#9a4acc);color:#fff;box-shadow:0 4px 16px rgba(120,50,200,0.3);">🤖 Play vs AI</button>
+  <div class="l-label" style="width:100%;max-width:320px;margin-bottom:8px;">🤖 Play vs AI</div>
+  <div style="display:flex;gap:8px;width:100%;max-width:320px;margin-bottom:8px;">
+    <button class="l-btn" id="ai-easy" style="flex:1;padding:11px 4px;background:linear-gradient(135deg,#2a7a2a,#4aaa4a);color:#fff;font-size:13px;margin-bottom:0;">😊 Easy</button>
+    <button class="l-btn" id="ai-medium" style="flex:1;padding:11px 4px;background:linear-gradient(135deg,#5a2a7a,#9a4acc);color:#fff;font-size:13px;margin-bottom:0;">😤 Medium</button>
+    <button class="l-btn" id="ai-hard" style="flex:1;padding:11px 4px;background:linear-gradient(135deg,#8a1a1a,#cc3333);color:#fff;font-size:13px;margin-bottom:0;">💀 Hard</button>
+  </div>
   <button class="l-btn l-btn-host" id="host-btn">🌐 Host Multiplayer</button>
   <div class="l-or">— OR JOIN —</div>
   <div class="l-section">
@@ -392,6 +397,7 @@ let ably=null,channel=null;
 let myId=null,isHost=false,roomCode=null;
 let myName='Player',vsAI=false;
 let matchMySpecies=null,matchOppSpecies=null; // locked for whole match
+let aiDifficulty='medium'; // easy | medium | hard
 let lobbyGuest=null;
 let tally=[0,0],round=1;
 let hostReady=false,guestReady=false;
@@ -401,22 +407,26 @@ function setStatus(m){document.getElementById('status-msg').textContent=m;}
 // ── CONNECT ───────────────────────────────────────────────────
 function initAbly(cb){
   setStatus('Connecting... 🐍');
-  ably=new Ably.Realtime({key:ABLY_KEY,clientId:'s'+Date.now()+Math.random().toString(36).slice(2,5),transports:['web_socket'],closeOnUnload:true});
+  ably=new Ably.Realtime({key:ABLY_KEY,clientId:'s'+Date.now()+Math.random().toString(36).slice(2,5),transports:['web_socket'],closeOnUnload:true,logLevel:0});
   let done=false;
   ably.connection.on('connected',()=>{if(!done){done=true;setStatus('');cb();}});
   ably.connection.on('failed',s=>setStatus('❌ '+(s.reason&&s.reason.message||'Connection failed')));
   ably.connection.on('disconnected',()=>{if(!done)setStatus('🔄 Retrying...');});
 }
 
-document.getElementById('ai-btn').onclick=()=>{
+function startVsAI(diff){
   myName=document.getElementById('pname').value.trim()||'Player';
   isHost=true; myId=0; vsAI=true;
+  aiDifficulty=diff;
   tally=[0,0]; round=1;
   matchMySpecies=mySpeciesId;
   matchOppSpecies=SPECIES[Math.floor(Math.random()*SPECIES.length)].id;
   const state=buildState();
   launchGame(state);
-};
+}
+document.getElementById('ai-easy').onclick=()=>startVsAI('easy');
+document.getElementById('ai-medium').onclick=()=>startVsAI('medium');
+document.getElementById('ai-hard').onclick=()=>startVsAI('hard');
 
 document.getElementById('host-btn').onclick=()=>{
   myName=document.getElementById('pname').value.trim()||'Host';
@@ -493,11 +503,9 @@ function onMsg(msg){
     launchGame(d.state);
   }
   else if(t==='pos'){
-    if(!G.running)return;
-    // update opponent snake from remote
-    const s=isHost?G.opp:G.opp;
-    s.headX=d.x;s.headY=d.y;s.angle=d.a;
-    if(d.segs) s.segs=d.segs;
+    if(!G.running||!G.opp)return;
+    G.opp.headX=d.x;G.opp.headY=d.y;G.opp.angle=d.a;
+    if(d.segs&&d.segs.length) G.opp.segs=d.segs;
     updateHUD();
   }
   else if(t==='pellet'){
@@ -541,6 +549,15 @@ function onMsg(msg){
     if(isHost)return;
     document.getElementById('ov-guest-ready-status').textContent='Host is ready!';
   }
+  else if(t==='collision'){
+    // A player reported their own head crashed into opponent body
+    if(!G.running)return;
+    if(d.loser==='me'){
+      // sender lost — for host: opp lost = me wins
+      if(isHost) endGame('me','Opponent crashed into you!');
+      else endGame('opp',d.msg||'You crashed into opponent!');
+    }
+  }
 }
 
 // ── GAME STATE ────────────────────────────────────────────────
@@ -559,7 +576,7 @@ const PELLET_COUNT=25;
 const WIN_SCORE=5;    // round wins to end the match
 const MATCH_WIN=5;    // same — first to 5 round wins
 const ROUND_TIME=60;
-const SYNC_MS=50;
+const SYNC_MS=30;
 
 const PELLET_COLORS=['#e74c3c','#f39c12','#27ae60','#2980b9','#8e44ad','#e67e22','#16a085','#d35400'];
 
@@ -608,10 +625,11 @@ function launchGame(state){
   if(myId===0){
     G.me=mkSnake(state.meStart.x,state.meStart.y,state.meStart.angle,meSp,state.meName,true);
     G.opp=mkSnake(state.oppStart.x,state.oppStart.y,state.oppStart.angle,oppSp,state.oppName,false);
+    if(!vsAI) G.opp.segs=[]; // segs will be filled by first pos sync
   } else {
-    // guest: I'm the "opp" slot but render as me
     G.me=mkSnake(state.oppStart.x,state.oppStart.y,state.oppStart.angle,oppSp,myName,true);
     G.opp=mkSnake(state.meStart.x,state.meStart.y,state.meStart.angle,meSp,state.meName,false);
+    G.opp.segs=[]; // segs will be filled by first pos sync
   }
 
   G.pellets=state.pellets.map(p=>({...p}));
@@ -716,10 +734,10 @@ function updateMe(){
     }
   }
 
-  // collision checks
-  if(isHost||vsAI){
+  // collision checks — everyone checks their own head
+  if(true){
     if(G.me.graceTicks>0) G.me.graceTicks--;
-    if(G.opp.graceTicks>0) G.opp.graceTicks--;
+    if(isHost&&G.opp&&G.opp.graceTicks>0) G.opp.graceTicks--;
     if(vsAI){
       const meGrace=(G.me.graceTicks||0)>0;
       const oppGrace=(G.opp.graceTicks||0)>0;
@@ -747,23 +765,15 @@ function updateMe(){
         }
       }
     } else {
-      // 2-player
-      if((G.me.graceTicks||0)===0){
+      // 2-player: each player checks their OWN head vs opponent's synced body
+      if((G.me.graceTicks||0)===0&&G.opp&&G.opp.segs&&G.opp.segs.length>4){
         for(let i=4;i<G.opp.segs.length;i++){
           const s=G.opp.segs[i];
           const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
           if(dx*dx+dy*dy<(colR+bodyR(G.opp,i))*(colR+bodyR(G.opp,i))){
-            endGame('opp','You crashed into AI body!');return;
-          }
-        }
-      }
-      if((G.opp.graceTicks||0)===0){
-        const oppColR=headR(G.opp);
-        for(let i=4;i<G.me.segs.length;i++){
-          const s=G.me.segs[i];
-          const dx=G.opp.headX-s.x,dy=G.opp.headY-s.y;
-          if(dx*dx+dy*dy<(oppColR+bodyR(G.me,i))*(oppColR+bodyR(G.me,i))){
-            endGame('me','Opponent crashed into your body!');return;
+            // I crashed — publish so both sides know, then end locally
+            if(channel) channel.publish('collision',{loser:'me',msg:'You crashed into opponent!'});
+            endGame('opp','You crashed into opponent!');return;
           }
         }
       }
@@ -788,53 +798,52 @@ function updateAI(){
   if(!G.opp||!G.running)return;
   const sp=G.opp.sp;
   const ox=G.opp.headX, oy=G.opp.headY;
-  const WALL=18; // stay this far from walls
+  const WALL=18;
+
+  // Difficulty settings
+  const diff=aiDifficulty||'medium';
+  const timerMin=diff==='easy'?25:diff==='hard'?5:12;
+  const timerRng=diff==='easy'?20:diff==='hard'?8:15;
+  const huntChance=diff==='easy'?0:diff==='hard'?0.82:0.55;
+  const turnMult=diff==='easy'?0.7:diff==='hard'?1.6:1.3;
+  const lookahead=diff==='hard'?25:15;
 
   // ── Choose target every N frames ─────────────────────────
   if(G.opp.aiTimer>0) G.opp.aiTimer--;
   if(G.opp.aiTimer<=0){
-    G.opp.aiTimer=12+0|Math.random()*15;
+    G.opp.aiTimer=timerMin+0|Math.random()*timerRng;
     const meX=G.me?G.me.headX:WORLD_W/2;
     const meY=G.me?G.me.headY:WORLD_H/2;
     const distToPlayer=Math.hypot(ox-meX,oy-meY);
-
-    // Hunt player if close enough AND not near a wall ourselves
     const safeFromWall=ox>WALL&&ox<WORLD_W-WALL&&oy>WALL&&oy<WORLD_H-WALL;
-    if(safeFromWall && distToPlayer<WORLD_H*0.5 && Math.random()<0.55){
-      // Try to cut in front of player (intercept)
-      const playerFutureX=meX+Math.cos(G.me.angle)*sp.speed*15;
-      const playerFutureY=meY+Math.sin(G.me.angle)*sp.speed*15;
-      const fx=Math.max(WALL,Math.min(WORLD_W-WALL,playerFutureX));
-      const fy=Math.max(WALL,Math.min(WORLD_H-WALL,playerFutureY));
+    if(safeFromWall&&distToPlayer<WORLD_H*0.6&&Math.random()<huntChance){
+      // Intercept player
+      const fx=Math.max(WALL,Math.min(WORLD_W-WALL,meX+Math.cos(G.me.angle)*sp.speed*lookahead));
+      const fy=Math.max(WALL,Math.min(WORLD_H-WALL,meY+Math.sin(G.me.angle)*sp.speed*lookahead));
       G.opp.aiTarget=Math.atan2(fy-oy,fx-ox);
     } else {
-      // Go to nearest safe pellet
       let best=null,bestScore=9999;
       G.pellets.forEach(p=>{
         if(p.x<WALL||p.x>WORLD_W-WALL||p.y<WALL||p.y>WORLD_H-WALL)return;
         const d=Math.hypot(ox-p.x,oy-p.y);
         if(d<bestScore){bestScore=d;best=p;}
       });
-      if(!best){// fallback any pellet
-        G.pellets.forEach(p=>{const d=Math.hypot(ox-p.x,oy-p.y);if(d<bestScore){bestScore=d;best=p;}});
-      }
-      G.opp.aiTarget=best
-        ? Math.atan2(best.y-oy,best.x-ox)
-        : Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
+      if(!best) G.pellets.forEach(p=>{const d=Math.hypot(ox-p.x,oy-p.y);if(d<bestScore){bestScore=d;best=p;}});
+      G.opp.aiTarget=best?Math.atan2(best.y-oy,best.x-ox):Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
     }
   }
 
-  // ── Wall avoidance: hard override every frame ─────────────
+  // ── Wall avoidance ────────────────────────────────────────
   const ox2=G.opp.headX,oy2=G.opp.headY;
   if(ox2<WALL||ox2>WORLD_W-WALL||oy2<WALL||oy2>WORLD_H-WALL){
     G.opp.aiTarget=Math.atan2(WORLD_H/2-oy2,WORLD_W/2-ox2);
-    G.opp.aiTimer=0; // recheck immediately next frame
+    G.opp.aiTimer=0;
   }
 
-  // ── Steer toward target ───────────────────────────────────
+  // ── Steer ─────────────────────────────────────────────────
   let da=G.opp.aiTarget-G.opp.angle;
   while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
-  G.opp.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed*1.3);
+  G.opp.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed*turnMult);
 
   // ── Move ─────────────────────────────────────────────────
   const mv=aiMove(G.opp.headX,G.opp.headY,G.opp.angle,sp.speed*0.95);
@@ -1065,7 +1074,7 @@ function updateTimerDisplay(){
 }
 function updateTally(){
   document.getElementById('tally-disp').textContent=tally[0]+'—'+tally[1];
-  document.getElementById('round-info').textContent='ROUND '+round+' · First to '+WIN_SCORE+' wins';
+  document.getElementById('round-info').textContent='ROUND '+round+(vsAI?' · '+aiDifficulty.toUpperCase():'')+' · First to '+WIN_SCORE+' wins';
 }
 
 // ── END ───────────────────────────────────────────────────────
@@ -1209,7 +1218,7 @@ document.getElementById('guest-quit-btn').onclick=()=>{
 // ── SYNC ──────────────────────────────────────────────────────
 function syncPos(){
   if(!channel||!G.running||vsAI)return;
-  channel.publish('pos',{x:G.me.headX,y:G.me.headY,a:G.me.angle,segs:G.me.segs.filter((_,i)=>i%3===0)});
+  channel.publish('pos',{x:G.me.headX,y:G.me.headY,a:G.me.angle,segs:G.me.segs});
 }
 
 // ── JOYSTICK ──────────────────────────────────────────────────
