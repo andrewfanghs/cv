@@ -556,19 +556,12 @@ function onMsg(msg){
     if(d.positions){
       Object.entries(d.positions).forEach(([slot,pd])=>{
         const slotNum=parseInt(slot);
-        if(slotNum===myId)return;
+        if(slotNum===myId)return; // don't overwrite our own snake
         const snake=[G.opp,...G.others].find(s=>s&&s.slot===slotNum);
         if(snake){
-          // Update angle so dead-reckoning stays accurate
-          snake._targetAngle=pd.a;
-          snake.angle=pd.a; // snap angle (small, invisible)
-          // Only correct position if significantly off (>5 world units)
-          const dx=pd.x-snake.headX, dy=pd.y-snake.headY;
-          if(dx*dx+dy*dy>25){
-            snake.headX=snake.headX*0.5+pd.x*0.5;
-            snake.headY=snake.headY*0.5+pd.y*0.5;
-          }
-          if(pd.segs&&pd.segs.length>0) snake.segs=pd.segs;
+          // Apply host positions directly — host is authoritative
+          snake.headX=pd.x; snake.headY=pd.y; snake.angle=pd.a;
+          snake.segs.unshift({x:pd.x,y:pd.y});snake.segs.pop();
           if(pd.alive===false&&snake.alive) killSnake(snake,true);
         }
       });
@@ -676,7 +669,7 @@ const PELLET_COUNT=25;
 const WIN_SCORE=5;    // round wins to end the match
 const MATCH_WIN=5;    // same — first to 5 round wins
 const ROUND_TIME=60;
-const SYNC_MS=16;
+// sync now happens per-frame in gameLoop
 
 const PELLET_COLORS=['#e74c3c','#f39c12','#27ae60','#2980b9','#8e44ad','#e67e22','#16a085','#d35400'];
 
@@ -770,7 +763,7 @@ function launchGame(state){
   G.timeLeft=ROUND_TIME;
   updateTimerDisplay();
   gameLoop();
-  G.syncTimer=setInterval(syncPos,SYNC_MS);
+  // sync handled inline in gameLoop
   if(isHost||vsAI){
     G.timerInterval=setInterval(()=>{
       if(!G.running){clearInterval(G.timerInterval);return;}
@@ -846,20 +839,25 @@ function gameLoop(){
     });
     checkCollisions();
   } else {
-    // Guest: dead-reckon other snakes at their current angle/speed — smooth 60fps
-    [G.opp,...G.others].filter(s=>s&&s.alive).forEach(s=>{
-      moveSnakeForward(s, false); // move locally, no pellet eating
-    });
+    // Guest: own snake only — other snakes updated via pos messages from host
   }
   draw();
-  // grace period flash on HUD
+  // Sync: host sends positions every frame; guest sends angle every frame
+  if(channel&&!vsAI){
+    if(isHost){
+      const positions={};
+      [G.me,G.opp,...G.others].filter(s=>s).forEach(s=>{
+        positions[s.slot]={x:s.headX,y:s.headY,a:s.angle,alive:s.alive};
+      });
+      channel.publish('pos',{positions,from:myId});
+    } else if(G.me) {
+      channel.publish('input',{a:G.me.angle,slot:myId,from:myId});
+    }
+  }
+  // grace period flash
   const gt=G.me?G.me.graceTicks||0:0;
   const timerEl=document.getElementById('timer-display');
-  if(gt>0&&timerEl){
-    const sec=Math.ceil(gt/60);
-    timerEl.style.color=sec<=1?'#cc2222':'#2a6a2a';
-  }
-
+  if(gt>0&&timerEl){timerEl.style.color=Math.ceil(gt/60)<=1?'#cc2222':'#2a6a2a';}
 }
 
 function updateMe(){
@@ -1252,21 +1250,25 @@ function updateTally(){
 // ── END ───────────────────────────────────────────────────────
 function checkCollisions(){
   if(!G.running)return;
-  const living=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>1);
-  living.forEach(snake=>{
-    if(!snake.alive||(snake.graceTicks||0)>0)return;
+  const living=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>3);
+  const SKIP=6;
+  for(const snake of living){
+    if(!snake.alive||(snake.graceTicks||0)>0) continue;
     const hr=headR(snake);
-    living.forEach(target=>{
-      if(target===snake||!target.alive)return;
-      for(let i=2;i<target.segs.length;i++){
+    let died=false;
+    for(const target of living){
+      if(died||target===snake||!target.alive) continue;
+      for(let i=SKIP;i<target.segs.length;i++){
         const s=target.segs[i];
         const dx=snake.headX-s.x,dy=snake.headY-s.y;
         if(dx*dx+dy*dy<(hr+bodyR(target,i))*(hr+bodyR(target,i))){
           killSnake(snake);
+          died=true;
+          break;
         }
       }
-    });
-  });
+    }
+  }
 }
 
 function killSnake(snake,fromNetwork){
@@ -1434,21 +1436,7 @@ document.getElementById('guest-quit-btn').onclick=()=>{
 };
 
 // ── SYNC ──────────────────────────────────────────────────────
-function syncPos(){
-  if(!channel||vsAI)return;
-  if(!G.running&&!G.me)return; // nothing to sync
-  if(isHost){
-    // Host broadcasts all snake positions
-    const positions={};
-    [G.me,G.opp,...G.others].filter(s=>s).forEach(s=>{
-      positions[s.slot]={x:s.headX,y:s.headY,a:s.angle,segs:s.segs.filter((_,i)=>i%2===0),alive:s.alive};
-    });
-    channel.publish('pos',{positions,from:myId});
-  } else {
-    // Guest sends only their target angle
-    if(G.me) channel.publish('input',{a:G.me.angle,slot:myId,from:myId});
-  }
-}
+function syncPos(){} // sync now happens inline in gameLoop
 
 // ── JOYSTICK ──────────────────────────────────────────────────
 // Follow-finger touch controls
