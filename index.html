@@ -264,6 +264,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   </div>
 </div>
 
+<!-- OBSERVER OVERLAY -->
+<div id="observer-overlay" style="display:none;position:fixed;top:48px;left:0;width:100%;z-index:25;pointer-events:none;" id="observer-overlay-inner">
+  <div style="margin:8px auto;max-width:200px;background:rgba(0,0,0,0.6);color:#fff;border-radius:12px;padding:8px 14px;text-align:center;font-size:12px;letter-spacing:1px;">
+    💀 You crashed — watching...
+  </div>
+</div>
+
 <script>
 /*@license Copyright 2015-2022 Ably Real-time Ltd (ably.com)
 
@@ -552,15 +559,37 @@ function onMsg(msg){
     launchGame(d.state);
   }
   else if(t==='pos'){
-    if(!G.running)return;
-    if(d.from===myId)return; // ignore own echo
-    // find which snake this belongs to
-    const slot=d.slot!=null?d.slot:d.from;
-    let target=null;
-    if(G.opp&&G.opp.slot===slot) target=G.opp;
-    else target=G.others.find(s=>s&&s.slot===slot)||null;
-    if(target){target.headX=d.x;target.headY=d.y;target.angle=d.a;if(d.segs&&d.segs.length)target.segs=d.segs;}
+    // Host broadcasts positions → guests apply them
+    if(isHost||!G.running)return;
+    if(d.from===myId)return;
+    if(d.positions){
+      Object.entries(d.positions).forEach(([slot,pd])=>{
+        const slotNum=parseInt(slot);
+        const snake=slotNum===myId?G.me:([G.opp,...G.others].find(s=>s&&s.slot===slotNum));
+        if(snake){
+          if(slotNum!==myId){
+            // Interpolate toward received position for smooth motion
+            snake.headX=pd.x; snake.headY=pd.y; snake.angle=pd.a;
+            if(pd.segs&&pd.segs.length>0) snake.segs=pd.segs;
+            if(pd.alive===false&&snake.alive) killSnake(snake,true);
+          }
+        }
+      });
+    }
     updateHUD();
+  }
+  else if(t==='input'){
+    // Guest sends angle → host steers that snake
+    if(!isHost||!G.running)return;
+    if(d.from===myId)return;
+    const slot=d.slot;
+    const snake=[G.opp,...G.others].find(s=>s&&s.slot===slot);
+    if(snake&&snake.alive){
+      // Steer guest snake toward their desired angle
+      let da=d.a-snake.angle;
+      while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
+      snake.angle+=Math.sign(da)*Math.min(Math.abs(da),snake.sp.turnSpeed*1.5);
+    }
   }
   else if(t==='pellet'){
     if(!isHost) G.pellets=d.pellets;
@@ -607,11 +636,15 @@ function onMsg(msg){
     if(isHost)return;
     document.getElementById('ov-guest-ready-status').textContent='Host is ready!';
   }
-  else if(t==='died'){
+  else if(t==='snakeDied'){
     if(!G.running)return;
     const deadSlot=d.slot;
     const deadSnake=[G.me,G.opp,...G.others].find(s=>s&&s.slot===deadSlot);
-    if(deadSnake) killSnake(deadSnake,true); // host authoritative — may trigger endGame
+    if(deadSnake&&deadSnake.alive){
+      deadSnake.alive=false;
+      G.aliveSlots.delete(deadSlot);
+      if(deadSnake===G.me) showObserverOverlay();
+    }
   }
   else if(t==='collision'){
     if(!G.running)return;
@@ -760,14 +793,52 @@ function applyHabitatHUD(){
   setTimeout(()=>el.style.opacity='0',2500);
 }
 
+function aiMove(headX,headY,angle,speed){
+  // Move and wall-follow, return {x,y,angle}
+  const WB=5;
+  let nx=headX+Math.cos(angle)*speed;
+  let ny=headY+Math.sin(angle)*speed;
+  if(nx<WB){nx=WB; angle=Math.sin(angle)>=0?Math.PI/2:-Math.PI/2;}
+  else if(nx>WORLD_W-WB){nx=WORLD_W-WB; angle=Math.sin(angle)>=0?Math.PI/2:-Math.PI/2;}
+  if(ny<WB){ny=WB; angle=Math.cos(angle)>=0?0:Math.PI;}
+  else if(ny>WORLD_H-WB){ny=WORLD_H-WB; angle=Math.cos(angle)>=0?0:Math.PI;}
+  return{x:Math.max(WB,Math.min(WORLD_W-WB,nx)),y:Math.max(WB,Math.min(WORLD_H-WB,ny)),angle};
+}
+function moveSnakeForward(snake){
+  // Move a snake along its current angle (host moves all snakes)
+  const sp=snake.sp;
+  const mv=aiMove(snake.headX,snake.headY,snake.angle,sp.speed*0.95);
+  snake.headX=mv.x; snake.headY=mv.y; snake.angle=mv.angle;
+  snake.segs.unshift({x:snake.headX,y:snake.headY});
+  snake.segs.pop();
+  if(snake.graceTicks>0) snake.graceTicks--;
+  // Eat pellets
+  const eatR=headR(snake)*0.7;
+  for(let i=G.pellets.length-1;i>=0;i--){
+    const p=G.pellets[i];
+    if(Math.hypot(snake.headX-p.x,snake.headY-p.y)<eatR+p.r){
+      snake.segs.push({...snake.segs[snake.segs.length-1]});
+      G.pellets.splice(i,1);G.pellets.push(mkPellet());
+    }
+  }
+}
+
 function gameLoop(){
   if(!G.running)return;
   G.animId=requestAnimationFrame(gameLoop);
-  updateMe();
-  if(vsAI||isHost){
-    // Update AI snakes: G.opp if AI, plus any G.others that are AI
-    const aiSnakes=[G.opp,...G.others].filter(s=>s&&s.isAI);
-    aiSnakes.forEach(s=>updateAISnake(s));
+  if(isHost||vsAI){
+    // Host moves ALL snakes (me + guests + AI)
+    updateMe(); // update G.me.angle from touch input
+    if(G.me&&G.me.alive) moveSnakeForward(G.me); // move my snake
+    [G.opp,...G.others].filter(s=>s&&s.alive).forEach(s=>{
+      if(s.isAI) updateAISnake(s);
+      else moveSnakeForward(s); // guest snake moved by host
+    });
+    // Collision detection (host only)
+    checkCollisions();
+  } else {
+    // Guest: update angle from touch, host moves snake and sends positions back
+    updateMe(); // only updates angle via touch
   }
   draw();
   // grace period flash on HUD
@@ -781,6 +852,7 @@ function gameLoop(){
 }
 
 function updateMe(){
+  if(!G.me||!G.me.alive)return;
   const sp=G.me.sp;
   if(G.touchTarget){
     const tx=(G.touchTarget.x)/SCALE_X;
@@ -793,84 +865,10 @@ function updateMe(){
       G.me.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed);
     }
   }
-  const WB=4;
-  let nx=G.me.headX+Math.cos(G.me.angle)*sp.speed;
-  let ny=G.me.headY+Math.sin(G.me.angle)*sp.speed;
-  // Wall follow: slide along wall if heading into it
-  if(nx<WB){nx=WB; if(Math.cos(G.me.angle)<0) G.me.angle=Math.sin(G.me.angle)>=0?Math.PI/2:-Math.PI/2;}
-  if(nx>WORLD_W-WB){nx=WORLD_W-WB; if(Math.cos(G.me.angle)>0) G.me.angle=Math.sin(G.me.angle)>=0?Math.PI/2:-Math.PI/2;}
-  if(ny<WB){ny=WB; if(Math.sin(G.me.angle)<0) G.me.angle=Math.cos(G.me.angle)>=0?0:Math.PI;}
-  if(ny>WORLD_H-WB){ny=WORLD_H-WB; if(Math.sin(G.me.angle)>0) G.me.angle=Math.cos(G.me.angle)>=0?0:Math.PI;}
-  G.me.headX=nx; G.me.headY=ny;
-  G.me.segs.unshift({x:G.me.headX,y:G.me.headY});
-  G.me.segs.pop();
-
-  // eat pellets
-  const eatR=headR(G.me)*0.7;
-  const colR=headR(G.me);
-  for(let i=G.pellets.length-1;i>=0;i--){
-    const p=G.pellets[i];
-    const dx=G.me.headX-p.x,dy=G.me.headY-p.y;
-    if(dx*dx+dy*dy<(eatR+p.r)*(eatR+p.r)){
-      G.me.segs.push({...G.me.segs[G.me.segs.length-1]});
-      G.pellets.splice(i,1);
-      G.pellets.push(mkPellet());
-      if(isHost&&!vsAI) channel.publish('pellet',{pellets:G.pellets});
-    }
-  }
-
-  // collision: check all living snakes
-  const allSnakes=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>1);
-  if(G.me.graceTicks>0) G.me.graceTicks--;
-
-  // MY head vs others' bodies (I control this locally)
-  if(G.me.alive&&(G.me.graceTicks||0)===0){
-    for(const opp of allSnakes){
-      if(opp===G.me||(opp.graceTicks||0)>0) continue;
-      for(let i=2;i<opp.segs.length;i++){
-        const s=opp.segs[i];
-        const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
-        if(dx*dx+dy*dy<(colR+bodyR(opp,i))*(colR+bodyR(opp,i))){
-          killSnake(G.me); // visual only on guest side
-          if(channel) channel.publish('died',{slot:myId});
-          return;
-        }
-      }
-    }
-  }
-  // AI heads vs all bodies (host is authoritative for AI)
-  if(isHost||vsAI){
-    const aiSnakes=allSnakes.filter(s=>s.isAI&&s.alive);
-    aiSnakes.forEach(ai=>{
-      if((ai.graceTicks||0)>0){ai.graceTicks--;return;}
-      const ahr=headR(ai);
-      allSnakes.forEach(target=>{
-        if(target===ai||(target.graceTicks||0)>0||!target.alive) return;
-        for(let i=2;i<target.segs.length;i++){
-          const s=target.segs[i];
-          const dx=ai.headX-s.x,dy=ai.headY-s.y;
-          if(G.running&&dx*dx+dy*dy<(ahr+bodyR(target,i))*(ahr+bodyR(target,i))){
-            if(channel) channel.publish('died',{slot:ai.slot});
-            killSnake(ai);
-          }
-        }
-      });
-    });
-  }
+  // Movement handled by moveSnakeForward() in gameLoop
 }
 
 
-function aiMove(headX,headY,angle,speed){
-  // Move and wall-follow, return {x,y,angle}
-  const WB=5;
-  let nx=headX+Math.cos(angle)*speed;
-  let ny=headY+Math.sin(angle)*speed;
-  if(nx<WB){nx=WB; angle=Math.sin(angle)>=0?Math.PI/2:-Math.PI/2;}
-  else if(nx>WORLD_W-WB){nx=WORLD_W-WB; angle=Math.sin(angle)>=0?Math.PI/2:-Math.PI/2;}
-  if(ny<WB){ny=WB; angle=Math.cos(angle)>=0?0:Math.PI;}
-  else if(ny>WORLD_H-WB){ny=WORLD_H-WB; angle=Math.cos(angle)>=0?0:Math.PI;}
-  return{x:Math.max(WB,Math.min(WORLD_W-WB,nx)),y:Math.max(WB,Math.min(WORLD_H-WB,ny)),angle};
-}
 
 function aiScoreAngle(angle, G_opp, steps){
   // Probe ahead: return danger score (higher = worse)
@@ -1226,14 +1224,42 @@ function updateTally(){
 }
 
 // ── END ───────────────────────────────────────────────────────
+function checkCollisions(){
+  if(!G.running)return;
+  const living=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>1);
+  living.forEach(snake=>{
+    if(!snake.alive||(snake.graceTicks||0)>0)return;
+    const hr=headR(snake);
+    living.forEach(target=>{
+      if(target===snake||!target.alive)return;
+      for(let i=2;i<target.segs.length;i++){
+        const s=target.segs[i];
+        const dx=snake.headX-s.x,dy=snake.headY-s.y;
+        if(dx*dx+dy*dy<(hr+bodyR(target,i))*(hr+bodyR(target,i))){
+          killSnake(snake);
+        }
+      }
+    });
+  });
+}
+
 function killSnake(snake,fromNetwork){
   if(!snake||!snake.alive||!G.running)return;
   snake.alive=false;
   G.aliveSlots.delete(snake.slot);
-  // Only host (or vsAI) decides when round ends
-  if((isHost||vsAI)&&G.aliveSlots.size<=1){
-    const winnerSlot=G.aliveSlots.size===1?[...G.aliveSlots][0]:-1;
-    endGame(winnerSlot,'');
+  // If MY snake died in multiplayer, show observer overlay
+  if(snake===G.me&&!vsAI&&G.aliveSlots.size>0){
+    showObserverOverlay();
+  }
+  // Host decides round end
+  if((isHost||vsAI)){
+    if(G.aliveSlots.size<=1){
+      const winnerSlot=G.aliveSlots.size===1?[...G.aliveSlots][0]:-1;
+      endGame(winnerSlot,'');
+    } else if(!vsAI&&channel){
+      // Broadcast that this snake died
+      channel.publish('snakeDied',{slot:snake.slot,aliveSlots:[...G.aliveSlots]});
+    }
   }
 }
 
@@ -1334,7 +1360,15 @@ function showWaitOverlay(iWin,t,msg,matchOver){
   updateTally();
 }
 
-function hideOverlays(){document.getElementById('win-overlay').style.display='none';document.getElementById('wait-overlay').style.display='none';}
+function hideOverlays(){
+  document.getElementById('win-overlay').style.display='none';
+  document.getElementById('wait-overlay').style.display='none';
+  const obs=document.getElementById('observer-overlay');if(obs)obs.style.display='none';
+}
+function showObserverOverlay(){
+  const obs=document.getElementById('observer-overlay');
+  if(obs){obs.style.display='block';}
+}
 
 function startNextRound(){
   hostReady=false;guestReady=false;
@@ -1375,7 +1409,17 @@ document.getElementById('guest-quit-btn').onclick=()=>{
 // ── SYNC ──────────────────────────────────────────────────────
 function syncPos(){
   if(!channel||!G.running||vsAI)return;
-  channel.publish('pos',{x:G.me.headX,y:G.me.headY,a:G.me.angle,segs:G.me.segs,from:myId,slot:myId});
+  if(isHost){
+    // Host broadcasts all snake positions
+    const positions={};
+    [G.me,G.opp,...G.others].filter(s=>s).forEach(s=>{
+      positions[s.slot]={x:s.headX,y:s.headY,a:s.angle,segs:s.segs.filter((_,i)=>i%2===0),alive:s.alive};
+    });
+    channel.publish('pos',{positions,from:myId});
+  } else {
+    // Guest sends only their target angle
+    if(G.me) channel.publish('input',{a:G.me.angle,slot:myId,from:myId});
+  }
 }
 
 // ── JOYSTICK ──────────────────────────────────────────────────
