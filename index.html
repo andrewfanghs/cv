@@ -904,7 +904,7 @@ function gameLoop(){
       channel.publish('pos',{positions,from:myId});
     } else if(G.me) {
       // Send angle + sampled segs so host has accurate guest body for collision
-      const guestSegs=G.me?G.me.segs.filter((_,i)=>i%3===0):[];
+      const guestSegs=G.me?G.me.segs:[];
       channel.publish('input',{a:G.me.angle,slot:myId,from:myId,segs:guestSegs,x:G.me?G.me.headX:0,y:G.me?G.me.headY:0});
     }
   }
@@ -1320,27 +1320,19 @@ function updateTally(){
 // ── END ───────────────────────────────────────────────────────
 function checkRoundEnd(){
   if(!G.running||(!isHost&&!vsAI))return;
-  const aliveList=[...G.aliveSlots];
-  // End when only 1 (or 0) alive
-  if(aliveList.length<=1){
-    const winnerSlot=aliveList.length===1?aliveList[0]:-1;
-    endGame(winnerSlot,'');
-    return;
-  }
-  // In multiplayer only: end early if no human players remain (AI-only = draw)
-  if(!vsAI){
-    const anyHumanAlive=aliveList.some(sl=>{
-      const sn=[G.me,G.opp,...G.others].find(s=>s&&s.slot===sl);
-      return sn&&sn.alive&&!sn.isAI;
-    });
-    if(!anyHumanAlive) endGame(-1,'All players eliminated');
+  const allSnakes=[G.me,G.opp,...G.others].filter(s=>s);
+  const aliveSnakes=allSnakes.filter(s=>s.alive);
+  // End only when <=1 snake alive — AI battles it out too
+  if(aliveSnakes.length<=1){
+    const winner=aliveSnakes[0]||null;
+    endGame(winner?winner.slot:-1,'');
   }
 }
 
 function checkCollisions(){
   if(!G.running)return;
   const living=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>3);
-  const SKIP=3;
+  const SKIP=2;
   for(const snake of living){
     if(!snake.alive||(snake.graceTicks||0)>0) continue;
     const hr=headR(snake);
