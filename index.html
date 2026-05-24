@@ -558,19 +558,18 @@ function onMsg(msg){
     if(isHost||!G.running)return;
     if(d.from===myId)return;
     if(d.positions){
+      const now=performance.now();
       Object.entries(d.positions).forEach(([slot,pd])=>{
         const slotNum=parseInt(slot);
-        if(slotNum===myId)return; // keep own snake local
+        if(slotNum===myId)return;
         const snake=[G.opp,...G.others].find(s=>s&&s.slot===slotNum);
         if(snake){
-          snake.headX=pd.x; snake.headY=pd.y; snake.angle=pd.a;
-          if(pd.segs&&pd.segs.length>1){
-            snake.segs=pd.segs; // full segs update
-          } else {
-            snake.segs.unshift({x:pd.x,y:pd.y});
-            if(snake.segs.length>snake.segs.length) snake.segs.pop();
-          }
-          if(pd.alive===false&&snake.alive) killSnake(snake,true);
+          if(pd.alive===false&&snake.alive){killSnake(snake,true);return;}
+          // Push snapshot with timestamp for interpolation
+          if(!snake._snapBuf) snake._snapBuf=[];
+          snake._snapBuf.push({t:now,x:pd.x,y:pd.y,a:pd.a,segs:pd.segs||null});
+          // Keep buffer small (last 10 snapshots)
+          if(snake._snapBuf.length>10) snake._snapBuf.shift();
         }
       });
     }
@@ -644,7 +643,6 @@ function onMsg(msg){
     document.getElementById('ov-guest-ready-status').textContent='Host is ready!';
   }
   else if(t==='snakeDied'){
-    if(!G.running)return;
     const deadSlot=d.slot;
     const deadSnake=[G.me,G.opp,...G.others].find(s=>s&&s.slot===deadSlot);
     if(deadSnake&&deadSnake.alive){
@@ -657,8 +655,7 @@ function onMsg(msg){
     }
   }
   else if(t==='collision'){
-    if(!G.running)return;
-    if(d.loser==='me') killSnake(G.me);
+    if(d.loser==='me'&&G.me&&G.me.alive) killSnake(G.me);
   }
 }
 
@@ -723,7 +720,7 @@ function mkSnake(x,y,angle,sp,name,isMe){
   const spacing=CELL*0.85;
   const segs=[];
   for(let i=0;i<baseSeg;i++) segs.push({x:x-Math.cos(angle)*i*spacing,y:y-Math.sin(angle)*i*spacing});
-  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle+0.8,aiTimer:0,graceTicks:60,_targetX:null,_targetY:null,_targetAngle:null};
+  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle+0.8,aiTimer:0,graceTicks:60,_targetX:null,_targetY:null,_targetAngle:null,_snapBuf:[]};
 }
 
 // ── LAUNCH ────────────────────────────────────────────────────
@@ -860,17 +857,44 @@ function gameLoop(){
         for(let i=6;i<target.segs.length;i++){
           const dx=G.me.headX-target.segs[i].x, dy=G.me.headY-target.segs[i].y;
           if(dx*dx+dy*dy<(hr+bodyR(target,i))*(hr+bodyR(target,i))){
+            killSnake(G.me);
+            // Tell host immediately — don't wait for next syncFrame
             if(channel) channel.publish('died',{slot:myId});
-            killSnake(G.me); hit=true; break;
+            hit=true; break;
           }
         }
         if(hit) break;
       }
     }
-    // Guest: dead-reckon other snakes between host sync packets (smooth visuals)
+    // Interpolate other snakes using snapshot buffer (smooth 60fps)
+    const renderDelay=100; // ms behind real-time to interpolate
+    const renderTime=performance.now()-renderDelay;
     [G.opp,...G.others].filter(s=>s&&s.alive).forEach(s=>{
-      const mv=aiMove(s.headX,s.headY,s.angle,s.sp.speed*0.95);
-      s.headX=mv.x; s.headY=mv.y; s.angle=mv.angle;
+      if(!s._snapBuf||s._snapBuf.length<1) return;
+      // Find two snapshots bracketing renderTime
+      const buf=s._snapBuf;
+      let from=buf[0],to=buf[0];
+      for(let i=1;i<buf.length;i++){
+        if(buf[i].t<=renderTime){from=buf[i];}
+        else{to=buf[i];break;}
+      }
+      if(from===to){
+        // Only one snapshot or all in past — extrapolate forward
+        const age=(performance.now()-from.t)/1000;
+        const mv=aiMove(from.x,from.y,from.a,s.sp.speed*0.95);
+        s.headX=mv.x; s.headY=mv.y; s.angle=from.a;
+      } else {
+        // Interpolate between from→to
+        const span=to.t-from.t;
+        const t2=span>0?Math.min(1,(renderTime-from.t)/span):1;
+        s.headX=from.x+(to.x-from.x)*t2;
+        s.headY=from.y+(to.y-from.y)*t2;
+        // Angle lerp (handle wrap-around)
+        let da=to.a-from.a;
+        while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
+        s.angle=from.a+da*t2;
+      }
+      // Update segs
       s.segs.unshift({x:s.headX,y:s.headY});
       s.segs.pop();
     });
@@ -1161,7 +1185,7 @@ function draw(){
   drawMinimap();
 }
 
-function headR(snake){return CELL*(0.3+snake.sp.siz*0.06)+snake.segs.length*0.01;}
+function headR(snake){return CELL*(0.35+snake.sp.siz*0.07)+snake.segs.length*0.012;}
 function bodyR(snake,i){const h=headR(snake);return Math.max(h*.5+h*.5*(1-i/snake.segs.length),h*.4);}
 
 function drawSnake(snake){
@@ -1291,7 +1315,7 @@ function updateTally(){
 function checkCollisions(){
   if(!G.running)return;
   const living=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>3);
-  const SKIP=6;
+  const SKIP=3;
   for(const snake of living){
     if(!snake.alive||(snake.graceTicks||0)>0) continue;
     const hr=headR(snake);
@@ -1312,7 +1336,7 @@ function checkCollisions(){
 }
 
 function killSnake(snake,fromNetwork){
-  if(!snake||!snake.alive||!G.running)return;
+  if(!snake||!snake.alive)return;
   snake.alive=false;
   G.aliveSlots.delete(snake.slot);
   // Death notification
@@ -1326,17 +1350,17 @@ function killSnake(snake,fromNetwork){
   }
   // Host decides round end
   if((isHost||vsAI)){
-    // Check if round should end
-    const aliveHumans=[...G.aliveSlots].filter(sl=>{
+    // Broadcast death to guests
+    if(!vsAI&&channel) channel.publish('snakeDied',{slot:snake.slot});
+    // End round if <=1 alive, or all remaining are AI
+    const aliveList=[...G.aliveSlots];
+    const anyHumanAlive=aliveList.some(sl=>{
       const sn=[G.me,G.opp,...G.others].find(s=>s&&s.slot===sl);
-      return sn&&!sn.isAI;
+      return sn&&sn.alive&&!sn.isAI;
     });
-    const shouldEnd=G.aliveSlots.size<=1||aliveHumans.length===0;
-    if(shouldEnd){
-      const winnerSlot=G.aliveSlots.size===1?[...G.aliveSlots][0]:-1;
+    if(aliveList.length<=1||!anyHumanAlive){
+      const winnerSlot=aliveList.length===1?aliveList[0]:-1;
       endGame(winnerSlot,'');
-    } else if(!vsAI&&channel){
-      channel.publish('snakeDied',{slot:snake.slot});
     }
   }
 }
