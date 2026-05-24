@@ -9,28 +9,28 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:'Segoe UI',sans-serif;}
 
 /* ── LOBBY ── */
-#lobby{position:fixed;inset:0;background:linear-gradient(160deg,#e8f5e0 0%,#f5f0e0 50%,#e0f0e8 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:100;padding:20px 20px 30px;overflow-y:auto;}
-#lobby h1{font-size:38px;color:#2a6a2a;text-shadow:0 2px 8px rgba(40,120,40,0.2);letter-spacing:3px;margin-bottom:2px;margin-top:10px;}
-.l-sub{color:#5a8a5a;font-size:11px;letter-spacing:3px;margin-bottom:3px;}
-.l-credit{color:#b0c8a0;font-size:10px;letter-spacing:1px;margin-bottom:18px;}
+#lobby{position:fixed;inset:0;background:linear-gradient(160deg,#e8f5e0 0%,#f5f0e0 50%,#e0f0e8 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;padding:10px 16px;overflow:hidden;}
+#lobby h1{font-size:26px;color:#2a6a2a;text-shadow:0 2px 6px rgba(40,120,40,0.2);letter-spacing:2px;margin-bottom:1px;margin-top:0;}
+.l-sub{color:#5a8a5a;font-size:10px;letter-spacing:2px;margin-bottom:1px;}
+.l-credit{color:#b0c8a0;font-size:9px;letter-spacing:1px;margin-bottom:6px;}
 .l-snakes{font-size:28px;margin-bottom:16px;letter-spacing:4px;}
 
-.l-section{width:100%;max-width:320px;margin-bottom:14px;}
-.l-label{font-size:10px;color:#6a8a6a;letter-spacing:2px;margin-bottom:7px;text-transform:uppercase;font-weight:bold;}
+.l-section{width:100%;max-width:320px;margin-bottom:6px;}
+.l-label{font-size:9px;color:#6a8a6a;letter-spacing:1px;margin-bottom:4px;text-transform:uppercase;font-weight:bold;}
 
-#lobby input{width:100%;background:#fff;border:1.5px solid #c8ddb8;border-radius:10px;padding:10px 14px;font-size:15px;color:#2a4a2a;outline:none;letter-spacing:1px;}
+#lobby input{width:100%;background:#fff;border:1.5px solid #c8ddb8;border-radius:8px;padding:7px 12px;font-size:14px;color:#2a4a2a;outline:none;letter-spacing:1px;}
 #lobby input:focus{border-color:#4a8a4a;}
 #lobby input::placeholder{color:#aabba0;}
 
 /* SPECIES GRID */
-#species-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.sp-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px 4px;border-radius:12px;border:2px solid #d8e8c8;background:#fff;cursor:pointer;transition:all .15s;position:relative;}
+#species-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.sp-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px 3px;border-radius:10px;border:2px solid #d8e8c8;background:#fff;cursor:pointer;transition:all .15s;position:relative;}
 .sp-card.sel{border-color:#2a6a2a;background:#e8f5e0;box-shadow:0 2px 8px rgba(40,120,40,0.2);}
 .sp-card:active{transform:scale(0.96);}
-.sp-svg{width:52px;height:52px;}
-.sp-name{font-size:9px;color:#4a6a4a;font-weight:bold;letter-spacing:.5px;text-align:center;margin-top:1px;}
+.sp-svg{width:40px;height:40px;}
+.sp-name{font-size:8px;color:#4a6a4a;font-weight:bold;letter-spacing:.3px;text-align:center;margin-top:1px;}
 .sp-card.sel .sp-name{color:#2a6a2a;}
-.sp-bars{display:flex;flex-direction:column;gap:2px;width:100%;padding:0 4px;margin-top:3px;}
+.sp-bars{display:flex;flex-direction:column;gap:1px;width:100%;padding:0 3px;margin-top:2px;}
 .sp-bar-row{display:flex;align-items:center;gap:3px;}
 .sp-bar-lbl{font-size:7px;color:#8aaa7a;width:10px;flex-shrink:0;font-weight:bold;}
 .sp-bar-track{flex:1;height:4px;background:#e8f0e0;border-radius:2px;overflow:hidden;}
@@ -38,13 +38,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 .sp-bar-fill.spd{background:#2a8a2a;}
 .sp-bar-fill.agi{background:#1a6aaa;}
 .sp-bar-fill.siz{background:#8a4a00;}
-#sp-detail{display:none;width:100%;max-width:320px;background:#fff;border-radius:12px;border:1.5px solid #c8ddb8;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(40,100,40,0.08);}
+#sp-detail{display:none;width:100%;max-width:320px;background:#fff;border-radius:10px;border:1.5px solid #c8ddb8;padding:8px 10px;margin-bottom:6px;}
 #sp-detail-inner{display:flex;gap:12px;align-items:flex-start;}
-#sp-detail-icon{width:56px;height:56px;flex-shrink:0;}
+#sp-detail-icon{width:44px;height:44px;flex-shrink:0;}
 #sp-detail-info{flex:1;}
-#sp-detail-name{font-size:14px;font-weight:bold;color:#2a6a2a;margin-bottom:4px;}
-#sp-detail-tip{font-size:11px;color:#6a8a6a;margin-bottom:8px;font-style:italic;}
-.detail-stat-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+#sp-detail-name{font-size:12px;font-weight:bold;color:#2a6a2a;margin-bottom:2px;}
+#sp-detail-tip{font-size:10px;color:#6a8a6a;margin-bottom:4px;font-style:italic;}
+.detail-stat-row{display:flex;align-items:center;gap:4px;margin-bottom:2px;}
 .detail-stat-lbl{font-size:10px;color:#6a8a6a;width:44px;font-weight:bold;}
 .detail-stat-track{flex:1;height:7px;background:#e8f0e0;border-radius:4px;overflow:hidden;}
 .detail-stat-fill{height:100%;border-radius:4px;}
@@ -57,21 +57,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 .detail-stat-val.agi{color:#1a5a9a;}
 
 /* BUTTONS */
-.l-btn{width:100%;max-width:320px;padding:13px;border:none;border-radius:26px;font-size:15px;font-weight:bold;cursor:pointer;letter-spacing:1px;margin-bottom:8px;}
+.l-btn{width:100%;max-width:320px;padding:9px;border:none;border-radius:22px;font-size:14px;font-weight:bold;cursor:pointer;letter-spacing:1px;margin-bottom:5px;}
 .l-btn-host{background:linear-gradient(135deg,#2a7a2a,#4aaa4a);color:#fff;box-shadow:0 4px 16px rgba(40,150,40,0.3);}
 .l-btn-join{background:linear-gradient(135deg,#1a4a8a,#2a6acc);color:#fff;box-shadow:0 4px 16px rgba(30,80,180,0.25);}
 .l-btn:active{transform:scale(0.97);}
-.l-or{color:#a0b890;font-size:11px;letter-spacing:3px;margin:4px 0 12px;text-align:center;}
+.l-or{color:#a0b890;font-size:10px;letter-spacing:2px;margin:2px 0 5px;text-align:center;}
 
-#status-msg{color:#4a8a4a;font-size:12px;text-align:center;min-height:18px;letter-spacing:1px;margin-top:6px;}
+#status-msg{font-size:12px;text-align:center;min-height:18px;letter-spacing:.5px;margin-top:4px;}
 
 /* WAITING ROOM */
-#waiting-room{display:none;width:100%;max-width:320px;background:#fff;border-radius:14px;padding:16px;border:1.5px solid #c8ddb8;margin-top:10px;box-shadow:0 4px 16px rgba(40,100,40,0.08);}
+#waiting-room{display:none;position:fixed;inset:0;background:rgba(232,245,224,0.97);border-radius:0;padding:20px;border:none;margin-top:0;z-index:110;flex-direction:column;align-items:center;justify-content:center;}
 .wr-title{color:#2a6a2a;font-size:14px;font-weight:bold;letter-spacing:1px;margin-bottom:8px;}
-#room-code-box{font-size:34px;font-weight:bold;color:#2a7a2a;letter-spacing:10px;text-align:center;margin:8px 0;text-shadow:0 2px 8px rgba(40,120,40,0.2);}
+#room-code-box{font-size:42px;font-weight:bold;color:#2a7a2a;letter-spacing:10px;text-align:center;margin:12px 0;text-shadow:0 2px 8px rgba(40,120,40,0.2);}
 .wr-hint{font-size:10px;color:#8aa880;text-align:center;margin-bottom:10px;letter-spacing:1px;}
 #player-list{font-size:13px;color:#4a7a4a;line-height:2;margin-bottom:10px;}
-.start-btn{width:100%;padding:12px;border:none;border-radius:22px;background:#2a7a2a;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;letter-spacing:1px;}
+.start-btn{width:100%;max-width:280px;padding:12px;border:none;border-radius:22px;background:#2a7a2a;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;letter-spacing:1px;}
 .start-btn:disabled{opacity:0.4;cursor:not-allowed;}
 .start-btn:not(:disabled):active{transform:scale(0.97);}
 
@@ -158,6 +158,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
     </div>
   </div>
 
+  <div id="status-msg"></div>
+
   <div class="l-section">
     <div class="l-label">Your name</div>
     <input id="pname" placeholder="Enter your name" maxlength="12" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
@@ -176,8 +178,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
     <input id="join-code" placeholder="4-digit code" maxlength="4" inputmode="numeric" style="text-align:center;font-size:22px;letter-spacing:8px;"/>
   </div>
   <button class="l-btn l-btn-join" id="join-btn">🔵 Join Game</button>
-
-  <div id="status-msg"></div>
 
   <div id="waiting-room">
     <div class="wr-title">🐍 Room</div>
@@ -216,6 +216,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   </div>
 
   <div id="credit-game">Created by Ethan &amp; Elroy Fang · 2026</div>
+<div id="debug-hud" style="position:fixed;bottom:100px;left:8px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;padding:4px 8px;border-radius:6px;z-index:50;pointer-events:none;white-space:pre;line-height:1.5;"></div>
 </div>
 
 <!-- ROUND RESULT OVERLAY (host + AI guest) -->
@@ -308,14 +309,14 @@ const ABLY_KEY='S4V2Tw.1ozI7g:9FOhAo1Uej8UubN3zVgWSnswcXAJ6wiSzHC2jBq2dZ4';
 
 // ── SPECIES ───────────────────────────────────────────────────
 const SPECIES=[
-  {id:'cobra',    name:'Cobra',     emoji:'🐍', head:'#1a7a1a', body:['#2aaa2a','#1a6b1a','#157015'], pattern:'solid',  hood:'#1a5a1a', speed:1.28, turnSpeed:0.076, spd:3, agi:3, siz:4, tip:'Balanced all-rounder'},
-  {id:'viper',    name:'Viper',     emoji:'🟡', head:'#c4a000', body:['#d4b800','#a88000','#c4a000'], pattern:'zigzag', speed:1.6, turnSpeed:0.088, spd:4, agi:4, siz:2, tip:'Fast and nimble but fragile'},
-  {id:'mamba',    name:'Mamba',     emoji:'🟢', head:'#007a30', body:['#00aa44','#007733','#006628'], pattern:'solid',  speed:1.92, turnSpeed:0.058, spd:5, agi:3, siz:2, tip:'Blazing speed, slim profile'},
-  {id:'rattler',  name:'Rattler',   emoji:'🔴', head:'#c44000', body:['#d45010','#a43000','#888888'], pattern:'rattle', speed:1.12, turnSpeed:0.096, spd:2, agi:5, siz:3, tip:'Tightest turns of any snake'},
-  {id:'anaconda', name:'Anaconda',  emoji:'🟤', head:'#5a3d00', body:['#7a5500','#3a2800','#5a3d00'], pattern:'blotch', speed:0.72, turnSpeed:0.052, spd:1, agi:2, siz:7, tip:'Enormous — hard to avoid'},
-  {id:'kingsnake',name:'King Snake',emoji:'⚫', head:'#111111', body:['#222222','#cc2222','#eeeeee'], pattern:'bands',  speed:1.28, turnSpeed:0.100, spd:3, agi:5, siz:2, tip:'Ultra-agile, razor thin'},
-  {id:'boa',      name:'Boa',       emoji:'🟠', head:'#8b4400', body:['#c06010','#6b3000','#ffaa00'], pattern:'blotch', speed:1.44, turnSpeed:0.064, spd:4, agi:2, siz:4, tip:'Fast and stocky — hard to dodge'},
-  {id:'python',   name:'Python',    emoji:'⚪', head:'#b89850', body:['#e8d898','#8a6830','#d4aa20'], pattern:'blotch', speed:0.96, turnSpeed:0.078, spd:2, agi:3, siz:5, tip:'Large and steady, hard to kill'},
+  {id:'cobra',    name:'Cobra',     emoji:'🐍', head:'#1a7a1a', body:['#2aaa2a','#1a6b1a','#157015'], pattern:'solid',  hood:'#1a5a1a', speed:1.088, turnSpeed:0.076, spd:3, agi:3, siz:4, tip:'Balanced all-rounder'},
+  {id:'viper',    name:'Viper',     emoji:'🟡', head:'#c4a000', body:['#d4b800','#a88000','#c4a000'], pattern:'zigzag', speed:1.36, turnSpeed:0.088, spd:4, agi:4, siz:2, tip:'Fast and nimble but fragile'},
+  {id:'mamba',    name:'Mamba',     emoji:'🟢', head:'#007a30', body:['#00aa44','#007733','#006628'], pattern:'solid',  speed:1.632, turnSpeed:0.058, spd:5, agi:3, siz:2, tip:'Blazing speed, slim profile'},
+  {id:'rattler',  name:'Rattler',   emoji:'🔴', head:'#c44000', body:['#d45010','#a43000','#888888'], pattern:'rattle', speed:0.952, turnSpeed:0.096, spd:2, agi:5, siz:3, tip:'Tightest turns of any snake'},
+  {id:'anaconda', name:'Anaconda',  emoji:'🟤', head:'#5a3d00', body:['#7a5500','#3a2800','#5a3d00'], pattern:'blotch', speed:0.612, turnSpeed:0.052, spd:1, agi:2, siz:7, tip:'Enormous — hard to avoid'},
+  {id:'kingsnake',name:'King Snake',emoji:'⚫', head:'#111111', body:['#222222','#cc2222','#eeeeee'], pattern:'bands',  speed:1.088, turnSpeed:0.100, spd:3, agi:5, siz:2, tip:'Ultra-agile, razor thin'},
+  {id:'boa',      name:'Boa',       emoji:'🟠', head:'#8b4400', body:['#c06010','#6b3000','#ffaa00'], pattern:'blotch', speed:1.224, turnSpeed:0.064, spd:4, agi:2, siz:4, tip:'Fast and stocky — hard to dodge'},
+  {id:'python',   name:'Python',    emoji:'⚪', head:'#b89850', body:['#e8d898','#8a6830','#d4aa20'], pattern:'blotch', speed:0.816, turnSpeed:0.078, spd:2, agi:3, siz:5, tip:'Large and steady, hard to kill'},
 ];
 
 // ── HABITATS ──────────────────────────────────────────────────
@@ -345,7 +346,7 @@ let activeHabitat=HABITATS[0];
 
 // Build species grid
 const grid=document.getElementById('species-grid');
-let mySpeciesId='cobra';
+let mySpeciesId=null;
 const SP_ICONS={'cobra':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="28" rx="32" ry="20" fill="#1a7a1a" opacity="0.85"/><ellipse cx="35" cy="28" rx="26" ry="15" fill="#2aaa2a" opacity="0.6"/><ellipse cx="35" cy="30" rx="14" ry="9" fill="#1a5a1a" opacity="0.5"/><ellipse cx="35" cy="46" rx="14" ry="12" fill="#1a7a1a"/><ellipse cx="35" cy="54" rx="8" ry="5" fill="#157015"/><circle cx="28" cy="44" r="4" fill="#fff"/><circle cx="42" cy="44" r="4" fill="#fff"/><circle cx="28.8" cy="44.5" r="2.2" fill="#1a1a1a"/><circle cx="42.8" cy="44.5" r="2.2" fill="#1a1a1a"/><circle cx="29.3" cy="44" r="0.8" fill="#fff"/><circle cx="43.3" cy="44" r="0.8" fill="#fff"/><ellipse cx="32" cy="53" rx="1.5" ry="1" fill="#0a400a"/><ellipse cx="38" cy="53" rx="1.5" ry="1" fill="#0a400a"/><line x1="35" y1="59" x2="31" y2="64" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="59" x2="39" y2="64" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="57" x2="35" y2="59" stroke="#cc2222" stroke-width="1.5"/></svg>`,'viper':`<svg class="sp-svg" viewBox="0 0 70 80"><polygon points="35,14 10,56 60,56" fill="#c4a000"/><polygon points="35,18 13,53 57,53" fill="#d4b800"/><polygon points="35,22 18,48 52,48" fill="#a88000" opacity="0.5"/><ellipse cx="23" cy="42" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="47" cy="42" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="23" cy="42" rx="1.5" ry="3.5" fill="#1a1a00"/><ellipse cx="47" cy="42" rx="1.5" ry="3.5" fill="#1a1a00"/><circle cx="22.5" cy="40.5" r="0.7" fill="#fff"/><circle cx="46.5" cy="40.5" r="0.7" fill="#fff"/><ellipse cx="29" cy="50" rx="2" ry="1.5" fill="#8a6000"/><ellipse cx="41" cy="50" rx="2" ry="1.5" fill="#8a6000"/><line x1="35" y1="56" x2="30" y2="62" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="40" y2="62" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="54" x2="35" y2="56" stroke="#cc2222" stroke-width="1.5"/></svg>`,'mamba':`<svg class="sp-svg" viewBox="0 0 70 82"><ellipse cx="35" cy="38" rx="12" ry="22" fill="#007a30"/><ellipse cx="35" cy="36" rx="9" ry="19" fill="#00aa44"/><ellipse cx="35" cy="56" rx="7" ry="4" fill="#006628"/><ellipse cx="30" cy="28" rx="4" ry="8" fill="#00cc55" opacity="0.3"/><circle cx="27" cy="36" r="4.5" fill="#fff"/><circle cx="43" cy="36" r="4.5" fill="#fff"/><circle cx="27.5" cy="36.5" r="2.5" fill="#111"/><circle cx="43.5" cy="36.5" r="2.5" fill="#111"/><circle cx="27.8" cy="35.8" r="0.9" fill="#fff"/><circle cx="43.8" cy="35.8" r="0.9" fill="#fff"/><line x1="35" y1="60" x2="28" y2="68" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="60" x2="42" y2="68" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="35" y2="60" stroke="#cc2222" stroke-width="2"/></svg>`,'rattler':`<svg class="sp-svg" viewBox="0 0 70 80"><polygon points="35,16 8,44 35,60 62,44" fill="#c44000"/><polygon points="35,20 12,44 35,56 58,44" fill="#d45010"/><polygon points="35,26 18,44 35,52 52,44" fill="#a43000" opacity="0.6"/><ellipse cx="24" cy="27" rx="8" ry="3" fill="#a43000" opacity="0.5"/><ellipse cx="46" cy="27" rx="8" ry="3" fill="#a43000" opacity="0.5"/><ellipse cx="22" cy="40" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="48" cy="40" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="22" cy="40" rx="1.5" ry="3.5" fill="#1a0800"/><ellipse cx="48" cy="40" rx="1.5" ry="3.5" fill="#1a0800"/><circle cx="21.5" cy="38.5" r="0.7" fill="#fff"/><circle cx="47.5" cy="38.5" r="0.7" fill="#fff"/><ellipse cx="35" cy="13" rx="7" ry="4" fill="#888" opacity="0.7"/><ellipse cx="35" cy="10" rx="5" ry="3" fill="#aaa" opacity="0.6"/><ellipse cx="35" cy="7" rx="3.5" ry="2.5" fill="#bbb" opacity="0.5"/><line x1="35" y1="60" x2="30" y2="66" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="60" x2="40" y2="66" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="58" x2="35" y2="60" stroke="#cc2222" stroke-width="1.5"/></svg>`,'anaconda':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="25" ry="18" fill="#5a3d00"/><ellipse cx="35" cy="38" rx="21" ry="15" fill="#7a5500"/><ellipse cx="25" cy="36" rx="7" ry="5" fill="#3a2800" opacity="0.6"/><ellipse cx="45" cy="36" rx="7" ry="5" fill="#3a2800" opacity="0.6"/><ellipse cx="35" cy="32" rx="5" ry="4" fill="#3a2800" opacity="0.5"/><ellipse cx="35" cy="52" rx="14" ry="6" fill="#4a3200"/><circle cx="23" cy="38" r="3.5" fill="#fff"/><circle cx="47" cy="38" r="3.5" fill="#fff"/><circle cx="23.5" cy="38.5" r="2" fill="#1a1000"/><circle cx="47.5" cy="38.5" r="2" fill="#1a1000"/><line x1="35" y1="58" x2="31" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="58" x2="39" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="35" y2="58" stroke="#cc2222" stroke-width="1.5"/></svg>`,'kingsnake':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="16" ry="14" fill="#111"/><ellipse cx="35" cy="38" rx="13" ry="11" fill="#222"/><rect x="19" y="33" width="32" height="5" rx="2" fill="#cc2222" opacity="0.85"/><rect x="20" y="42" width="30" height="4" rx="2" fill="#cc2222" opacity="0.7"/><rect x="20" y="39" width="30" height="3" rx="1" fill="#eee" opacity="0.9"/><ellipse cx="35" cy="51" rx="9" ry="5" fill="#1a1a1a"/><circle cx="26" cy="38" r="4.5" fill="#cc4400"/><circle cx="44" cy="38" r="4.5" fill="#cc4400"/><circle cx="26.5" cy="38.5" r="2" fill="#111"/><circle cx="44.5" cy="38.5" r="2" fill="#111"/><circle cx="26.8" cy="37.8" r="0.7" fill="#fff"/><circle cx="44.8" cy="37.8" r="0.7" fill="#fff"/><line x1="35" y1="56" x2="30" y2="62" stroke="#eee" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="40" y2="62" stroke="#eee" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="54" x2="35" y2="56" stroke="#eee" stroke-width="1.5"/></svg>`,'boa':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="22" ry="16" fill="#8b4400"/><ellipse cx="35" cy="38" rx="18" ry="13" fill="#c06010"/><ellipse cx="20" cy="36" rx="8" ry="6" fill="#6b3000" opacity="0.7"/><ellipse cx="50" cy="36" rx="8" ry="6" fill="#6b3000" opacity="0.7"/><ellipse cx="35" cy="30" rx="7" ry="5" fill="#6b3000" opacity="0.6"/><ellipse cx="35" cy="51" rx="14" ry="6" fill="#7a3800"/><circle cx="24" cy="38" r="4.5" fill="#ffaa00"/><circle cx="46" cy="38" r="4.5" fill="#ffaa00"/><ellipse cx="24" cy="38" rx="1.8" ry="3" fill="#2a1000"/><ellipse cx="46" cy="38" rx="1.8" ry="3" fill="#2a1000"/><circle cx="24.3" cy="36.8" r="0.7" fill="#fff"/><circle cx="46.3" cy="36.8" r="0.7" fill="#fff"/><line x1="35" y1="57" x2="31" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="57" x2="39" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="55" x2="35" y2="57" stroke="#cc2222" stroke-width="1.5"/></svg>`,'python':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="20" ry="15" fill="#b89850"/><ellipse cx="35" cy="38" rx="16" ry="12" fill="#e8d898"/><ellipse cx="35" cy="30" rx="10" ry="6" fill="#8a6830" opacity="0.7"/><path d="M16 46 Q35 50 54 46" stroke="#a88840" stroke-width="1.5" fill="none"/><ellipse cx="18" cy="40" rx="6" ry="5" fill="#c8a860" opacity="0.5"/><ellipse cx="52" cy="40" rx="6" ry="5" fill="#c8a860" opacity="0.5"/><ellipse cx="35" cy="51" rx="11" ry="5" fill="#a88840"/><circle cx="27" cy="49" r="1.5" fill="#8a6820" opacity="0.8"/><circle cx="43" cy="49" r="1.5" fill="#8a6820" opacity="0.8"/><circle cx="24" cy="38" r="4.5" fill="#d4aa20"/><circle cx="46" cy="38" r="4.5" fill="#d4aa20"/><ellipse cx="24" cy="38" rx="1.5" ry="3.2" fill="#1a1400"/><ellipse cx="46" cy="38" rx="1.5" ry="3.2" fill="#1a1400"/><circle cx="24.3" cy="36.8" r="0.7" fill="#fff"/><circle cx="46.3" cy="36.8" r="0.7" fill="#fff"/><line x1="35" y1="56" x2="30" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="40" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="54" x2="35" y2="56" stroke="#cc2222" stroke-width="1.5"/></svg>`};
 function showDetail(sp){
   document.getElementById('sp-detail').style.display='block';
@@ -361,7 +362,7 @@ function showDetail(sp){
 }
 SPECIES.forEach(sp=>{
   const card=document.createElement('div');
-  card.className='sp-card'+(sp.id==='cobra'?' sel':'');
+  card.className='sp-card';
   const barW_spd=(sp.spd/10*100)+'%';
   const barW_agi=(sp.agi/10*100)+'%';
   const barW_siz=(sp.siz/10*100)+'%';
@@ -376,11 +377,12 @@ SPECIES.forEach(sp=>{
     document.querySelectorAll('.sp-card').forEach(c=>c.classList.remove('sel'));
     card.classList.add('sel');
     mySpeciesId=sp.id;
+    setStatus('');
     showDetail(sp);
   };
   grid.appendChild(card);
 });
-showDetail(SPECIES[0]);
+// no default selection
 
 document.getElementById('random-btn').onclick=()=>{
   const sp=SPECIES[Math.floor(Math.random()*SPECIES.length)];
@@ -396,13 +398,14 @@ document.getElementById('random-btn').onclick=()=>{
 let ably=null,channel=null;
 let myId=null,isHost=false,roomCode=null;
 let myName='Player',vsAI=false;
-let matchMySpecies=null,matchOppSpecies=null; // locked for whole match
-let aiDifficulty='medium'; // easy | medium | hard
-let lobbyGuest=null;
-let tally=[0,0],round=1;
+let matchSpecies=[null,null,null,null]; // species per slot, locked for match
+let aiDifficulty='medium';
+let lobbyGuests=[]; // array of {id,name,species} for slots 1-3
+let tally=[0,0,0,0],round=1;
+let numPlayers=2; // total players (human+AI) in this match
 let hostReady=false,guestReady=false;
 
-function setStatus(m){document.getElementById('status-msg').textContent=m;}
+function setStatus(m){const el=document.getElementById('status-msg');el.textContent=m;el.style.color=m.startsWith('⚠️')?'#cc4400':'#4a8a4a';}
 
 // ── CONNECT ───────────────────────────────────────────────────
 function initAbly(cb){
@@ -416,11 +419,14 @@ function initAbly(cb){
 
 function startVsAI(diff){
   myName=document.getElementById('pname').value.trim()||'Player';
+  if(!mySpeciesId){setStatus('⚠️ Please select a snake first!');return;}
+  setStatus('');
   isHost=true; myId=0; vsAI=true;
   aiDifficulty=diff;
+  lobbyGuests=[];
+  numPlayers=2;
   tally=[0,0]; round=1;
-  matchMySpecies=mySpeciesId;
-  matchOppSpecies=SPECIES[Math.floor(Math.random()*SPECIES.length)].id;
+  matchSpecies=[mySpeciesId,null,null,null];
   const state=buildState();
   launchGame(state);
 }
@@ -430,33 +436,36 @@ document.getElementById('ai-hard').onclick=()=>startVsAI('hard');
 
 document.getElementById('host-btn').onclick=()=>{
   myName=document.getElementById('pname').value.trim()||'Host';
+  if(!mySpeciesId){setStatus('⚠️ Please select a snake first!');return;}
   setStatus('Connecting...');
   initAbly(()=>{
-    isHost=true;myId=0;
+    isHost=true;myId=0;lobbyGuests=[];
     roomCode=String(1000+(0|Math.random()*9000));
     channel=ably.channels.get('slitherduel-'+roomCode);
     channel.subscribe(onMsg);
     document.getElementById('room-code-box').textContent=roomCode;
-    document.getElementById('waiting-room').style.display='block';
+    document.getElementById('waiting-room').style.display='flex';
     document.getElementById('start-btn').disabled=false;
-    document.getElementById('start-btn').textContent='▶ Start (vs AI)';
+    document.getElementById('start-btn').textContent='▶ Start (2-4 players)';
     setStatus('');updatePlayerList();
   });
 };
 
 document.getElementById('join-btn').onclick=()=>{
   myName=document.getElementById('pname').value.trim()||'Guest';
+  if(!mySpeciesId){setStatus('⚠️ Please select a snake first!');return;}
   const code=document.getElementById('join-code').value.trim();
   if(code.length!==4){setStatus('Enter a 4-digit code');return;}
   setStatus('Connecting...');
   initAbly(()=>{
-    isHost=false;myId=1;
+    isHost=false;myId=1; // will be updated by 'joined' msg
+    lobbyGuests=[];
     roomCode=code;
     channel=ably.channels.get('slitherduel-'+roomCode);
     channel.subscribe(onMsg);
     channel.publish('join',{name:myName,species:mySpeciesId});
     document.getElementById('room-code-box').textContent=roomCode;
-    document.getElementById('waiting-room').style.display='block';
+    document.getElementById('waiting-room').style.display='flex';
     document.getElementById('start-btn').disabled=true;
     document.getElementById('start-btn').textContent='Waiting for host...';
     setStatus('Joined! Waiting for host...');updatePlayerList();
@@ -464,20 +473,24 @@ document.getElementById('join-btn').onclick=()=>{
 };
 
 function updatePlayerList(){
-  let html=`<div>${getSp(mySpeciesId).emoji} <b>${myName}</b>${isHost?' 👑':''}</div>`;
-  if(lobbyGuest) html+=`<div>${getSp(lobbyGuest.species).emoji} <b>${lobbyGuest.name}</b>${!isHost?' 👑':''}</div>`;
-  else if(!isHost) html+=`<div style="color:#aaa">Waiting for host...</div>`;
-  document.getElementById('player-list').innerHTML=html;
+  let h=`<div>${getSp(mySpeciesId).emoji} <b>${myName}</b> ${isHost?'👑 Host':'(you)'}</div>`;
+  lobbyGuests.forEach(g=>{h+=`<div>${getSp(g.species).emoji} <b>${g.name}</b></div>`;});
+  if(!isHost&&lobbyGuests.length===0) h+=`<div style="color:#aaa;font-size:11px">Waiting for host...</div>`;
+  document.getElementById('player-list').innerHTML=h;
 }
 
 document.getElementById('start-btn').onclick=()=>{
   if(!isHost)return;
-  vsAI=!lobbyGuest;
-  tally=[0,0];round=1; // fresh match
-  matchMySpecies=mySpeciesId;
-  matchOppSpecies=lobbyGuest?lobbyGuest.species:SPECIES[Math.floor(Math.random()*SPECIES.length)].id;
+  // Determine total players: host + guests, fill rest with AI
+  numPlayers=Math.max(2,1+lobbyGuests.length); // at least 2 (1 human + 1 AI)
+  vsAI=lobbyGuests.length===0;
+  tally=Array(numPlayers).fill(0);round=1;
+  // Lock species: host=slot0, guests=slots1+, AI fills remaining
+  matchSpecies=Array(numPlayers).fill(null);
+  matchSpecies[0]=mySpeciesId;
+  lobbyGuests.forEach(g=>{matchSpecies[g.id]=g.species;});
   const state=buildState();
-  if(!vsAI) channel.publish('start',{state,tally,round});
+  if(lobbyGuests.length>0) channel.publish('start',{state,tally,round});
   launchGame(state);
 };
 
@@ -485,15 +498,21 @@ function onMsg(msg){
   const d=msg.data,t=msg.name;
   if(t==='join'){
     if(!isHost)return;
-    lobbyGuest={name:d.name,species:d.species};
+    if(lobbyGuests.length>=3){channel.publish('full',{});return;}
+    const guestId=lobbyGuests.length+1; // slots 1,2,3
+    lobbyGuests.push({id:guestId,name:d.name,species:d.species});
     updatePlayerList();
-    document.getElementById('start-btn').textContent='▶ Start (2 players)';
-    channel.publish('joined',{name:myName,species:mySpeciesId});
+    const n=lobbyGuests.length+1;
+    document.getElementById('start-btn').textContent='▶ Start ('+n+' players)';
+    channel.publish('joined',{name:myName,species:mySpeciesId,yourId:guestId,totalSoFar:n});
   }
   else if(t==='joined'){
     if(isHost)return;
-    lobbyGuest={name:d.name,species:d.species};
-    updatePlayerList();setStatus('Host found! Waiting to start...');
+    if(d.yourId!=null) myId=d.yourId;
+    updatePlayerList();setStatus('Joined as P'+(myId+1)+'! Waiting to start...');
+  }
+  else if(t==='full'){
+    setStatus('Room is full!');
   }
   else if(t==='start'){
     if(isHost)return;
@@ -503,10 +522,14 @@ function onMsg(msg){
     launchGame(d.state);
   }
   else if(t==='pos'){
-    if(!G.running||!G.opp)return;
+    if(!G.running)return;
     if(d.from===myId)return; // ignore own echo
-    G.opp.headX=d.x;G.opp.headY=d.y;G.opp.angle=d.a;
-    if(d.segs&&d.segs.length) G.opp.segs=d.segs;
+    // find which snake this belongs to
+    const slot=d.slot!=null?d.slot:d.from;
+    let target=null;
+    if(G.opp&&G.opp.slot===slot) target=G.opp;
+    else target=G.others.find(s=>s&&s.slot===slot)||null;
+    if(target){target.headX=d.x;target.headY=d.y;target.angle=d.a;if(d.segs&&d.segs.length)target.segs=d.segs;}
     updateHUD();
   }
   else if(t==='pellet'){
@@ -518,9 +541,13 @@ function onMsg(msg){
   else if(t==='end'){
     if(isHost)return;
     G.running=false;
-    cancelAnimationFrame(G.animId);clearInterval(G.syncTimer);
-    tally=d.tally;round=d.round;
-    const wIsDraw=d.winner==='draw'; showWaitOverlay(wIsDraw?false:d.winner==='opp',d.tally,d.msg,d.matchOver||false);
+    cancelAnimationFrame(G.animId);clearInterval(G.syncTimer);clearInterval(G.timerInterval);
+    if(d.tally){tally=d.tally;}
+    if(d.numPlayers){numPlayers=d.numPlayers;}
+    round=d.round||round;
+    const iWin=d.winnerSlot===myId;
+    const isDraw=d.winnerSlot===-1;
+    showWaitOverlay(iWin,d.tally||tally,d.msg||'',d.matchOver||false);
   }
   else if(t==='replay'){
     if(isHost)return;
@@ -550,10 +577,16 @@ function onMsg(msg){
     if(isHost)return;
     document.getElementById('ov-guest-ready-status').textContent='Host is ready!';
   }
+  else if(t==='died'){
+    if(!G.running)return;
+    // A remote player died — find and kill their snake
+    const deadSlot=d.slot;
+    const deadSnake=[G.opp,...G.others].find(s=>s&&s.slot===deadSlot);
+    if(deadSnake) killSnake(deadSnake);
+  }
   else if(t==='collision'){
     if(!G.running)return;
-    // Other player crashed into our body — we win
-    if(d.loser==='me') endGame('me','Opponent crashed into you!');
+    if(d.loser==='me') killSnake(G.me);
   }
 }
 
@@ -577,38 +610,51 @@ const SYNC_MS=30;
 
 const PELLET_COLORS=['#e74c3c','#f39c12','#27ae60','#2980b9','#8e44ad','#e67e22','#16a085','#d35400'];
 
-let G={running:false,animId:null,syncTimer:null,timerInterval:null,me:null,opp:null,pellets:[],timeLeft:ROUND_TIME,touchTarget:null};
+// Corner spawn positions [TL, TR, BL, BR] with inward angles
+const CORNERS=[
+  {x:()=>WORLD_W*0.15, y:()=>WORLD_H*0.15, angle:Math.PI*0.25},   // slot0 TL → down-right
+  {x:()=>WORLD_W*0.85, y:()=>WORLD_H*0.15, angle:Math.PI*0.75},   // slot1 TR → down-left
+  {x:()=>WORLD_W*0.15, y:()=>WORLD_H*0.85, angle:-Math.PI*0.25},  // slot2 BL → up-right
+  {x:()=>WORLD_W*0.85, y:()=>WORLD_H*0.85, angle:-Math.PI*0.75},  // slot3 BR → up-left
+];
+let G={running:false,animId:null,syncTimer:null,timerInterval:null,me:null,opp:null,others:[],pellets:[],timeLeft:ROUND_TIME,touchTarget:null,aliveSlots:new Set()};
 
 function getSp(id){return SPECIES.find(s=>s.id===id)||SPECIES[0];}
 
+function randSpecies(){return SPECIES[Math.floor(Math.random()*SPECIES.length)].id;}
 function buildState(){
   const hab=HABITATS[0|Math.random()*HABITATS.length];
   const pellets=[];
   for(let i=0;i<PELLET_COUNT;i++) pellets.push(mkPellet(hab));
-  return {
-    meSpec:matchMySpecies||mySpeciesId,
-    oppSpec:matchOppSpecies||(lobbyGuest?lobbyGuest.species:SPECIES[0].id),
-    meName:myName,
-    oppName:lobbyGuest?lobbyGuest.name:'AI',
-    pellets,
-    habitatId:hab.id,
-    meStart:{x:WORLD_W*0.15,y:WORLD_H*0.15,angle:Math.PI*0.25},
-    oppStart:{x:WORLD_W*0.85,y:WORLD_H*0.85,angle:Math.PI*1.25},
-  };
+  // Build player info for all slots
+  const slots=[];
+  for(let i=0;i<numPlayers;i++){
+    const guest=lobbyGuests.find(g=>g.id===i);
+    const isAI=i!==myId&&!guest;
+    slots.push({
+      slot:i,
+      name:i===myId?myName:(guest?guest.name:'AI'+(isAI&&numPlayers>2?i:'')),
+      species:matchSpecies[i]||(i===myId?mySpeciesId:randSpecies()),
+      isAI,
+      corner:CORNERS[i],
+    });
+  }
+  return {slots,pellets,habitatId:hab.id,numPlayers};
 }
 function mkPellet(hab){const colors=(hab||activeHabitat).pellet;const mg=12;return{x:mg+Math.random()*(WORLD_W-mg*2),y:mg+Math.random()*(WORLD_H-mg*2),r:3+Math.random()*3,c:colors[0|Math.random()*colors.length],pulse:Math.random()*Math.PI*2};}
 
 function mkSnake(x,y,angle,sp,name,isMe){
-  const baseSeg=sp.siz*sp.siz; // siz:1→1,2→4,3→9,4→16,5→25,7→49 segs
+  const baseSeg=Math.max(6,sp.siz*sp.siz); // min 6, up to 49 for anaconda
   const spacing=CELL*0.85;
   const segs=[];
   for(let i=0;i<baseSeg;i++) segs.push({x:x-Math.cos(angle)*i*spacing,y:y-Math.sin(angle)*i*spacing});
-  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle+0.8,aiTimer:0,graceTicks:90};
+  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle+0.8,aiTimer:0,graceTicks:60};
 }
 
 // ── LAUNCH ────────────────────────────────────────────────────
 function launchGame(state){
   document.getElementById('lobby').style.display='none';
+  document.getElementById('waiting-room').style.display='none';
   document.getElementById('game').style.display='block';
   hideOverlays();
 
@@ -616,31 +662,35 @@ function launchGame(state){
   canvas.width=window.innerWidth;canvas.height=window.innerHeight;
   canvas.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;';
 
-  const meSp=getSp(state.meSpec);
-  const oppSp=getSp(state.oppSpec);
+  G.running=false; G.me=null; G.opp=null; G.others=[];
+  numPlayers=state.numPlayers||2;
 
-  if(myId===0){
-    G.me=mkSnake(state.meStart.x,state.meStart.y,state.meStart.angle,meSp,state.meName,true);
-    G.opp=mkSnake(state.oppStart.x,state.oppStart.y,state.oppStart.angle,oppSp,state.oppName,false);
-    // opp segs start at spawn position; will update via pos sync
-  } else {
-    G.me=mkSnake(state.oppStart.x,state.oppStart.y,state.oppStart.angle,oppSp,myName,true);
-    G.opp=mkSnake(state.meStart.x,state.meStart.y,state.meStart.angle,meSp,state.meName,false);
-    // opp segs start at spawn position; will update via pos sync
-  }
+  state.slots.forEach(sl=>{
+    const sp=getSp(sl.species);
+    const c=CORNERS[sl.slot];
+    const isMe=sl.slot===myId;
+    const snake=mkSnake(c.x(),c.y(),c.angle,sp,isMe?myName:sl.name,isMe);
+    snake.slot=sl.slot;
+    snake.isAI=sl.isAI;
+    if(!isMe&&!sl.isAI) snake.segs=[]; // remote human segs filled by sync
+    if(isMe) G.me=snake;
+    else if(!G.opp) G.opp=snake;
+    else G.others.push(snake);
+  });
 
   G.pellets=state.pellets.map(p=>({...p}));
   G.running=true;
+  G.aliveSlots=new Set([G.me,...(G.opp?[G.opp]:[]),...G.others].filter(s=>s).map(s=>s.slot));
   activeHabitat=HABITATS.find(h=>h.id===state.habitatId)||HABITATS[0];
   applyHabitatHUD();
 
-  // update emoji displays
-  document.getElementById('me-emoji').textContent=G.me.sp.emoji;
-  document.getElementById('opp-emoji').textContent=G.opp.sp.emoji;
-  document.getElementById('me-name').textContent=G.me.name+' ('+G.me.sp.name+')';
-  document.getElementById('opp-name').textContent=G.opp.name+' ('+G.opp.sp.name+')';
-  document.getElementById('me-name').style.color=G.me.sp.head;
-  document.getElementById('opp-name').style.color=G.opp.sp.head;
+  // HUD: show my snake and primary opp
+  document.getElementById('me-emoji').textContent=G.me?G.me.sp.emoji:'';
+  document.getElementById('opp-emoji').textContent=G.opp?G.opp.sp.emoji:'';
+  document.getElementById('me-name').textContent=G.me?(G.me.name+' ('+G.me.sp.name+')'):'';
+  document.getElementById('opp-name').textContent=G.opp?(G.opp.name+' ('+G.opp.sp.name+')'):'';
+  if(G.me) document.getElementById('me-name').style.color=G.me.sp.head;
+  if(G.opp) document.getElementById('opp-name').style.color=G.opp.sp.head;
 
   updateHUD();updateTally();
 
@@ -656,8 +706,12 @@ function launchGame(state){
       if(!G.running){clearInterval(G.timerInterval);return;}
       G.timeLeft--;
       updateTimerDisplay();
-      if(!vsAI) channel.publish('tick',{t:G.timeLeft});
-      if(G.timeLeft<=0){clearInterval(G.timerInterval);endGame('draw','Time up - Draw!');}
+      if(!vsAI&&channel) channel.publish('tick',{t:G.timeLeft});
+      if(G.timeLeft<=0){
+        clearInterval(G.timerInterval);
+        const alive=[...G.aliveSlots];
+        endGame(alive.length===1?alive[0]:-1,'Time up!');
+      }
     },1000);
   }
 }
@@ -681,14 +735,24 @@ function gameLoop(){
   if(!G.running)return;
   G.animId=requestAnimationFrame(gameLoop);
   updateMe();
-  if(vsAI) updateAI();
+  if(vsAI||isHost){
+    // Update AI snakes: G.opp if AI, plus any G.others that are AI
+    const aiSnakes=[G.opp,...G.others].filter(s=>s&&s.isAI);
+    aiSnakes.forEach(s=>updateAISnake(s));
+  }
   draw();
   // grace period flash on HUD
-  const gt=G.me.graceTicks||0;
+  const gt=G.me?G.me.graceTicks||0:0;
   const timerEl=document.getElementById('timer-display');
   if(gt>0&&timerEl){
     const sec=Math.ceil(gt/60);
     timerEl.style.color=sec<=1?'#cc2222':'#2a6a2a';
+  }
+  // debug hud
+  const dbg=document.getElementById('debug-hud');
+  if(dbg&&G.me){
+    const oppSegs=G.opp?G.opp.segs.length:0;
+    dbg.textContent='me:'+G.me.segs.length+'segs alive:'+G.me.alive+' grace:'+G.me.graceTicks+'\nopp:'+oppSegs+'segs alive:'+(G.opp?G.opp.alive:'?')+' grace:'+(G.opp?G.opp.graceTicks:'?')+'\naliveSlots:'+[...G.aliveSlots].join(',')+'\nrunning:'+G.running;
   }
 }
 
@@ -731,50 +795,42 @@ function updateMe(){
     }
   }
 
-  // collision checks — everyone checks their own head
-  if(true){
-    if(G.me.graceTicks>0) G.me.graceTicks--;
-    if(isHost&&G.opp&&G.opp.graceTicks>0) G.opp.graceTicks--;
-    if(vsAI){
-      const meGrace=(G.me.graceTicks||0)>0;
-      const oppGrace=(G.opp.graceTicks||0)>0;
-      // Player head into AI body → player LOSES
-      if(!meGrace){
-        for(let i=4;i<G.opp.segs.length;i++){
-          const s=G.opp.segs[i];
-          const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
-          const br=bodyR(G.opp,i);
-          if(dx*dx+dy*dy<(colR+br)*(colR+br)){
-            endGame('opp','You crashed into AI!');return;
-          }
-        }
-      }
-      // AI head into player body → player WINS
-      if(!oppGrace){
-        const oppColR=headR(G.opp);
-        for(let i=4;i<G.me.segs.length;i++){
-          const s=G.me.segs[i];
-          const dx=G.opp.headX-s.x,dy=G.opp.headY-s.y;
-          const br=bodyR(G.me,i);
-          if(dx*dx+dy*dy<(oppColR+br)*(oppColR+br)){
-            endGame('me','AI crashed into you!');return;
-          }
-        }
-      }
-    } else {
-      // 2-player: each player checks their OWN head vs opponent's synced body
-      if((G.me.graceTicks||0)===0&&G.opp&&G.opp.segs&&G.opp.segs.length>4){
-        for(let i=4;i<G.opp.segs.length;i++){
-          const s=G.opp.segs[i];
-          const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
-          if(dx*dx+dy*dy<(colR+bodyR(G.opp,i))*(colR+bodyR(G.opp,i))){
-            // I crashed into opponent — I lose, opponent wins
-            if(channel) channel.publish('collision',{loser:'me'});
-            endGame('opp','You crashed into opponent!');return;
-          }
+  // collision: check all living snakes
+  const allSnakes=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>1);
+  if(G.me.graceTicks>0) G.me.graceTicks--;
+
+  // MY head vs others' bodies (I control this locally)
+  if(G.me.alive&&(G.me.graceTicks||0)===0){
+    for(const opp of allSnakes){
+      if(opp===G.me||(opp.graceTicks||0)>0) continue;
+      for(let i=2;i<opp.segs.length;i++){
+        const s=opp.segs[i];
+        const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
+        if(dx*dx+dy*dy<(colR+bodyR(opp,i))*(colR+bodyR(opp,i))){
+          if(channel) channel.publish('died',{slot:myId});
+          killSnake(G.me);return;
         }
       }
     }
+  }
+  // AI heads vs all bodies (host is authoritative for AI)
+  if(isHost||vsAI){
+    const aiSnakes=allSnakes.filter(s=>s.isAI&&s.alive);
+    aiSnakes.forEach(ai=>{
+      if((ai.graceTicks||0)>0){ai.graceTicks--;return;}
+      const ahr=headR(ai);
+      allSnakes.forEach(target=>{
+        if(target===ai||(target.graceTicks||0)>0||!target.alive) return;
+        for(let i=2;i<target.segs.length;i++){
+          const s=target.segs[i];
+          const dx=ai.headX-s.x,dy=ai.headY-s.y;
+          if(G.running&&dx*dx+dy*dy<(ahr+bodyR(target,i))*(ahr+bodyR(target,i))){
+            if(channel) channel.publish('died',{slot:ai.slot});
+            killSnake(ai);
+          }
+        }
+      });
+    });
   }
 }
 
@@ -791,24 +847,24 @@ function aiMove(headX,headY,angle,speed){
   return{x:Math.max(WB,Math.min(WORLD_W-WB,nx)),y:Math.max(WB,Math.min(WORLD_H-WB,ny)),angle};
 }
 
-function updateAI(){
-  if(!G.opp||!G.running)return;
-  const sp=G.opp.sp;
-  const ox=G.opp.headX, oy=G.opp.headY;
+function updateAISnake(G_opp){
+  if(!G_opp||!G.running)return;
+  const sp=G_opp.sp;
+  const ox=G_opp.headX, oy=G_opp.headY;
   const WALL=18;
 
   // Difficulty settings
   const diff=aiDifficulty||'medium';
-  const timerMin=diff==='easy'?25:diff==='hard'?5:12;
-  const timerRng=diff==='easy'?20:diff==='hard'?8:15;
-  const huntChance=diff==='easy'?0:diff==='hard'?0.82:0.55;
-  const turnMult=diff==='easy'?0.7:diff==='hard'?1.6:1.3;
-  const lookahead=diff==='hard'?25:15;
+  const timerMin=diff==='easy'?10:diff==='hard'?2:5;
+  const timerRng=diff==='easy'?10:diff==='hard'?3:6;
+  const huntChance=diff==='easy'?0.45:diff==='hard'?0.97:0.85;
+  const turnMult=diff==='easy'?1.3:diff==='hard'?2.5:2.0;
+  const lookahead=diff==='hard'?50:diff==='medium'?32:18;
 
   // ── Choose target every N frames ─────────────────────────
-  if(G.opp.aiTimer>0) G.opp.aiTimer--;
-  if(G.opp.aiTimer<=0){
-    G.opp.aiTimer=timerMin+0|Math.random()*timerRng;
+  if(G_opp.aiTimer>0) G_opp.aiTimer--;
+  if(G_opp.aiTimer<=0){
+    G_opp.aiTimer=timerMin+0|Math.random()*timerRng;
     const meX=G.me?G.me.headX:WORLD_W/2;
     const meY=G.me?G.me.headY:WORLD_H/2;
     const distToPlayer=Math.hypot(ox-meX,oy-meY);
@@ -817,7 +873,7 @@ function updateAI(){
       // Intercept player
       const fx=Math.max(WALL,Math.min(WORLD_W-WALL,meX+Math.cos(G.me.angle)*sp.speed*lookahead));
       const fy=Math.max(WALL,Math.min(WORLD_H-WALL,meY+Math.sin(G.me.angle)*sp.speed*lookahead));
-      G.opp.aiTarget=Math.atan2(fy-oy,fx-ox);
+      G_opp.aiTarget=Math.atan2(fy-oy,fx-ox);
     } else {
       let best=null,bestScore=9999;
       G.pellets.forEach(p=>{
@@ -826,36 +882,36 @@ function updateAI(){
         if(d<bestScore){bestScore=d;best=p;}
       });
       if(!best) G.pellets.forEach(p=>{const d=Math.hypot(ox-p.x,oy-p.y);if(d<bestScore){bestScore=d;best=p;}});
-      G.opp.aiTarget=best?Math.atan2(best.y-oy,best.x-ox):Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
+      G_opp.aiTarget=best?Math.atan2(best.y-oy,best.x-ox):Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
     }
   }
 
   // ── Wall avoidance ────────────────────────────────────────
-  const ox2=G.opp.headX,oy2=G.opp.headY;
+  const ox2=G_opp.headX,oy2=G_opp.headY;
   if(ox2<WALL||ox2>WORLD_W-WALL||oy2<WALL||oy2>WORLD_H-WALL){
-    G.opp.aiTarget=Math.atan2(WORLD_H/2-oy2,WORLD_W/2-ox2);
-    G.opp.aiTimer=0;
+    G_opp.aiTarget=Math.atan2(WORLD_H/2-oy2,WORLD_W/2-ox2);
+    G_opp.aiTimer=0;
   }
 
   // ── Steer ─────────────────────────────────────────────────
-  let da=G.opp.aiTarget-G.opp.angle;
+  let da=G_opp.aiTarget-G_opp.angle;
   while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
-  G.opp.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed*turnMult);
+  G_opp.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed*turnMult);
 
   // ── Move ─────────────────────────────────────────────────
-  const mv=aiMove(G.opp.headX,G.opp.headY,G.opp.angle,sp.speed*0.95);
-  G.opp.headX=mv.x; G.opp.headY=mv.y; G.opp.angle=mv.angle;
+  const mv=aiMove(G_opp.headX,G_opp.headY,G_opp.angle,sp.speed*0.95);
+  G_opp.headX=mv.x; G_opp.headY=mv.y; G_opp.angle=mv.angle;
 
-  G.opp.segs.unshift({x:G.opp.headX,y:G.opp.headY});
-  G.opp.segs.pop();
-  if(G.opp.graceTicks>0) G.opp.graceTicks--;
+  G_opp.segs.unshift({x:G_opp.headX,y:G_opp.headY});
+  G_opp.segs.pop();
+  if(G_opp.graceTicks>0) G_opp.graceTicks--;
 
   // ── Eat pellets ───────────────────────────────────────────
-  const eatR=headR(G.opp)*0.7;
+  const eatR=headR(G_opp)*0.7;
   for(let i=G.pellets.length-1;i>=0;i--){
     const p=G.pellets[i];
-    if(Math.hypot(G.opp.headX-p.x,G.opp.headY-p.y)<eatR+p.r){
-      G.opp.segs.push({...G.opp.segs[G.opp.segs.length-1]});
+    if(Math.hypot(G_opp.headX-p.x,G_opp.headY-p.y)<eatR+p.r){
+      G_opp.segs.push({...G_opp.segs[G_opp.segs.length-1]});
       G.pellets.splice(i,1);G.pellets.push(mkPellet());
     }
   }
@@ -946,14 +1002,17 @@ function draw(){
     ctx.restore();
   });
 
-  // snakes
-  if(G.opp&&G.opp.segs) drawSnake(G.opp);
-  if(G.me&&G.me.segs) drawSnake(G.me);
-  // AI indicator ring (always visible)
-  if(vsAI&&G.opp&&G.opp.segs){
-    const oh=G.opp.segs[0],ohr=headR(G.opp);
-    ctx.beginPath();ctx.arc(oh.x,oh.y,ohr+3,0,Math.PI*2);
-    ctx.strokeStyle='rgba(255,50,50,0.7)';ctx.lineWidth=1.5/SCALE_X;ctx.stroke();
+  // snakes — draw dead first (ghost), then alive on top
+  const allForDraw=[...G.others,G.opp,G.me].filter(s=>s&&s.segs&&s.segs.length);
+  allForDraw.filter(s=>!s.alive).forEach(s=>{ctx.globalAlpha=0.25;drawSnake(s);ctx.globalAlpha=1;});
+  allForDraw.filter(s=>s.alive).forEach(s=>drawSnake(s));
+  // AI indicator rings
+  if(vsAI||isHost){
+    [G.opp,...G.others].filter(s=>s&&s.isAI&&s.segs&&s.segs.length).forEach(s=>{
+      const oh=s.segs[0],ohr=headR(s);
+      ctx.beginPath();ctx.arc(oh.x,oh.y,ohr+3,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,50,50,0.7)';ctx.lineWidth=1.5/SCALE_X;ctx.stroke();
+    });
   }
 
   ctx.restore(); // end SCALE transform
@@ -1070,35 +1129,51 @@ function updateTimerDisplay(){
   el.style.fontWeight=t<=15?'bold':'normal';
 }
 function updateTally(){
-  document.getElementById('tally-disp').textContent=tally[0]+'—'+tally[1];
+  document.getElementById('tally-disp').textContent=tally.slice(0,numPlayers).join('—');
   document.getElementById('round-info').textContent='ROUND '+round+(vsAI?' · '+aiDifficulty.toUpperCase():'')+' · First to '+WIN_SCORE+' wins';
 }
 
 // ── END ───────────────────────────────────────────────────────
-function endGame(winner,msg){
-  if(!G.running)return;
-  console.log('endGame:',winner,msg,'me.score:',G.me?G.me.score:0,'opp.score:',G.opp?G.opp.score:0,'timeLeft:',G.timeLeft);
-  G.running=false;
-  cancelAnimationFrame(G.animId);clearInterval(G.syncTimer);clearInterval(G.timerInterval);
-  const isDraw=winner==='draw';
-  const iWin=!isDraw&&winner==='me';
-  if(isDraw){/* no tally change */}
-  else if(iWin)tally[0]++;else tally[1]++;
-  round++;
-  // check if match is over (someone hit WIN_SCORE wins)
-  const matchOver=tally[0]>=MATCH_WIN||tally[1]>=MATCH_WIN;
-  if(!vsAI&&isHost&&channel) channel.publish('end',{winner:isDraw?'draw':(iWin?'opp':'me'),tally:[tally[1],tally[0]],round,msg,matchOver});
-  showWinOverlay(iWin,msg,isDraw,matchOver);
+function killSnake(snake){
+  const dbg=document.getElementById('debug-hud');
+  if(!snake||!snake.alive||!G.running){
+    if(dbg) dbg.textContent+='\nKILL SKIP slot:'+(snake?.slot)+' alive:'+(snake?.alive)+' running:'+G.running;
+    return;
+  }
+  if(dbg) dbg.textContent='KILLED slot:'+snake.slot+'\nalive before:'+[...G.aliveSlots].join(',');
+  snake.alive=false;
+  G.aliveSlots.delete(snake.slot);
+  if(dbg) dbg.textContent+='\nalive after:'+[...G.aliveSlots].join(',');
+  if(G.aliveSlots.size<=1){
+    const winnerSlot=G.aliveSlots.size===1?[...G.aliveSlots][0]:-1;
+    if(dbg) dbg.textContent+='\nCALLING endGame winner:'+winnerSlot;
+    endGame(winnerSlot,'');
+  }
 }
 
-function fillScorecard(){} // no length display needed
+function endGame(winnerSlot,msg){
+  if(!G.running)return;
+  G.running=false;
+  cancelAnimationFrame(G.animId);clearInterval(G.syncTimer);clearInterval(G.timerInterval);
+  const isDraw=winnerSlot===-1;
+  const iWin=winnerSlot===myId;
+  if(!isDraw&&winnerSlot>=0&&winnerSlot<tally.length) tally[winnerSlot]=(tally[winnerSlot]||0)+1;
+  round++;
+  const matchOver=tally.some(w=>w>=MATCH_WIN);
+  if(!vsAI&&isHost&&channel) channel.publish('end',{winnerSlot,tally,round,msg,matchOver,numPlayers});
+  showWinOverlay(iWin,msg||'',isDraw,matchOver);
+}
+
+function fillScorecard(){}
 
 function showWinOverlay(iWin,msg,isDraw,matchOver){
+  const dbg2=document.getElementById('debug-hud');
+  if(dbg2) dbg2.textContent='showWinOverlay called! iWin:'+iWin+' isDraw:'+isDraw;
   hostReady=false;guestReady=false;
   const badge=matchOver?'MATCH OVER':'ROUND '+(round-1)+' RESULT';
   document.getElementById('ov-round-badge').textContent=badge;
   if(matchOver){
-    const iMatchWin=tally[0]>=MATCH_WIN;
+    const iMatchWin=tally[myId]>=MATCH_WIN;
     document.getElementById('win-icon').textContent=iMatchWin?'🏆':'💀';
     document.getElementById('win-title').textContent=iMatchWin?'YOU WIN THE MATCH!':'OPPONENT WINS!';
     document.getElementById('win-title').style.color=iMatchWin?'#2a6a2a':'#8a2a2a';
@@ -1109,7 +1184,7 @@ function showWinOverlay(iWin,msg,isDraw,matchOver){
     document.getElementById('win-title').style.color=isDraw?'#6a6a2a':(iWin?'#2a6a2a':'#8a2a2a');
     document.getElementById('win-sub').textContent=(msg||'')+(G.opp?' · Opponent: '+G.opp.sp.name:'');
   }
-  document.getElementById('win-tally').textContent=tally[0]+'—'+tally[1];
+  document.getElementById('win-tally').textContent=tally.slice(0,numPlayers).join('—');
   document.getElementById('ov-tally-lbl').textContent='ROUND WINS (first to '+WIN_SCORE+')';
   fillScorecard();
   if(matchOver){
@@ -1154,7 +1229,7 @@ function showWaitOverlay(iWin,t,msg,matchOver){
     document.getElementById('wait-title').style.color=iWin?'#2a6a2a':'#8a2a2a';
     document.getElementById('wait-sub').textContent=msg||'';
   }
-  document.getElementById('wait-tally').textContent=t[0]+'—'+t[1];
+  const ta=Array.isArray(t)?t:(tally);document.getElementById('wait-tally').textContent=ta.slice(0,numPlayers).join('—');
   fillScorecard();
   if(matchOver){
     document.getElementById('guest-ready-btn').style.display='none';
@@ -1215,7 +1290,7 @@ document.getElementById('guest-quit-btn').onclick=()=>{
 // ── SYNC ──────────────────────────────────────────────────────
 function syncPos(){
   if(!channel||!G.running||vsAI)return;
-  channel.publish('pos',{x:G.me.headX,y:G.me.headY,a:G.me.angle,segs:G.me.segs,from:myId});
+  channel.publish('pos',{x:G.me.headX,y:G.me.headY,a:G.me.angle,segs:G.me.segs,from:myId,slot:myId});
 }
 
 // ── JOYSTICK ──────────────────────────────────────────────────
