@@ -101,10 +101,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 #gc{display:block;position:absolute;top:0;left:0;touch-action:none;}
 
 /* HUD */
-#hud-bar{position:fixed;top:0;left:0;width:100%;background:rgba(240,235,224,0.9);border-bottom:1.5px solid #d0c8a8;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;z-index:10;backdrop-filter:blur(4px);}
-.hud-player{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:bold;}
-.hud-score{font-size:22px;font-weight:bold;color:#2a6a2a;letter-spacing:2px;}
-.hud-label{font-size:10px;color:#8a9a7a;letter-spacing:1px;}
+#hud-bar{position:fixed;top:0;left:0;width:100%;background:rgba(240,235,224,0.95);border-bottom:1.5px solid #d0c8a8;padding:4px 8px;display:flex;flex-direction:column;gap:2px;z-index:10;backdrop-filter:blur(4px);}
+.hud-player-pill{display:flex;align-items:center;gap:3px;background:#fff;border-radius:10px;padding:2px 6px;border:1px solid #d8e8c8;font-size:10px;font-weight:bold;}
+.hud-player-pill.me{border-color:#2a7a2a;background:#e8f5e0;}
+.hud-player-pill.dead{opacity:0.35;text-decoration:line-through;}
 .hud-pts{font-size:11px;color:#4a7a4a;background:#e0f0d0;border-radius:10px;padding:2px 8px;}
 #round-info{font-size:10px;color:#8a9a7a;letter-spacing:1px;text-align:center;}
 
@@ -206,28 +206,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 <!-- GAME -->
 <div id="game">
   <canvas id="gc"></canvas>
-  <div id="hud-bar">
-    <div class="hud-player">
-      <span id="me-emoji">🐍</span>
-      <div>
-        <div id="me-name" style="color:#2a6a2a;">You</div>
-        <div class="hud-pts" id="me-pts">0 pts</div>
+  <div id="hud-bar" style="flex-direction:column;padding:4px 8px;gap:2px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+      <div id="hud-players" style="display:flex;gap:6px;align-items:center;flex:1;overflow:hidden;"></div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:6px;">
+        <div id="round-info" style="font-size:9px;color:#8a9a7a;letter-spacing:.5px;white-space:nowrap;">ROUND 1</div>
+        <div id="timer-display" style="font-size:12px;font-weight:bold;color:#2a6a2a;background:rgba(40,100,40,0.1);border-radius:6px;padding:1px 6px;letter-spacing:1px;">1:00</div>
       </div>
     </div>
-    <div style="text-align:center;">
-      <div class="hud-score" id="tally-disp">0—0</div>
-      <div style="display:flex;align-items:center;gap:6px;justify-content:center;">
-        <div id="round-info">ROUND 1 · First to 5</div>
-        <div id="timer-display" style="font-size:13px;font-weight:bold;color:#2a6a2a;background:rgba(40,100,40,0.1);border-radius:8px;padding:1px 7px;letter-spacing:1px;">1:30</div>
-      </div>
-    </div>
-    <div class="hud-player" style="flex-direction:row-reverse;">
-      <span id="opp-emoji">🐍</span>
-      <div style="text-align:right;">
-        <div id="opp-name" style="color:#8a2a2a;">Opp</div>
-        <div class="hud-pts" id="opp-pts" style="background:#fde8e8;color:#8a2a2a;">0 pts</div>
-      </div>
-    </div>
+    <div id="tally-disp" style="font-size:11px;font-weight:bold;color:#2a6a2a;letter-spacing:.5px;text-align:left;"></div>
   </div>
 
   <div id="credit-game">Created by Ethan &amp; Elroy Fang · 2026</div>
@@ -652,6 +639,7 @@ function onMsg(msg){
       const isMe=deadSnake===G.me;
       showDeathMsg(emoji+' '+(isMe?'You':deadSnake.name)+' crashed!', isMe?'#cc3333':deadSnake.sp?deadSnake.sp.head:'#666');
       if(deadSnake===G.me) showObserverOverlay();
+      checkRoundEnd(); // check if round should end after this death
     }
   }
   else if(t==='collision'){
@@ -661,7 +649,7 @@ function onMsg(msg){
 
 // ── GAME STATE ────────────────────────────────────────────────
 const W=window.innerWidth,H=window.innerHeight;
-const HUD_H=48;
+const HUD_H=58;
 // Portrait phone ratio: 9:16. On desktop, cap game area to phone-like box.
 const IS_MOBILE=W<600;
 const GAME_W=IS_MOBILE?W:Math.min(W,Math.round((H-HUD_H)*9/16)); // cap width on desktop
@@ -690,6 +678,7 @@ const CORNERS=[
   {x:()=>WORLD_W*0.85, y:()=>WORLD_H*0.85, angle:-Math.PI*0.75},  // slot3 BR → up-left
 ];
 let G={running:false,animId:null,syncTimer:null,timerInterval:null,me:null,opp:null,others:[],pellets:[],timeLeft:ROUND_TIME,touchTarget:null,aliveSlots:new Set()};
+let playerNames=[]; // names per slot index
 
 function getSp(id){return SPECIES.find(s=>s.id===id)||SPECIES[0];}
 
@@ -751,18 +740,18 @@ function launchGame(state){
   });
 
   G.pellets=state.pellets.map(p=>({...p}));
+  // Build player name list for tally display
+  playerNames=[];
+  [G.me,G.opp,...G.others].filter(s=>s).sort((a,b)=>a.slot-b.slot).forEach(s=>{
+    playerNames[s.slot]=s.name;
+  });
   G.running=true;
   G.aliveSlots=new Set([G.me,...(G.opp?[G.opp]:[]),...G.others].filter(s=>s).map(s=>s.slot));
   activeHabitat=HABITATS.find(h=>h.id===state.habitatId)||HABITATS[0];
   applyHabitatHUD();
 
   // HUD: show my snake and primary opp
-  document.getElementById('me-emoji').textContent=G.me?G.me.sp.emoji:'';
-  document.getElementById('opp-emoji').textContent=G.opp?G.opp.sp.emoji:'';
-  document.getElementById('me-name').textContent=G.me?(G.me.name+' ('+G.me.sp.name+')'):'';
-  document.getElementById('opp-name').textContent=G.opp?(G.opp.name+' ('+G.opp.sp.name+')'):'';
-  if(G.me) document.getElementById('me-name').style.color=G.me.sp.head;
-  if(G.opp) document.getElementById('opp-name').style.color=G.opp.sp.head;
+  // HUD updated dynamically by updateHUD()
 
   updateHUD();updateTally();
 
@@ -1293,10 +1282,19 @@ function drawMinimap(){
 
 // ── HUD ───────────────────────────────────────────────────────
 function updateHUD(){
-  const meLen=G.me?G.me.segs.length:0;
-  const oppLen=G.opp?G.opp.segs.length:0;
-  document.getElementById('me-pts').textContent='🐍 '+meLen;
-  document.getElementById('opp-pts').textContent='🐍 '+oppLen;
+  const container=document.getElementById('hud-players');
+  if(!container)return;
+  const allSnakes=[G.me,G.opp,...G.others].filter(s=>s);
+  // Rebuild pills
+  container.innerHTML=allSnakes.map(s=>{
+    const isMe=s===G.me;
+    const dead=!s.alive;
+    const emoji=s.sp?s.sp.emoji:'🐍';
+    const name=s.name.length>7?s.name.slice(0,7):s.name;
+    const cls='hud-player-pill'+(isMe?' me':'')+(dead?' dead':'');
+    const len=s.segs?s.segs.length:0;
+    return `<div class="${cls}">${emoji} ${name} <span style="color:#6a8a6a;font-size:9px;">×${len}</span></div>`;
+  }).join('');
 }
 function updateTimerDisplay(){
   const el=document.getElementById('timer-display');
@@ -1307,11 +1305,37 @@ function updateTimerDisplay(){
   el.style.fontWeight=t<=15?'bold':'normal';
 }
 function updateTally(){
-  document.getElementById('tally-disp').textContent=tally.slice(0,numPlayers).join('—');
+  const tallyEl=document.getElementById('tally-disp');
+  const parts=tally.slice(0,numPlayers).map((w,i)=>{
+    const name=playerNames[i]||(i===0?'P1':'P'+(i+1));
+    const shortName=name.length>6?name.slice(0,6):name;
+    return shortName+':'+w;
+  });
+  tallyEl.textContent=parts.join('  ');
+  tallyEl.style.fontSize=numPlayers>2?'13px':'22px';
   document.getElementById('round-info').textContent='ROUND '+round+(vsAI?' · '+aiDifficulty.toUpperCase():'')+' · First to '+WIN_SCORE+' wins';
 }
 
 // ── END ───────────────────────────────────────────────────────
+function checkRoundEnd(){
+  if(!G.running||(!isHost&&!vsAI))return;
+  const aliveList=[...G.aliveSlots];
+  // End when only 1 (or 0) alive
+  if(aliveList.length<=1){
+    const winnerSlot=aliveList.length===1?aliveList[0]:-1;
+    endGame(winnerSlot,'');
+    return;
+  }
+  // In multiplayer only: end early if no human players remain (AI-only = draw)
+  if(!vsAI){
+    const anyHumanAlive=aliveList.some(sl=>{
+      const sn=[G.me,G.opp,...G.others].find(s=>s&&s.slot===sl);
+      return sn&&sn.alive&&!sn.isAI;
+    });
+    if(!anyHumanAlive) endGame(-1,'All players eliminated');
+  }
+}
+
 function checkCollisions(){
   if(!G.running)return;
   const living=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs&&s.segs.length>3);
@@ -1350,18 +1374,8 @@ function killSnake(snake,fromNetwork){
   }
   // Host decides round end
   if((isHost||vsAI)){
-    // Broadcast death to guests
     if(!vsAI&&channel) channel.publish('snakeDied',{slot:snake.slot});
-    // End round if <=1 alive, or all remaining are AI
-    const aliveList=[...G.aliveSlots];
-    const anyHumanAlive=aliveList.some(sl=>{
-      const sn=[G.me,G.opp,...G.others].find(s=>s&&s.slot===sl);
-      return sn&&sn.alive&&!sn.isAI;
-    });
-    if(aliveList.length<=1||!anyHumanAlive){
-      const winnerSlot=aliveList.length===1?aliveList[0]:-1;
-      endGame(winnerSlot,'');
-    }
+    checkRoundEnd();
   }
 }
 
@@ -1397,7 +1411,8 @@ function showWinOverlay(iWin,msg,isDraw,matchOver){
     document.getElementById('win-title').style.color=isDraw?'#6a6a2a':(iWin?'#2a6a2a':'#8a2a2a');
     document.getElementById('win-sub').textContent=(msg||'')+(G.opp?' · Opponent: '+G.opp.sp.name:'');
   }
-  document.getElementById('win-tally').textContent=tally.slice(0,numPlayers).join('—');
+  const tallyParts=tally.slice(0,numPlayers).map((w,i)=>(playerNames[i]||(i===0?'P1':'P'+(i+1)))+':'+w);
+  document.getElementById('win-tally').textContent=tallyParts.join('  ');
   document.getElementById('ov-tally-lbl').textContent='ROUND WINS (first to '+WIN_SCORE+')';
   fillScorecard();
   if(matchOver){
@@ -1442,7 +1457,7 @@ function showWaitOverlay(iWin,t,msg,matchOver){
     document.getElementById('wait-title').style.color=iWin?'#2a6a2a':'#8a2a2a';
     document.getElementById('wait-sub').textContent=msg||'';
   }
-  const ta=Array.isArray(t)?t:(tally);document.getElementById('wait-tally').textContent=ta.slice(0,numPlayers).join('—');
+  const ta=Array.isArray(t)?t:(tally);const wtp=ta.slice(0,numPlayers).map((w,i)=>(playerNames[i]||(i===0?'P1':'P'+(i+1)))+':'+w);document.getElementById('wait-tally').textContent=wtp.join('  ');
   fillScorecard();
   if(matchOver){
     document.getElementById('guest-ready-btn').style.display='none';
