@@ -836,6 +836,7 @@ function gameLoop(){
       // guest snakes: position comes from 'input' messages, not moved by host
     });
     checkCollisions();
+    checkRoundEnd(); // also check round end every frame (catches stale state)
   } else {
     // Guest checks own head collision (authoritative for own position)
     if(G.me&&G.me.alive&&(G.me.graceTicks||0)===0){
