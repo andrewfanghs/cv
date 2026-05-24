@@ -2,32 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Slither Duel</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
 html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:'Segoe UI',sans-serif;}
 
 /* ── LOBBY ── */
-#lobby{position:fixed;inset:0;background:linear-gradient(160deg,#e8f5e0 0%,#f5f0e0 50%,#e0f0e8 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;padding:10px 16px;overflow:hidden;}
-#lobby h1{font-size:26px;color:#2a6a2a;text-shadow:0 2px 6px rgba(40,120,40,0.2);letter-spacing:2px;margin-bottom:1px;margin-top:0;}
+#lobby{position:fixed;inset:0;background:linear-gradient(160deg,#e8f5e0 0%,#f5f0e0 50%,#e0f0e8 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;z-index:100;padding:8px 14px 10px;overflow:hidden;}
+/* bottom action panel */
+.action-panel{width:100%;max-width:320px;background:#fff;border-radius:14px;border:1.5px solid #d0e8c0;display:flex;gap:0;overflow:hidden;box-shadow:0 2px 8px rgba(40,100,40,0.08);}
+.action-col{flex:1;display:flex;flex-direction:column;gap:8px;padding:12px 10px;}
+.action-col-divider{width:1.5px;background:#d0e8c0;flex-shrink:0;}
+.action-col-title{font-size:9px;font-weight:bold;color:#6a8a6a;letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:2px;}
+
+.diff-btn{width:100%;padding:8px;border:none;border-radius:10px;font-size:12px;font-weight:bold;cursor:pointer;}
+.diff-btn:active{transform:scale(0.96);}
+.diff-easy{background:linear-gradient(135deg,#2a7a2a,#4aaa4a);color:#fff;}
+.diff-medium{background:linear-gradient(135deg,#5a2a7a,#9a4acc);color:#fff;}
+.diff-hard{background:linear-gradient(135deg,#8a1a1a,#cc3333);color:#fff;}
+.host-btn-big{width:100%;padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#1a4a8a,#2a6acc);color:#fff;}
+.host-btn-big:active{transform:scale(0.97);}
+.join-row{display:flex;gap:5px;align-items:center;}
+.join-code-input{flex:1;background:#f5f8f5;border:1.5px solid #c8ddb8;border-radius:8px;padding:10px 4px;font-size:15px;color:#2a4a2a;outline:none;letter-spacing:5px;text-align:center;}
+.join-btn-small{padding:7px 10px;border:none;border-radius:8px;background:#2a6acc;color:#fff;font-size:12px;font-weight:bold;cursor:pointer;}
+.join-btn-small:active{transform:scale(0.97);}
+#lobby h1{font-size:22px;color:#2a6a2a;text-shadow:0 1px 4px rgba(40,120,40,0.2);letter-spacing:2px;margin:0;}
 .l-sub{color:#5a8a5a;font-size:10px;letter-spacing:2px;margin-bottom:1px;}
-.l-credit{color:#b0c8a0;font-size:9px;letter-spacing:1px;margin-bottom:6px;}
-.l-snakes{font-size:28px;margin-bottom:16px;letter-spacing:4px;}
+.l-credit{color:#b0c8a0;font-size:9px;letter-spacing:1px;margin:0;}
 
-.l-section{width:100%;max-width:320px;margin-bottom:6px;}
-.l-label{font-size:9px;color:#6a8a6a;letter-spacing:1px;margin-bottom:4px;text-transform:uppercase;font-weight:bold;}
 
-#lobby input{width:100%;background:#fff;border:1.5px solid #c8ddb8;border-radius:8px;padding:7px 12px;font-size:14px;color:#2a4a2a;outline:none;letter-spacing:1px;}
+.l-section{width:100%;max-width:320px;margin:0;}
+.l-label{font-size:9px;color:#6a8a6a;letter-spacing:1px;margin-bottom:3px;text-transform:uppercase;font-weight:bold;}
+
+#lobby input{width:100%;background:#fff;border:1.5px solid #c8ddb8;border-radius:8px;padding:6px 12px;font-size:14px;color:#2a4a2a;outline:none;letter-spacing:1px;}
 #lobby input:focus{border-color:#4a8a4a;}
 #lobby input::placeholder{color:#aabba0;}
 
 /* SPECIES GRID */
-#species-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
-.sp-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px 3px;border-radius:10px;border:2px solid #d8e8c8;background:#fff;cursor:pointer;transition:all .15s;position:relative;}
+#species-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.sp-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 2px 2px;border-radius:8px;border:2px solid #d8e8c8;background:#fff;cursor:pointer;transition:all .15s;position:relative;}
 .sp-card.sel{border-color:#2a6a2a;background:#e8f5e0;box-shadow:0 2px 8px rgba(40,120,40,0.2);}
 .sp-card:active{transform:scale(0.96);}
-.sp-svg{width:40px;height:40px;}
+.sp-svg{width:36px;height:36px;}
 .sp-name{font-size:8px;color:#4a6a4a;font-weight:bold;letter-spacing:.3px;text-align:center;margin-top:1px;}
 .sp-card.sel .sp-name{color:#2a6a2a;}
 .sp-bars{display:flex;flex-direction:column;gap:1px;width:100%;padding:0 3px;margin-top:2px;}
@@ -38,23 +57,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 .sp-bar-fill.spd{background:#2a8a2a;}
 .sp-bar-fill.agi{background:#1a6aaa;}
 .sp-bar-fill.siz{background:#8a4a00;}
-#sp-detail{display:none;width:100%;max-width:320px;background:#fff;border-radius:10px;border:1.5px solid #c8ddb8;padding:8px 10px;margin-bottom:6px;}
-#sp-detail-inner{display:flex;gap:12px;align-items:flex-start;}
-#sp-detail-icon{width:44px;height:44px;flex-shrink:0;}
-#sp-detail-info{flex:1;}
-#sp-detail-name{font-size:12px;font-weight:bold;color:#2a6a2a;margin-bottom:2px;}
-#sp-detail-tip{font-size:10px;color:#6a8a6a;margin-bottom:4px;font-style:italic;}
-.detail-stat-row{display:flex;align-items:center;gap:4px;margin-bottom:2px;}
-.detail-stat-lbl{font-size:10px;color:#6a8a6a;width:44px;font-weight:bold;}
-.detail-stat-track{flex:1;height:7px;background:#e8f0e0;border-radius:4px;overflow:hidden;}
-.detail-stat-fill{height:100%;border-radius:4px;}
-.detail-stat-fill.spd{background:linear-gradient(90deg,#2a8a2a,#4acc4a);}
-.detail-stat-fill.agi{background:linear-gradient(90deg,#1a6aaa,#3a9add);}
-.detail-stat-fill.siz{background:linear-gradient(90deg,#8a4a00,#cc7a20);}
-.detail-stat-val.siz{color:#8a4a00;}
-.detail-stat-val{font-size:10px;font-weight:bold;width:20px;text-align:right;}
-.detail-stat-val.spd{color:#2a7a2a;}
-.detail-stat-val.agi{color:#1a5a9a;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* BUTTONS */
 .l-btn{width:100%;max-width:320px;padding:9px;border:none;border-radius:22px;font-size:14px;font-weight:bold;cursor:pointer;letter-spacing:1px;margin-bottom:5px;}
@@ -63,7 +82,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 .l-btn:active{transform:scale(0.97);}
 .l-or{color:#a0b890;font-size:10px;letter-spacing:2px;margin:2px 0 5px;text-align:center;}
 
-#status-msg{font-size:12px;text-align:center;min-height:18px;letter-spacing:.5px;margin-top:4px;}
+#status-msg{font-size:11px;text-align:center;min-height:14px;letter-spacing:.5px;margin:0;}
 
 /* WAITING ROOM */
 #waiting-room{display:none;position:fixed;inset:0;background:rgba(232,245,224,0.97);border-radius:0;padding:20px;border:none;margin-top:0;z-index:110;flex-direction:column;align-items:center;justify-content:center;}
@@ -125,7 +144,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 <!-- LOBBY -->
 <div id="lobby">
   <h1>SLITHER DUEL</h1>
-  
   <div class="l-credit">Created by Ethan &amp; Elroy Fang · 2026</div>
 
   <div class="l-section">
@@ -135,30 +153,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
     </div>
     <div id="species-grid"></div>
   </div>
-  <div id="sp-detail">
-    <div id="sp-detail-inner">
-      <div id="sp-detail-icon"></div>
-      <div id="sp-detail-info">
-        <div id="sp-detail-name"></div>
-        <div id="sp-detail-tip"></div>
-        <div class="detail-stat-row">
-          <div class="detail-stat-lbl">Speed</div>
-          <div class="detail-stat-track"><div class="detail-stat-fill spd" id="d-spd-bar"></div></div>
-          <div class="detail-stat-val spd" id="d-spd-val"></div>
-        </div>
-        <div class="detail-stat-row">
-          <div class="detail-stat-lbl">Agility</div>
-          <div class="detail-stat-track"><div class="detail-stat-fill agi" id="d-agi-bar"></div></div>
-          <div class="detail-stat-val agi" id="d-agi-val"></div>
-        </div>
-        <div class="detail-stat-row">
-          <div class="detail-stat-lbl">Size</div>
-          <div class="detail-stat-track"><div class="detail-stat-fill siz" id="d-siz-bar"></div></div>
-          <div class="detail-stat-val siz" id="d-siz-val"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div id="status-msg"></div>
 
@@ -167,19 +161,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
     <input id="pname" placeholder="Enter your name" maxlength="12" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
   </div>
 
-  <div class="l-label" style="width:100%;max-width:320px;margin-bottom:8px;">🤖 Play vs AI</div>
-  <div style="display:flex;gap:8px;width:100%;max-width:320px;margin-bottom:8px;">
-    <button class="l-btn" id="ai-easy" style="flex:1;padding:11px 4px;background:linear-gradient(135deg,#2a7a2a,#4aaa4a);color:#fff;font-size:13px;margin-bottom:0;">😊 Easy</button>
-    <button class="l-btn" id="ai-medium" style="flex:1;padding:11px 4px;background:linear-gradient(135deg,#5a2a7a,#9a4acc);color:#fff;font-size:13px;margin-bottom:0;">😤 Medium</button>
-    <button class="l-btn" id="ai-hard" style="flex:1;padding:11px 4px;background:linear-gradient(135deg,#8a1a1a,#cc3333);color:#fff;font-size:13px;margin-bottom:0;">💀 Hard</button>
+  <!-- UNIFIED ACTION PANEL -->
+  <div class="action-panel">
+    <div class="action-col">
+      <div class="action-col-title">🤖 vs AI</div>
+      <button class="diff-btn diff-easy" id="ai-easy">😊 Easy</button>
+      <button class="diff-btn diff-medium" id="ai-medium">😤 Medium</button>
+      <button class="diff-btn diff-hard" id="ai-hard">💀 Hard</button>
+    </div>
+    <div class="action-col-divider"></div>
+    <div class="action-col">
+      <div class="action-col-title">🌐 Multiplayer</div>
+      <button class="host-btn-big" id="host-btn">Host Game</button>
+      <div class="join-row">
+        <input class="join-code-input" id="join-code" placeholder="CODE" maxlength="4" inputmode="numeric"/>
+        <button class="join-btn-small" id="join-btn">Join</button>
+      </div>
+    </div>
   </div>
-  <button class="l-btn l-btn-host" id="host-btn">🌐 Host Multiplayer</button>
-  <div class="l-or">— OR JOIN —</div>
-  <div class="l-section">
-    <div class="l-label">Room code</div>
-    <input id="join-code" placeholder="4-digit code" maxlength="4" inputmode="numeric" style="text-align:center;font-size:22px;letter-spacing:8px;"/>
-  </div>
-  <button class="l-btn l-btn-join" id="join-btn">🔵 Join Game</button>
+
+</div>
+
+
 
   <div id="waiting-room">
     <div class="wr-title">🐍 Room</div>
@@ -196,7 +199,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
     <button class="start-btn" id="start-btn" disabled>Waiting...</button>
   </div>
 </div>
-
 <!-- GAME -->
 <div id="game">
   <canvas id="gc"></canvas>
@@ -363,18 +365,7 @@ let activeHabitat=HABITATS[0];
 const grid=document.getElementById('species-grid');
 let mySpeciesId=null;
 const SP_ICONS={'cobra':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="28" rx="32" ry="20" fill="#1a7a1a" opacity="0.85"/><ellipse cx="35" cy="28" rx="26" ry="15" fill="#2aaa2a" opacity="0.6"/><ellipse cx="35" cy="30" rx="14" ry="9" fill="#1a5a1a" opacity="0.5"/><ellipse cx="35" cy="46" rx="14" ry="12" fill="#1a7a1a"/><ellipse cx="35" cy="54" rx="8" ry="5" fill="#157015"/><circle cx="28" cy="44" r="4" fill="#fff"/><circle cx="42" cy="44" r="4" fill="#fff"/><circle cx="28.8" cy="44.5" r="2.2" fill="#1a1a1a"/><circle cx="42.8" cy="44.5" r="2.2" fill="#1a1a1a"/><circle cx="29.3" cy="44" r="0.8" fill="#fff"/><circle cx="43.3" cy="44" r="0.8" fill="#fff"/><ellipse cx="32" cy="53" rx="1.5" ry="1" fill="#0a400a"/><ellipse cx="38" cy="53" rx="1.5" ry="1" fill="#0a400a"/><line x1="35" y1="59" x2="31" y2="64" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="59" x2="39" y2="64" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="57" x2="35" y2="59" stroke="#cc2222" stroke-width="1.5"/></svg>`,'viper':`<svg class="sp-svg" viewBox="0 0 70 80"><polygon points="35,14 10,56 60,56" fill="#c4a000"/><polygon points="35,18 13,53 57,53" fill="#d4b800"/><polygon points="35,22 18,48 52,48" fill="#a88000" opacity="0.5"/><ellipse cx="23" cy="42" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="47" cy="42" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="23" cy="42" rx="1.5" ry="3.5" fill="#1a1a00"/><ellipse cx="47" cy="42" rx="1.5" ry="3.5" fill="#1a1a00"/><circle cx="22.5" cy="40.5" r="0.7" fill="#fff"/><circle cx="46.5" cy="40.5" r="0.7" fill="#fff"/><ellipse cx="29" cy="50" rx="2" ry="1.5" fill="#8a6000"/><ellipse cx="41" cy="50" rx="2" ry="1.5" fill="#8a6000"/><line x1="35" y1="56" x2="30" y2="62" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="40" y2="62" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="54" x2="35" y2="56" stroke="#cc2222" stroke-width="1.5"/></svg>`,'mamba':`<svg class="sp-svg" viewBox="0 0 70 82"><ellipse cx="35" cy="38" rx="12" ry="22" fill="#007a30"/><ellipse cx="35" cy="36" rx="9" ry="19" fill="#00aa44"/><ellipse cx="35" cy="56" rx="7" ry="4" fill="#006628"/><ellipse cx="30" cy="28" rx="4" ry="8" fill="#00cc55" opacity="0.3"/><circle cx="27" cy="36" r="4.5" fill="#fff"/><circle cx="43" cy="36" r="4.5" fill="#fff"/><circle cx="27.5" cy="36.5" r="2.5" fill="#111"/><circle cx="43.5" cy="36.5" r="2.5" fill="#111"/><circle cx="27.8" cy="35.8" r="0.9" fill="#fff"/><circle cx="43.8" cy="35.8" r="0.9" fill="#fff"/><line x1="35" y1="60" x2="28" y2="68" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="60" x2="42" y2="68" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="35" y2="60" stroke="#cc2222" stroke-width="2"/></svg>`,'rattler':`<svg class="sp-svg" viewBox="0 0 70 80"><polygon points="35,16 8,44 35,60 62,44" fill="#c44000"/><polygon points="35,20 12,44 35,56 58,44" fill="#d45010"/><polygon points="35,26 18,44 35,52 52,44" fill="#a43000" opacity="0.6"/><ellipse cx="24" cy="27" rx="8" ry="3" fill="#a43000" opacity="0.5"/><ellipse cx="46" cy="27" rx="8" ry="3" fill="#a43000" opacity="0.5"/><ellipse cx="22" cy="40" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="48" cy="40" rx="4.5" ry="4.5" fill="#fff"/><ellipse cx="22" cy="40" rx="1.5" ry="3.5" fill="#1a0800"/><ellipse cx="48" cy="40" rx="1.5" ry="3.5" fill="#1a0800"/><circle cx="21.5" cy="38.5" r="0.7" fill="#fff"/><circle cx="47.5" cy="38.5" r="0.7" fill="#fff"/><ellipse cx="35" cy="13" rx="7" ry="4" fill="#888" opacity="0.7"/><ellipse cx="35" cy="10" rx="5" ry="3" fill="#aaa" opacity="0.6"/><ellipse cx="35" cy="7" rx="3.5" ry="2.5" fill="#bbb" opacity="0.5"/><line x1="35" y1="60" x2="30" y2="66" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="60" x2="40" y2="66" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="58" x2="35" y2="60" stroke="#cc2222" stroke-width="1.5"/></svg>`,'anaconda':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="25" ry="18" fill="#5a3d00"/><ellipse cx="35" cy="38" rx="21" ry="15" fill="#7a5500"/><ellipse cx="25" cy="36" rx="7" ry="5" fill="#3a2800" opacity="0.6"/><ellipse cx="45" cy="36" rx="7" ry="5" fill="#3a2800" opacity="0.6"/><ellipse cx="35" cy="32" rx="5" ry="4" fill="#3a2800" opacity="0.5"/><ellipse cx="35" cy="52" rx="14" ry="6" fill="#4a3200"/><circle cx="23" cy="38" r="3.5" fill="#fff"/><circle cx="47" cy="38" r="3.5" fill="#fff"/><circle cx="23.5" cy="38.5" r="2" fill="#1a1000"/><circle cx="47.5" cy="38.5" r="2" fill="#1a1000"/><line x1="35" y1="58" x2="31" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="58" x2="39" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="35" y2="58" stroke="#cc2222" stroke-width="1.5"/></svg>`,'kingsnake':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="16" ry="14" fill="#111"/><ellipse cx="35" cy="38" rx="13" ry="11" fill="#222"/><rect x="19" y="33" width="32" height="5" rx="2" fill="#cc2222" opacity="0.85"/><rect x="20" y="42" width="30" height="4" rx="2" fill="#cc2222" opacity="0.7"/><rect x="20" y="39" width="30" height="3" rx="1" fill="#eee" opacity="0.9"/><ellipse cx="35" cy="51" rx="9" ry="5" fill="#1a1a1a"/><circle cx="26" cy="38" r="4.5" fill="#cc4400"/><circle cx="44" cy="38" r="4.5" fill="#cc4400"/><circle cx="26.5" cy="38.5" r="2" fill="#111"/><circle cx="44.5" cy="38.5" r="2" fill="#111"/><circle cx="26.8" cy="37.8" r="0.7" fill="#fff"/><circle cx="44.8" cy="37.8" r="0.7" fill="#fff"/><line x1="35" y1="56" x2="30" y2="62" stroke="#eee" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="40" y2="62" stroke="#eee" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="54" x2="35" y2="56" stroke="#eee" stroke-width="1.5"/></svg>`,'boa':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="22" ry="16" fill="#8b4400"/><ellipse cx="35" cy="38" rx="18" ry="13" fill="#c06010"/><ellipse cx="20" cy="36" rx="8" ry="6" fill="#6b3000" opacity="0.7"/><ellipse cx="50" cy="36" rx="8" ry="6" fill="#6b3000" opacity="0.7"/><ellipse cx="35" cy="30" rx="7" ry="5" fill="#6b3000" opacity="0.6"/><ellipse cx="35" cy="51" rx="14" ry="6" fill="#7a3800"/><circle cx="24" cy="38" r="4.5" fill="#ffaa00"/><circle cx="46" cy="38" r="4.5" fill="#ffaa00"/><ellipse cx="24" cy="38" rx="1.8" ry="3" fill="#2a1000"/><ellipse cx="46" cy="38" rx="1.8" ry="3" fill="#2a1000"/><circle cx="24.3" cy="36.8" r="0.7" fill="#fff"/><circle cx="46.3" cy="36.8" r="0.7" fill="#fff"/><line x1="35" y1="57" x2="31" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="57" x2="39" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="55" x2="35" y2="57" stroke="#cc2222" stroke-width="1.5"/></svg>`,'python':`<svg class="sp-svg" viewBox="0 0 70 80"><ellipse cx="35" cy="40" rx="20" ry="15" fill="#b89850"/><ellipse cx="35" cy="38" rx="16" ry="12" fill="#e8d898"/><ellipse cx="35" cy="30" rx="10" ry="6" fill="#8a6830" opacity="0.7"/><path d="M16 46 Q35 50 54 46" stroke="#a88840" stroke-width="1.5" fill="none"/><ellipse cx="18" cy="40" rx="6" ry="5" fill="#c8a860" opacity="0.5"/><ellipse cx="52" cy="40" rx="6" ry="5" fill="#c8a860" opacity="0.5"/><ellipse cx="35" cy="51" rx="11" ry="5" fill="#a88840"/><circle cx="27" cy="49" r="1.5" fill="#8a6820" opacity="0.8"/><circle cx="43" cy="49" r="1.5" fill="#8a6820" opacity="0.8"/><circle cx="24" cy="38" r="4.5" fill="#d4aa20"/><circle cx="46" cy="38" r="4.5" fill="#d4aa20"/><ellipse cx="24" cy="38" rx="1.5" ry="3.2" fill="#1a1400"/><ellipse cx="46" cy="38" rx="1.5" ry="3.2" fill="#1a1400"/><circle cx="24.3" cy="36.8" r="0.7" fill="#fff"/><circle cx="46.3" cy="36.8" r="0.7" fill="#fff"/><line x1="35" y1="56" x2="30" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="56" x2="40" y2="63" stroke="#cc2222" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="54" x2="35" y2="56" stroke="#cc2222" stroke-width="1.5"/></svg>`};
-function showDetail(sp){
-  document.getElementById('sp-detail').style.display='block';
-  document.getElementById('sp-detail-icon').innerHTML=SP_ICONS[sp.id]||'';
-  document.getElementById('sp-detail-name').textContent=sp.name;
-  document.getElementById('sp-detail-tip').textContent=sp.tip;
-  document.getElementById('d-spd-bar').style.width=(sp.spd/10*100)+'%';
-  document.getElementById('d-agi-bar').style.width=(sp.agi/10*100)+'%';
-  document.getElementById('d-siz-bar').style.width=(sp.siz/10*100)+'%';
-  document.getElementById('d-spd-val').textContent=sp.spd+'/10';
-  document.getElementById('d-agi-val').textContent=sp.agi+'/10';
-  document.getElementById('d-siz-val').textContent=sp.siz+'/10';
-}
+function showDetail(sp){} // stats shown inline on cards
 SPECIES.forEach(sp=>{
   const card=document.createElement('div');
   card.className='sp-card';
@@ -419,7 +410,7 @@ let lobbyGuests=[]; // array of {id,name,species} for slots 1-3
 let numAI=1; // AI players to add (host controls)
 let tally=[0,0,0,0],round=1;
 let numPlayers=2; // total players (human+AI) in this match
-let hostReady=false,guestReady=false;
+let hostReady=false,guestReadySlots=new Set(); // tracks which guest slots are ready
 
 function setStatus(m){const el=document.getElementById('status-msg');el.textContent=m;el.style.color=m.startsWith('⚠️')?'#cc4400':'#4a8a4a';}
 
@@ -619,9 +610,13 @@ function onMsg(msg){
   }
   else if(t==='guestReady'){
     if(!isHost)return;
-    guestReady=true;
-    document.getElementById('ov-ready-status').textContent='✓ Opponent is ready!';
-    if(hostReady&&guestReady) startNextRound();
+    guestReadySlots.add(d.slot);
+    const allGuestsReady=lobbyGuests.every(g=>guestReadySlots.has(g.id));
+    const readyCount=guestReadySlots.size;
+    const totalGuests=lobbyGuests.length;
+    document.getElementById('ov-ready-status').textContent=
+      readyCount+'/'+totalGuests+' opponent'+(totalGuests>1?'s':'')+' ready!';
+    if(hostReady&&allGuestsReady) startNextRound();
   }
   else if(t==='guestQuit'){
     if(isHost)return;
@@ -1280,7 +1275,7 @@ function fillScorecard(){}
 
 function showWinOverlay(iWin,msg,isDraw,matchOver){
 
-  hostReady=false;guestReady=false;
+  hostReady=false;guestReadySlots=new Set();
   const badge=matchOver?'MATCH OVER':'ROUND '+(round-1)+' RESULT';
   document.getElementById('ov-round-badge').textContent=badge;
   if(matchOver){
@@ -1371,7 +1366,7 @@ function showObserverOverlay(){
 }
 
 function startNextRound(){
-  hostReady=false;guestReady=false;
+  hostReady=false;guestReadySlots=new Set();
   hideOverlays();
   const state=buildState();
   if(!vsAI&&channel) channel.publish('replay',{state,tally,round});
@@ -1385,9 +1380,10 @@ document.getElementById('replay-btn').onclick=()=>{
   } else {
     hostReady=true;
     document.getElementById('replay-btn').disabled=true;
-    document.getElementById('replay-btn').textContent='✓ Waiting for opponent...';
+    document.getElementById('replay-btn').textContent='✓ Waiting for opponents...';
     channel.publish('hostReady',{});
-    if(guestReady) startNextRound();
+    const allReady=lobbyGuests.every(g=>guestReadySlots.has(g.id));
+    if(allReady) startNextRound();
   }
 };
 document.getElementById('quit-btn').onclick=()=>{
@@ -1399,7 +1395,7 @@ document.getElementById('guest-ready-btn').onclick=()=>{
   document.getElementById('guest-ready-btn').disabled=true;
   document.getElementById('guest-ready-btn').textContent='✓ Waiting for host...';
   document.getElementById('ov-guest-ready-status').textContent='';
-  channel.publish('guestReady',{});
+  channel.publish('guestReady',{slot:myId});
 };
 document.getElementById('guest-quit-btn').onclick=()=>{
   channel.publish('guestQuit',{});
