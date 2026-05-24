@@ -72,6 +72,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 .wr-hint{font-size:10px;color:#8aa880;text-align:center;margin-bottom:10px;letter-spacing:1px;}
 #player-list{font-size:13px;color:#4a7a4a;line-height:2;margin-bottom:10px;}
 .start-btn{width:100%;max-width:280px;padding:12px;border:none;border-radius:22px;background:#2a7a2a;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;letter-spacing:1px;}
+.ai-count-btn{padding:5px 12px;border:2px solid #c8ddb8;border-radius:8px;background:#fff;color:#4a7a4a;font-size:13px;font-weight:bold;cursor:pointer;}
+.ai-count-btn.sel{background:#2a7a2a;color:#fff;border-color:#2a7a2a;}
 .start-btn:disabled{opacity:0.4;cursor:not-allowed;}
 .start-btn:not(:disabled):active{transform:scale(0.97);}
 
@@ -123,7 +125,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 <!-- LOBBY -->
 <div id="lobby">
   <h1>SLITHER DUEL</h1>
-  <div class="l-sub">1v1 SNAKE BATTLE</div>
+  
   <div class="l-credit">Created by Ethan &amp; Elroy Fang · 2026</div>
 
   <div class="l-section">
@@ -182,8 +184,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   <div id="waiting-room">
     <div class="wr-title">🐍 Room</div>
     <div id="room-code-box"></div>
-    <div class="wr-hint">Share this code with your opponent</div>
+    <div class="wr-hint">Share this code with others</div>
     <div id="player-list"></div>
+    <div id="ai-count-row" style="display:none;margin-bottom:10px;display:flex;align-items:center;gap:8px;justify-content:center;">
+      <span style="font-size:11px;color:#6a8a6a;">Add AI players:</span>
+      <button class="ai-count-btn" data-n="0">0</button>
+      <button class="ai-count-btn" data-n="1">1</button>
+      <button class="ai-count-btn" data-n="2">2</button>
+      <button class="ai-count-btn" data-n="3">3</button>
+    </div>
     <button class="start-btn" id="start-btn" disabled>Waiting...</button>
   </div>
 </div>
@@ -216,7 +225,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   </div>
 
   <div id="credit-game">Created by Ethan &amp; Elroy Fang · 2026</div>
-<div id="debug-hud" style="position:fixed;bottom:100px;left:8px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;padding:4px 8px;border-radius:6px;z-index:50;pointer-events:none;white-space:pre;line-height:1.5;"></div>
 </div>
 
 <!-- ROUND RESULT OVERLAY (host + AI guest) -->
@@ -401,6 +409,7 @@ let myName='Player',vsAI=false;
 let matchSpecies=[null,null,null,null]; // species per slot, locked for match
 let aiDifficulty='medium';
 let lobbyGuests=[]; // array of {id,name,species} for slots 1-3
+let numAI=1; // AI players to add (host controls)
 let tally=[0,0,0,0],round=1;
 let numPlayers=2; // total players (human+AI) in this match
 let hostReady=false,guestReady=false;
@@ -426,7 +435,7 @@ function startVsAI(diff){
   lobbyGuests=[];
   numPlayers=2;
   tally=[0,0]; round=1;
-  matchSpecies=[mySpeciesId,null,null,null];
+  matchSpecies=[mySpeciesId, SPECIES[Math.floor(Math.random()*SPECIES.length)].id, null, null];
   const state=buildState();
   launchGame(state);
 }
@@ -446,8 +455,8 @@ document.getElementById('host-btn').onclick=()=>{
     document.getElementById('room-code-box').textContent=roomCode;
     document.getElementById('waiting-room').style.display='flex';
     document.getElementById('start-btn').disabled=false;
-    document.getElementById('start-btn').textContent='▶ Start (2-4 players)';
-    setStatus('');updatePlayerList();
+    numAI=1;
+    setStatus('');updatePlayerList();updateAICountRow();updateStartBtn();
   });
 };
 
@@ -472,6 +481,26 @@ document.getElementById('join-btn').onclick=()=>{
   });
 };
 
+function updateAICountRow(){
+  const humanCount=1+lobbyGuests.length;
+  const maxAI=Math.max(0,4-humanCount);
+  const row=document.getElementById('ai-count-row');
+  if(!row)return;
+  row.style.display=humanCount>=4?'none':'flex';
+  // limit numAI
+  if(numAI>maxAI) numAI=maxAI;
+  row.querySelectorAll('.ai-count-btn').forEach(btn=>{
+    const n=parseInt(btn.dataset.n);
+    btn.style.display=n<=maxAI?'':'none';
+    btn.classList.toggle('sel',n===numAI);
+    btn.onclick=()=>{numAI=n;updateAICountRow();updateStartBtn();};
+  });
+}
+function updateStartBtn(){
+  const total=1+lobbyGuests.length+numAI;
+  document.getElementById('start-btn').textContent='▶ Start ('+total+' players, '+numAI+' AI)';
+}
+
 function updatePlayerList(){
   let h=`<div>${getSp(mySpeciesId).emoji} <b>${myName}</b> ${isHost?'👑 Host':'(you)'}</div>`;
   lobbyGuests.forEach(g=>{h+=`<div>${getSp(g.species).emoji} <b>${g.name}</b></div>`;});
@@ -482,13 +511,14 @@ function updatePlayerList(){
 document.getElementById('start-btn').onclick=()=>{
   if(!isHost)return;
   // Determine total players: host + guests, fill rest with AI
-  numPlayers=Math.max(2,1+lobbyGuests.length); // at least 2 (1 human + 1 AI)
+  numPlayers=1+lobbyGuests.length+numAI;
   vsAI=lobbyGuests.length===0;
   tally=Array(numPlayers).fill(0);round=1;
-  // Lock species: host=slot0, guests=slots1+, AI fills remaining
   matchSpecies=Array(numPlayers).fill(null);
   matchSpecies[0]=mySpeciesId;
   lobbyGuests.forEach(g=>{matchSpecies[g.id]=g.species;});
+  // AI slots get random species locked for match
+  for(let i=0;i<numPlayers;i++){if(!matchSpecies[i])matchSpecies[i]=SPECIES[Math.floor(Math.random()*SPECIES.length)].id;}
   const state=buildState();
   if(lobbyGuests.length>0) channel.publish('start',{state,tally,round});
   launchGame(state);
@@ -503,7 +533,7 @@ function onMsg(msg){
     lobbyGuests.push({id:guestId,name:d.name,species:d.species});
     updatePlayerList();
     const n=lobbyGuests.length+1;
-    document.getElementById('start-btn').textContent='▶ Start ('+n+' players)';
+    updatePlayerList();updateAICountRow();updateStartBtn();
     channel.publish('joined',{name:myName,species:mySpeciesId,yourId:guestId,totalSoFar:n});
   }
   else if(t==='joined'){
@@ -579,10 +609,9 @@ function onMsg(msg){
   }
   else if(t==='died'){
     if(!G.running)return;
-    // A remote player died — find and kill their snake
     const deadSlot=d.slot;
-    const deadSnake=[G.opp,...G.others].find(s=>s&&s.slot===deadSlot);
-    if(deadSnake) killSnake(deadSnake);
+    const deadSnake=[G.me,G.opp,...G.others].find(s=>s&&s.slot===deadSlot);
+    if(deadSnake) killSnake(deadSnake,true); // host authoritative — may trigger endGame
   }
   else if(t==='collision'){
     if(!G.running)return;
@@ -748,12 +777,7 @@ function gameLoop(){
     const sec=Math.ceil(gt/60);
     timerEl.style.color=sec<=1?'#cc2222':'#2a6a2a';
   }
-  // debug hud
-  const dbg=document.getElementById('debug-hud');
-  if(dbg&&G.me){
-    const oppSegs=G.opp?G.opp.segs.length:0;
-    dbg.textContent='me:'+G.me.segs.length+'segs alive:'+G.me.alive+' grace:'+G.me.graceTicks+'\nopp:'+oppSegs+'segs alive:'+(G.opp?G.opp.alive:'?')+' grace:'+(G.opp?G.opp.graceTicks:'?')+'\naliveSlots:'+[...G.aliveSlots].join(',')+'\nrunning:'+G.running;
-  }
+
 }
 
 function updateMe(){
@@ -807,8 +831,9 @@ function updateMe(){
         const s=opp.segs[i];
         const dx=G.me.headX-s.x,dy=G.me.headY-s.y;
         if(dx*dx+dy*dy<(colR+bodyR(opp,i))*(colR+bodyR(opp,i))){
+          killSnake(G.me); // visual only on guest side
           if(channel) channel.publish('died',{slot:myId});
-          killSnake(G.me);return;
+          return;
         }
       }
     }
@@ -847,49 +872,116 @@ function aiMove(headX,headY,angle,speed){
   return{x:Math.max(WB,Math.min(WORLD_W-WB,nx)),y:Math.max(WB,Math.min(WORLD_H-WB,ny)),angle};
 }
 
+function aiScoreAngle(angle, G_opp, steps){
+  // Probe ahead: return danger score (higher = worse)
+  let x=G_opp.headX, y=G_opp.headY, cost=0;
+  const sp=G_opp.sp, WALL=14;
+  for(let s=1;s<=steps;s++){
+    x+=Math.cos(angle)*sp.speed;
+    y+=Math.sin(angle)*sp.speed;
+    // Wall danger
+    const wd=Math.min(x,y,WORLD_W-x,WORLD_H-y);
+    if(wd<WALL) cost+=(WALL-wd)*s*1.5;
+    if(wd<4) return 99999;
+    // Body danger: check all living snakes' bodies
+    const allSnakes=[G.me,G.opp,...G.others].filter(s=>s&&s.alive&&s.segs);
+    for(const sn of allSnakes){
+      if(sn===G_opp) continue;
+      for(let i=2;i<Math.min(sn.segs.length,20);i++){
+        const dx=x-sn.segs[i].x, dy=y-sn.segs[i].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<headR(G_opp)+bodyR(sn,i)) return 99999;
+        if(dist<(headR(G_opp)+bodyR(sn,i))*2.5) cost+=60/s;
+      }
+    }
+  }
+  return cost;
+}
+
 function updateAISnake(G_opp){
-  if(!G_opp||!G.running)return;
+  if(!G_opp||!G.running||!G_opp.alive)return;
   const sp=G_opp.sp;
   const ox=G_opp.headX, oy=G_opp.headY;
-  const WALL=18;
+  const WALL=16;
 
   // Difficulty settings
   const diff=aiDifficulty||'medium';
-  const timerMin=diff==='easy'?10:diff==='hard'?2:5;
-  const timerRng=diff==='easy'?10:diff==='hard'?3:6;
-  const huntChance=diff==='easy'?0.45:diff==='hard'?0.97:0.85;
-  const turnMult=diff==='easy'?1.3:diff==='hard'?2.5:2.0;
-  const lookahead=diff==='hard'?50:diff==='medium'?32:18;
+  const timerMin=diff==='easy'?12:diff==='hard'?3:6;
+  const timerRng=diff==='easy'?12:diff==='hard'?4:8;
+  const huntChance=diff==='easy'?0.3:diff==='hard'?0.88:0.65;
+  const turnMult=diff==='easy'?1.1:diff==='hard'?2.2:1.7;
+  const lookahead=diff==='hard'?30:diff==='medium'?20:12;
+  const probeSteps=diff==='hard'?10:diff==='medium'?7:4;
+  const defenseRadius=diff==='easy'?25:diff==='medium'?35:20; // how close before going defensive
 
-  // ── Choose target every N frames ─────────────────────────
+  // ── Every-frame danger check: is current path dangerous? ─
+  const currentDanger=aiScoreAngle(G_opp.angle, G_opp, probeSteps);
+  let forceReplan=currentDanger>500;
+
+  // ── Choose target ─────────────────────────────────────────
   if(G_opp.aiTimer>0) G_opp.aiTimer--;
-  if(G_opp.aiTimer<=0){
+  if(G_opp.aiTimer<=0||forceReplan){
     G_opp.aiTimer=timerMin+0|Math.random()*timerRng;
+
     const meX=G.me?G.me.headX:WORLD_W/2;
     const meY=G.me?G.me.headY:WORLD_H/2;
     const distToPlayer=Math.hypot(ox-meX,oy-meY);
     const safeFromWall=ox>WALL&&ox<WORLD_W-WALL&&oy>WALL&&oy<WORLD_H-WALL;
-    if(safeFromWall&&distToPlayer<WORLD_H*0.6&&Math.random()<huntChance){
-      // Intercept player
+
+    // Candidates: current, ±15°, ±30°, ±45°, ±90°, target angles
+    const candidates=[];
+    [-Math.PI*0.5,-Math.PI*0.25,-Math.PI*0.125,0,Math.PI*0.125,Math.PI*0.25,Math.PI*0.5].forEach(d=>{
+      candidates.push(G_opp.angle+d);
+    });
+
+    // Defensive: if player is close and heading toward us, evade
+    let desiredTarget=null;
+    const playerApproaching=G.me&&distToPlayer<defenseRadius;
+    if(playerApproaching){
+      // Flee: go perpendicular to player approach
+      const awayAngle=Math.atan2(oy-meY,ox-meX);
+      candidates.push(awayAngle);
+      candidates.push(awayAngle+Math.PI*0.4);
+      candidates.push(awayAngle-Math.PI*0.4);
+      desiredTarget=awayAngle;
+    } else if(safeFromWall&&distToPlayer<WORLD_H*0.55&&Math.random()<huntChance){
+      // Intercept player future position
       const fx=Math.max(WALL,Math.min(WORLD_W-WALL,meX+Math.cos(G.me.angle)*sp.speed*lookahead));
       const fy=Math.max(WALL,Math.min(WORLD_H-WALL,meY+Math.sin(G.me.angle)*sp.speed*lookahead));
-      G_opp.aiTarget=Math.atan2(fy-oy,fx-ox);
+      desiredTarget=Math.atan2(fy-oy,fx-ox);
+      candidates.push(desiredTarget);
     } else {
-      let best=null,bestScore=9999;
+      // Go to nearest safe pellet
+      let best=null,bestD=9999;
       G.pellets.forEach(p=>{
         if(p.x<WALL||p.x>WORLD_W-WALL||p.y<WALL||p.y>WORLD_H-WALL)return;
         const d=Math.hypot(ox-p.x,oy-p.y);
-        if(d<bestScore){bestScore=d;best=p;}
+        if(d<bestD){bestD=d;best=p;}
       });
-      if(!best) G.pellets.forEach(p=>{const d=Math.hypot(ox-p.x,oy-p.y);if(d<bestScore){bestScore=d;best=p;}});
-      G_opp.aiTarget=best?Math.atan2(best.y-oy,best.x-ox):Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
+      if(!best) G.pellets.forEach(p=>{const d=Math.hypot(ox-p.x,oy-p.y);if(d<bestD){bestD=d;best=p;}});
+      desiredTarget=best?Math.atan2(best.y-oy,best.x-ox):Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
+      candidates.push(desiredTarget);
     }
+    // Centre fallback
+    candidates.push(Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox));
+
+    // Score all candidates — pick safest that is also closest to desired
+    let bestAngle=G_opp.aiTarget||G_opp.angle;
+    let bestScore=Infinity;
+    candidates.forEach(a=>{
+      const danger=aiScoreAngle(a,G_opp,probeSteps);
+      // Penalise deviation from desired target
+      const desired=desiredTarget!=null?desiredTarget:G_opp.angle;
+      let dev=Math.abs(a-desired); while(dev>Math.PI)dev=Math.abs(dev-Math.PI*2);
+      const score=danger+dev*8;
+      if(score<bestScore){bestScore=score;bestAngle=a;}
+    });
+    G_opp.aiTarget=bestAngle;
   }
 
-  // ── Wall avoidance ────────────────────────────────────────
-  const ox2=G_opp.headX,oy2=G_opp.headY;
-  if(ox2<WALL||ox2>WORLD_W-WALL||oy2<WALL||oy2>WORLD_H-WALL){
-    G_opp.aiTarget=Math.atan2(WORLD_H/2-oy2,WORLD_W/2-ox2);
+  // ── Wall override every frame ─────────────────────────────
+  if(ox<WALL||ox>WORLD_W-WALL||oy<WALL||oy>WORLD_H-WALL){
+    G_opp.aiTarget=Math.atan2(WORLD_H/2-oy,WORLD_W/2-ox);
     G_opp.aiTimer=0;
   }
 
@@ -898,7 +990,7 @@ function updateAISnake(G_opp){
   while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
   G_opp.angle+=Math.sign(da)*Math.min(Math.abs(da),sp.turnSpeed*turnMult);
 
-  // ── Move ─────────────────────────────────────────────────
+  // ── Move with wall-follow ─────────────────────────────────
   const mv=aiMove(G_opp.headX,G_opp.headY,G_opp.angle,sp.speed*0.95);
   G_opp.headX=mv.x; G_opp.headY=mv.y; G_opp.angle=mv.angle;
 
@@ -1134,19 +1226,13 @@ function updateTally(){
 }
 
 // ── END ───────────────────────────────────────────────────────
-function killSnake(snake){
-  const dbg=document.getElementById('debug-hud');
-  if(!snake||!snake.alive||!G.running){
-    if(dbg) dbg.textContent+='\nKILL SKIP slot:'+(snake?.slot)+' alive:'+(snake?.alive)+' running:'+G.running;
-    return;
-  }
-  if(dbg) dbg.textContent='KILLED slot:'+snake.slot+'\nalive before:'+[...G.aliveSlots].join(',');
+function killSnake(snake,fromNetwork){
+  if(!snake||!snake.alive||!G.running)return;
   snake.alive=false;
   G.aliveSlots.delete(snake.slot);
-  if(dbg) dbg.textContent+='\nalive after:'+[...G.aliveSlots].join(',');
-  if(G.aliveSlots.size<=1){
+  // Only host (or vsAI) decides when round ends
+  if((isHost||vsAI)&&G.aliveSlots.size<=1){
     const winnerSlot=G.aliveSlots.size===1?[...G.aliveSlots][0]:-1;
-    if(dbg) dbg.textContent+='\nCALLING endGame winner:'+winnerSlot;
     endGame(winnerSlot,'');
   }
 }
@@ -1167,8 +1253,7 @@ function endGame(winnerSlot,msg){
 function fillScorecard(){}
 
 function showWinOverlay(iWin,msg,isDraw,matchOver){
-  const dbg2=document.getElementById('debug-hud');
-  if(dbg2) dbg2.textContent='showWinOverlay called! iWin:'+iWin+' isDraw:'+isDraw;
+
   hostReady=false;guestReady=false;
   const badge=matchOver?'MATCH OVER':'ROUND '+(round-1)+' RESULT';
   document.getElementById('ov-round-badge').textContent=badge;
