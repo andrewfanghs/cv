@@ -550,20 +550,18 @@ function onMsg(msg){
     launchGame(d.state);
   }
   else if(t==='pos'){
-    // Host broadcasts positions → guests apply them
     if(isHost||!G.running)return;
     if(d.from===myId)return;
     if(d.positions){
       Object.entries(d.positions).forEach(([slot,pd])=>{
         const slotNum=parseInt(slot);
-        const snake=slotNum===myId?G.me:([G.opp,...G.others].find(s=>s&&s.slot===slotNum));
+        if(slotNum===myId)return; // ignore our own position from host
+        const snake=[G.opp,...G.others].find(s=>s&&s.slot===slotNum);
         if(snake){
-          if(slotNum!==myId){
-            // Interpolate toward received position for smooth motion
-            snake.headX=pd.x; snake.headY=pd.y; snake.angle=pd.a;
-            if(pd.segs&&pd.segs.length>0) snake.segs=pd.segs;
-            if(pd.alive===false&&snake.alive) killSnake(snake,true);
-          }
+          // Store as interpolation targets (smoothly glide toward)
+          snake._targetX=pd.x; snake._targetY=pd.y; snake._targetAngle=pd.a;
+          if(pd.segs&&pd.segs.length>0) snake.segs=pd.segs;
+          if(pd.alive===false&&snake.alive) killSnake(snake,true);
         }
       });
     }
@@ -663,7 +661,7 @@ const PELLET_COUNT=25;
 const WIN_SCORE=5;    // round wins to end the match
 const MATCH_WIN=5;    // same — first to 5 round wins
 const ROUND_TIME=60;
-const SYNC_MS=30;
+const SYNC_MS=16;
 
 const PELLET_COLORS=['#e74c3c','#f39c12','#27ae60','#2980b9','#8e44ad','#e67e22','#16a085','#d35400'];
 
@@ -705,7 +703,7 @@ function mkSnake(x,y,angle,sp,name,isMe){
   const spacing=CELL*0.85;
   const segs=[];
   for(let i=0;i<baseSeg;i++) segs.push({x:x-Math.cos(angle)*i*spacing,y:y-Math.sin(angle)*i*spacing});
-  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle+0.8,aiTimer:0,graceTicks:60};
+  return{headX:x,headY:y,angle,segs,sp,name,score:0,isMe,alive:true,aiTarget:angle+0.8,aiTimer:0,graceTicks:60,_targetX:null,_targetY:null,_targetAngle:null};
 }
 
 // ── LAUNCH ────────────────────────────────────────────────────
@@ -799,15 +797,14 @@ function aiMove(headX,headY,angle,speed){
   else if(ny>WORLD_H-WB){ny=WORLD_H-WB; angle=Math.cos(angle)>=0?0:Math.PI;}
   return{x:Math.max(WB,Math.min(WORLD_W-WB,nx)),y:Math.max(WB,Math.min(WORLD_H-WB,ny)),angle};
 }
-function moveSnakeForward(snake){
-  // Move a snake along its current angle (host moves all snakes)
+function moveSnakeForward(snake, eatPellets=true){
   const sp=snake.sp;
   const mv=aiMove(snake.headX,snake.headY,snake.angle,sp.speed*0.95);
   snake.headX=mv.x; snake.headY=mv.y; snake.angle=mv.angle;
   snake.segs.unshift({x:snake.headX,y:snake.headY});
   snake.segs.pop();
   if(snake.graceTicks>0) snake.graceTicks--;
-  // Eat pellets
+  if(!eatPellets)return;
   const eatR=headR(snake)*0.7;
   for(let i=G.pellets.length-1;i>=0;i--){
     const p=G.pellets[i];
@@ -821,19 +818,27 @@ function moveSnakeForward(snake){
 function gameLoop(){
   if(!G.running)return;
   G.animId=requestAnimationFrame(gameLoop);
+
+  // EVERYONE moves their own snake locally for smooth rendering
+  updateMe();
+  if(G.me&&G.me.alive) moveSnakeForward(G.me, isHost||vsAI); // only host eats pellets
+
   if(isHost||vsAI){
-    // Host moves ALL snakes (me + guests + AI)
-    updateMe(); // update G.me.angle from touch input
-    if(G.me&&G.me.alive) moveSnakeForward(G.me); // move my snake
+    // Host additionally moves AI snakes and guest snakes (using received angles)
     [G.opp,...G.others].filter(s=>s&&s.alive).forEach(s=>{
       if(s.isAI) updateAISnake(s);
-      else moveSnakeForward(s); // guest snake moved by host
+      else moveSnakeForward(s); // steered by received input angle
     });
-    // Collision detection (host only)
     checkCollisions();
   } else {
-    // Guest: update angle from touch, host moves snake and sends positions back
-    updateMe(); // only updates angle via touch
+    // Guest: smoothly interpolate other snakes toward host-confirmed positions
+    [G.opp,...G.others].filter(s=>s&&s.alive&&s._targetX!=null).forEach(s=>{
+      s.headX+=(s._targetX-s.headX)*0.3;
+      s.headY+=(s._targetY-s.headY)*0.3;
+      s.angle+=(s._targetAngle-s.angle)*0.3;
+      s.segs.unshift({x:s.headX,y:s.headY});
+      s.segs.pop();
+    });
   }
   draw();
   // grace period flash on HUD
