@@ -113,6 +113,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
 
 
 #credit-game{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:9px;color:#c8d8b8;letter-spacing:1px;z-index:9;pointer-events:none;white-space:nowrap;}
+#death-bar{display:none;position:fixed;top:48px;left:0;width:100%;z-index:15;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;}
+.death-msg{background:rgba(0,0,0,0.72);color:#fff;font-size:11px;font-weight:bold;padding:4px 14px;border-radius:20px;letter-spacing:.5px;animation:deathFade 2.5s ease-out forwards;}
+@keyframes deathFade{0%{opacity:1;transform:translateY(0);}70%{opacity:1;}100%{opacity:0;transform:translateY(-10px);}}
 
 /* OVERLAYS */
 .full-overlay{position:fixed;inset:0;background:rgba(240,235,224,0.97);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:30;padding:20px;gap:0;}
@@ -228,6 +231,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f0ebe0;font-family:
   </div>
 
   <div id="credit-game">Created by Ethan &amp; Elroy Fang · 2026</div>
+  <div id="death-bar" style="display:none;position:fixed;top:48px;left:0;width:100%;z-index:15;pointer-events:none;"></div>
 </div>
 
 <!-- ROUND RESULT OVERLAY (host + AI guest) -->
@@ -573,16 +577,17 @@ function onMsg(msg){
     updateHUD();
   }
   else if(t==='input'){
-    // Guest sends angle → host steers that snake
     if(!isHost||!G.running)return;
     if(d.from===myId)return;
     const slot=d.slot;
     const snake=[G.opp,...G.others].find(s=>s&&s.slot===slot);
     if(snake&&snake.alive){
-      // Steer guest snake toward their desired angle
-      let da=d.a-snake.angle;
-      while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;
-      snake.angle+=Math.sign(da)*Math.min(Math.abs(da),snake.sp.turnSpeed*1.5);
+      // Apply guest's actual position (authoritative for their own movement)
+      if(d.x!=null&&d.y!=null){
+        snake.headX=d.x; snake.headY=d.y;
+      }
+      snake.angle=d.a;
+      if(d.segs&&d.segs.length>1) snake.segs=d.segs;
     }
   }
   else if(t==='pellet'){
@@ -645,6 +650,9 @@ function onMsg(msg){
     if(deadSnake&&deadSnake.alive){
       deadSnake.alive=false;
       G.aliveSlots.delete(deadSlot);
+      const emoji=deadSnake.sp?deadSnake.sp.emoji:'🐍';
+      const isMe=deadSnake===G.me;
+      showDeathMsg(emoji+' '+(isMe?'You':deadSnake.name)+' crashed!', isMe?'#cc3333':deadSnake.sp?deadSnake.sp.head:'#666');
       if(deadSnake===G.me) showObserverOverlay();
     }
   }
@@ -739,7 +747,7 @@ function launchGame(state){
     const snake=mkSnake(c.x(),c.y(),c.angle,sp,isMe?myName:sl.name,isMe);
     snake.slot=sl.slot;
     snake.isAI=sl.isAI;
-    if(!isMe&&!sl.isAI) snake.segs=[]; // remote human segs filled by sync
+    // keep initial segs; host moves guest snake locally
     if(isMe) G.me=snake;
     else if(!G.opp) G.opp=snake;
     else G.others.push(snake);
@@ -839,7 +847,7 @@ function gameLoop(){
     // Host additionally moves AI snakes and guest snakes (using received angles)
     [G.opp,...G.others].filter(s=>s&&s.alive).forEach(s=>{
       if(s.isAI) updateAISnake(s);
-      else moveSnakeForward(s); // steered by received input angle
+      // guest snakes: position comes from 'input' messages, not moved by host
     });
     checkCollisions();
   } else {
@@ -881,7 +889,9 @@ function gameLoop(){
       });
       channel.publish('pos',{positions,from:myId});
     } else if(G.me) {
-      channel.publish('input',{a:G.me.angle,slot:myId,from:myId});
+      // Send angle + sampled segs so host has accurate guest body for collision
+      const guestSegs=G.me?G.me.segs.filter((_,i)=>i%3===0):[];
+      channel.publish('input',{a:G.me.angle,slot:myId,from:myId,segs:guestSegs,x:G.me?G.me.headX:0,y:G.me?G.me.headY:0});
     }
   }
   // grace period flash
@@ -1305,18 +1315,28 @@ function killSnake(snake,fromNetwork){
   if(!snake||!snake.alive||!G.running)return;
   snake.alive=false;
   G.aliveSlots.delete(snake.slot);
+  // Death notification
+  const emoji=snake.sp?snake.sp.emoji:'🐍';
+  const isMe=snake===G.me;
+  const deathColor=isMe?'#cc3333':snake.sp?snake.sp.head:'#666';
+  showDeathMsg(emoji+' '+(isMe?'You':snake.name)+' crashed!', deathColor);
   // If MY snake died in multiplayer, show observer overlay
   if(snake===G.me&&!vsAI&&G.aliveSlots.size>0){
     showObserverOverlay();
   }
   // Host decides round end
   if((isHost||vsAI)){
-    if(G.aliveSlots.size<=1){
+    // Check if round should end
+    const aliveHumans=[...G.aliveSlots].filter(sl=>{
+      const sn=[G.me,G.opp,...G.others].find(s=>s&&s.slot===sl);
+      return sn&&!sn.isAI;
+    });
+    const shouldEnd=G.aliveSlots.size<=1||aliveHumans.length===0;
+    if(shouldEnd){
       const winnerSlot=G.aliveSlots.size===1?[...G.aliveSlots][0]:-1;
       endGame(winnerSlot,'');
     } else if(!vsAI&&channel){
-      // Broadcast that this snake died
-      channel.publish('snakeDied',{slot:snake.slot,aliveSlots:[...G.aliveSlots]});
+      channel.publish('snakeDied',{slot:snake.slot});
     }
   }
 }
@@ -1418,6 +1438,18 @@ function showWaitOverlay(iWin,t,msg,matchOver){
   updateTally();
 }
 
+function showDeathMsg(text, color){
+  const bar=document.getElementById('death-bar');
+  if(!bar)return;
+  bar.style.display='flex';
+  const el=document.createElement('div');
+  el.className='death-msg';
+  el.textContent=text;
+  el.style.borderLeft='3px solid '+(color||'#cc3333');
+  bar.appendChild(el);
+  setTimeout(()=>{el.remove();if(!bar.children.length)bar.style.display='none';},2500);
+}
+
 function hideOverlays(){
   document.getElementById('win-overlay').style.display='none';
   document.getElementById('wait-overlay').style.display='none';
@@ -1432,8 +1464,13 @@ function startNextRound(){
   hostReady=false;guestReadySlots=new Set();
   hideOverlays();
   const state=buildState();
-  if(!vsAI&&channel) channel.publish('replay',{state,tally,round});
-  launchGame(state);
+  if(!vsAI&&channel){
+    channel.publish('replay',{state,tally,round});
+    // Small delay so Ably delivers message before host launches
+    setTimeout(()=>launchGame(state), 300);
+  } else {
+    launchGame(state);
+  }
 }
 
 document.getElementById('replay-btn').onclick=()=>{
