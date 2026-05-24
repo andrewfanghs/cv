@@ -829,7 +829,7 @@ function gameLoop(){
 
   // EVERYONE moves their own snake locally for smooth rendering
   updateMe();
-  if(G.me&&G.me.alive) moveSnakeForward(G.me, isHost||vsAI); // only host eats pellets
+  if(G.me&&G.me.alive) moveSnakeForward(G.me, true); // eat pellets locally for responsiveness
 
   if(isHost||vsAI){
     // Host additionally moves AI snakes and guest snakes (using received angles)
@@ -839,11 +839,15 @@ function gameLoop(){
     });
     checkCollisions();
   } else {
-    // Guest: smoothly interpolate other snakes toward host-confirmed positions
-    [G.opp,...G.others].filter(s=>s&&s.alive&&s._targetX!=null).forEach(s=>{
-      s.headX+=(s._targetX-s.headX)*0.3;
-      s.headY+=(s._targetY-s.headY)*0.3;
-      s.angle+=(s._targetAngle-s.angle)*0.3;
+    // Guest: predict other snakes forward locally for smooth rendering
+    [G.opp,...G.others].filter(s=>s&&s.alive).forEach(s=>{
+      if(s._targetX==null)return;
+      // Extrapolate: move by current angle/speed, then gently correct toward host pos
+      const sp2=s.sp;
+      const mv=aiMove(s.headX,s.headY,s.angle,sp2.speed*0.95);
+      s.headX=mv.x*0.6+s._targetX*0.4;
+      s.headY=mv.y*0.6+s._targetY*0.4;
+      s.angle=mv.angle*0.7+s._targetAngle*0.3;
       s.segs.unshift({x:s.headX,y:s.headY});
       s.segs.pop();
     });
@@ -1102,10 +1106,9 @@ function draw(){
     ctx.restore();
   });
 
-  // snakes — draw dead first (ghost), then alive on top
-  const allForDraw=[...G.others,G.opp,G.me].filter(s=>s&&s.segs&&s.segs.length);
-  allForDraw.filter(s=>!s.alive).forEach(s=>{ctx.globalAlpha=0.25;drawSnake(s);ctx.globalAlpha=1;});
-  allForDraw.filter(s=>s.alive).forEach(s=>drawSnake(s));
+  // snakes — only draw alive snakes
+  const allForDraw=[...G.others,G.opp,G.me].filter(s=>s&&s.alive&&s.segs&&s.segs.length);
+  allForDraw.forEach(s=>drawSnake(s));
   // AI indicator rings
   if(vsAI||isHost){
     [G.opp,...G.others].filter(s=>s&&s.isAI&&s.segs&&s.segs.length).forEach(s=>{
@@ -1184,10 +1187,24 @@ function drawSnake(snake){
   ctx.moveTo(tx,ty);
   ctx.lineTo(tx+Math.cos(ea+.35)*hr*.5,ty+Math.sin(ea+.35)*hr*.5);
   ctx.strokeStyle='#cc2222';ctx.lineWidth=0.8;ctx.stroke();
-  // name + score label
-  ctx.fillStyle=sp.head;ctx.font=`bold ${Math.round(Math.max(hr*.85,4))}px sans-serif`;
-  ctx.textAlign='center';ctx.textBaseline='bottom';
-  ctx.fillText((snake.isMe?'★ ':'')+snake.name,h.x,h.y-hr-1.5);
+  // "YOU" arrow for player's own snake
+  if(snake.isMe){
+    const pulse=0.7+Math.sin(Date.now()*0.006)*0.3;
+    ctx.globalAlpha=pulse;
+    ctx.beginPath();ctx.arc(h.x,h.y,hr*2.2,0,Math.PI*2);
+    ctx.strokeStyle='#ffffff';ctx.lineWidth=1.2/SCALE;ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.fillStyle='#fff';
+    ctx.font=`bold ${Math.round(Math.max(hr*0.7,3.5))}px sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('YOU',h.x,h.y-hr*2.8);
+  }
+  // name label for others
+  if(!snake.isMe){
+    ctx.fillStyle=sp.head;ctx.font=`bold ${Math.round(Math.max(hr*.85,4))}px sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText(snake.name,h.x,h.y-hr-1.5);
+  }
 }
 
 function drawMinimap(){
