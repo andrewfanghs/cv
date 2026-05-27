@@ -140,14 +140,6 @@ body{
 }
 
 .hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1}
-.hero-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.15);
-  border:1px solid rgba(255,255,255,.25);
-  border-radius:20px;padding:4px 12px;
-  font-size:12px;font-weight:700;letter-spacing:.04em;
-  color:rgba(255,255,255,.9);margin-bottom:14px;
-}
 .hero h1{
   font-family:'Pacifico',cursive;
   font-size:clamp(32px,6vw,58px);
@@ -164,17 +156,6 @@ body{
   color:rgba(255,255,255,.85);
   margin-bottom:20px;
 }
-.hero-chips{
-  display:flex;flex-wrap:wrap;gap:8px;
-}
-.hero-chip{
-  background:rgba(255,255,255,.15);
-  border:1px solid rgba(255,255,255,.2);
-  border-radius:20px;padding:5px 14px;
-  font-size:13px;font-weight:600;color:#fff;
-}
-.hero-chip .label{color:rgba(255,255,255,.65);font-weight:500;margin-right:4px}
-
 /* ── WAVE BOTTOM ── */
 .hero-wave{
   position:absolute;bottom:-1px;left:0;right:0;
@@ -456,15 +437,8 @@ svg{display:block;width:100%}
     <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
   </div>
   <div class="hero-inner">
-    <div class="hero-tag">✈️ Family Adventure 2026</div>
     <h1>Japan <span class="highlight">Trip!</span></h1>
-    <div class="hero-sub">Andrew, Cheryl, Ethan & Elroy 🏄‍♂️👧</div>
-    <div class="hero-chips">
-      <div class="hero-chip"><span class="label">When</span>30 May – 8 Jun</div>
-      <div class="hero-chip">🏝 Okinawa</div>
-      <div class="hero-chip">🏙 Osaka</div>
-      <div class="hero-chip"><span class="label">Kids</span>Ethan (8) · Elroy (6)</div>
-    </div>
+    <div class="hero-sub">Andrew, Cheryl, Ethan & Elroy · 30 May – 8 Jun 2026 🌴</div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 48" preserveAspectRatio="none" style="height:48px">
     <path d="M0,32 C360,0 720,48 1080,16 C1260,0 1380,24 1440,32 L1440,48 L0,48 Z" fill="#E8F4FD"/>
@@ -478,6 +452,7 @@ svg{display:block;width:100%}
     <button class="nav-btn" onclick="showPage('okinawa')">🏝 Okinawa</button>
     <button class="nav-btn" onclick="showPage('osaka')">🏙 Osaka</button>
     <button class="nav-btn" onclick="showPage('maps')">🗺 Maps</button>
+    <button class="nav-btn" onclick="showPage('notes')">📝 Notes</button>
   </div>
 </nav>
 
@@ -488,22 +463,22 @@ svg{display:block;width:100%}
   <div style="margin-bottom:28px">
     <div class="flight-row">
       <span class="flight-no">SQ 656</span>
-      <span class="flight-route">Singapore → Fukuoka</span>
+      <span class="flight-route">Singapore Changi T2 → Fukuoka T1</span>
       <span class="flight-time">30 May · 01:20 → 08:20</span>
     </div>
     <div class="flight-row">
       <span class="flight-no">NH 1207</span>
-      <span class="flight-route">Fukuoka → Okinawa (Naha)</span>
+      <span class="flight-route">Fukuoka T1 (Domestic) → Okinawa Naha T1</span>
       <span class="flight-time">30 May · 12:05 → 13:55</span>
     </div>
     <div class="flight-row">
       <span class="flight-no">NU 004</span>
-      <span class="flight-route">Okinawa → Osaka (KIX)</span>
+      <span class="flight-route">Okinawa Naha T1 → Osaka KIX T1</span>
       <span class="flight-time">4 Jun · 11:15 → 13:15</span>
     </div>
     <div class="flight-row">
       <span class="flight-no">SQ 621</span>
-      <span class="flight-route">Osaka (KIX) → Singapore</span>
+      <span class="flight-route">Osaka KIX T1 → Singapore Changi T3</span>
       <span class="flight-time">8 Jun · 17:25 → 22:55</span>
     </div>
   </div>
@@ -785,7 +760,6 @@ function renderDay(d, container) {
   const el = document.createElement('div');
   el.className = 'card';
   el.id = 'card-' + d.id;
-  const savedNote = localStorage.getItem('note-' + d.id) || '';
   el.innerHTML = `
     <div class="card-header" onclick="toggleCard('${d.id}')">
       <div class="day-pill" style="background:${d.color}">${d.num}</div>
@@ -824,23 +798,10 @@ function renderDay(d, container) {
             `).join('')}
           </div>
         </div>
-        <div class="notes-area">
-          <div class="notes-label">📝 My notes</div>
-          <textarea class="notes" id="notes-${d.id}" placeholder="Add food spots, reminders, ideas…">${savedNote}</textarea>
-          <div class="save-note" id="save-status-${d.id}">Type to add notes — saved automatically</div>
-        </div>
       </div>
     </div>
   `;
   container.appendChild(el);
-  const ta = el.querySelector(`#notes-${d.id}`);
-  ta.addEventListener('input', () => {
-    localStorage.setItem('note-' + d.id, ta.value);
-    const st = document.getElementById('save-status-' + d.id);
-    st.textContent = '✓ Saved!';
-    st.classList.add('saved');
-    setTimeout(() => { st.textContent = 'Type to add notes — saved automatically'; st.classList.remove('saved'); }, 2000);
-  });
 }
 
 function toggleCard(id) {
@@ -859,7 +820,19 @@ days.forEach(d => {
   else renderDay(d, osaContainer);
 });
 
-days.forEach(d => {
+days.forEach((d, i) => {
+  // Insert city break labels
+  if (i === 0) {
+    const hdr = document.createElement('div');
+    hdr.innerHTML = `<div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#3A9E6F;margin:0 0 8px;display:flex;align-items:center;gap:8px">🏝 Okinawa <span style="flex:1;height:2px;background:linear-gradient(to right,rgba(58,158,111,.25),transparent);border-radius:2px;display:inline-block"></span></div>`;
+    quickContainer.appendChild(hdr);
+  }
+  if (i === 6) {
+    const hdr = document.createElement('div');
+    hdr.innerHTML = `<div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#C4724A;margin:16px 0 8px;display:flex;align-items:center;gap:8px">🏙 Osaka <span style="flex:1;height:2px;background:linear-gradient(to right,rgba(196,114,74,.25),transparent);border-radius:2px;display:inline-block"></span></div>`;
+    quickContainer.appendChild(hdr);
+  }
+
   const el = document.createElement('div');
   el.className = 'quick-item';
   el.onclick = () => {
@@ -888,6 +861,78 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   document.querySelector(`[onclick="showPage('${name}')"]`).classList.add('active');
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ── PERSISTENT NOTES (storage API + localStorage fallback) ── */
+async function saveNote(id, value, statusEl) {
+  // Try Artifacts persistent storage first
+  try {
+    await window.storage.set('note-' + id, value);
+  } catch(e) {}
+  // Always also write to localStorage as backup
+  try { localStorage.setItem('note-' + id, value); } catch(e) {}
+  if (statusEl) {
+    statusEl.textContent = '✓ Saved!';
+    statusEl.classList.add('saved');
+    setTimeout(() => {
+      statusEl.textContent = 'Type to add notes — saved automatically';
+      statusEl.classList.remove('saved');
+    }, 2000);
+  }
+}
+
+async function loadNote(id) {
+  let val = '';
+  // Try persistent storage first
+  try {
+    const r = await window.storage.get('note-' + id);
+    if (r && r.value) val = r.value;
+  } catch(e) {
+    // Fall back to localStorage
+    try { val = localStorage.getItem('note-' + id) || ''; } catch(e2) {}
+  }
+  // If nothing in persistent store, check localStorage
+  if (!val) {
+    try { val = localStorage.getItem('note-' + id) || ''; } catch(e) {}
+  }
+  const ta = document.getElementById('notes-' + id);
+  if (ta && val) ta.value = val;
+}
+
+/* ── EXPORT / IMPORT NOTES ── */
+function exportNotes() {
+  const notes = {};
+  days.forEach(d => {
+    const ta = document.getElementById('notes-' + d.id);
+    if (ta && ta.value.trim()) notes[d.id] = ta.value;
+  });
+  const json = JSON.stringify(notes, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'japan-trip-notes.json';
+  a.click();
+}
+
+function importNotes(file) {
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const notes = JSON.parse(e.target.result);
+      for (const [id, val] of Object.entries(notes)) {
+        const ta = document.getElementById('notes-' + id);
+        if (ta) {
+          ta.value = val;
+          await saveNote(id, val, null);
+        }
+      }
+      document.getElementById('import-status').textContent = '✓ Notes imported!';
+      setTimeout(() => document.getElementById('import-status').textContent = '', 3000);
+    } catch(err) {
+      alert('Could not read notes file.');
+    }
+  };
+  reader.readAsText(file);
 }
 
 /* ── PASSWORD ── */
@@ -939,6 +984,128 @@ document.getElementById('pw-input').addEventListener('input',function(){
   60%{transform:translateX(-6px)}
   80%{transform:translateX(6px)}
 }
+
+/* ── NOTES BACKUP PANEL ── */
+.notes-backup-panel{
+  margin-top:32px;
+  background:#fff;border-radius:16px;
+  border:1.5px solid rgba(58,158,111,.2);
+  padding:18px 20px;
+  box-shadow:var(--card-shadow);
+}
+.backup-title{font-size:14px;font-weight:800;color:#2A7A52;margin-bottom:4px}
+.backup-desc{font-size:12px;font-weight:500;color:var(--text-soft);margin-bottom:14px;line-height:1.5}
+.backup-btns{display:flex;gap:10px;flex-wrap:wrap}
+.backup-btn{
+  padding:9px 16px;border-radius:10px;border:1.5px solid rgba(58,158,111,.3);
+  background:linear-gradient(135deg,#F0FBF6,#E8F8F0);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  color:#2A7A52;cursor:pointer;transition:all .15s;
+}
+.backup-btn:hover{background:linear-gradient(135deg,#E0F5EC,#D4F0E4);transform:translateY(-1px)}
 </style>
+<!-- ════════ NOTES ════════ -->
+<div id="page-notes" class="page">
+<div class="content">
+
+  <div style="background:linear-gradient(135deg,#3A9E6F,#2A7A52);border-radius:18px;padding:20px 22px;margin-bottom:24px;display:flex;align-items:center;gap:14px">
+    <div style="font-size:36px;line-height:1">📝</div>
+    <div>
+      <div style="font-size:20px;font-weight:800;color:#fff">Trip Notes</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.75);font-weight:500;margin-top:2px">Jot down food spots, reminders, anything you like</div>
+    </div>
+  </div>
+
+  <div class="free-notes-card">
+    <textarea id="free-notes-ta"
+      placeholder="✍️  Start typing here…
+
+Ideas:
+• Food places to try
+• Things to pack
+• Things to book in advance
+• Reminders for the kids
+• Anything goes!"
+    ></textarea>
+    <div class="free-notes-footer">
+      <span class="free-notes-status" id="free-notes-status"></span>
+      <button class="free-notes-btn primary" onclick="saveFreeNotes()">💾 Save</button>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;padding:12px 16px;background:rgba(58,158,111,.08);border-radius:12px;border:1.5px solid rgba(58,158,111,.15)">
+    <div style="font-size:12px;font-weight:700;color:#2A7A52;margin-bottom:2px">💡 About saving</div>
+    <div style="font-size:12px;font-weight:500;color:#718096;line-height:1.55">Notes are saved in <strong>this browser's localStorage</strong> — they'll be here every time you open this file in the same browser, even after closing.</div>
+  </div>
+
+</div>
+</div>
+
+<style>
+.free-notes-card{
+  background:#fff;border-radius:20px;
+  box-shadow:var(--card-shadow);
+  border:1.5px solid rgba(58,158,111,.15);
+  overflow:hidden;
+}
+#free-notes-ta{
+  display:block;width:100%;
+  min-height:420px;
+  padding:20px 22px;
+  font-family:'Nunito',sans-serif;
+  font-size:15px;font-weight:500;
+  line-height:1.7;color:var(--text);
+  border:none;outline:none;resize:vertical;
+  background:#fff;
+}
+#free-notes-ta::placeholder{color:#C0BDB7;font-weight:400}
+.free-notes-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;
+  border-top:1.5px solid rgba(58,158,111,.1);
+  background:linear-gradient(135deg,#F0FBF6,#EBF8F2);
+  flex-wrap:wrap;gap:8px;
+}
+.free-notes-status{
+  font-size:12px;font-weight:700;color:#3A9E6F;
+  display:flex;align-items:center;gap:5px;
+}
+.free-notes-status.saving{color:#B8843A}
+.free-notes-actions{display:flex;gap:8px}
+.free-notes-btn{
+  padding:7px 14px;border-radius:9px;
+  border:1.5px solid rgba(58,158,111,.25);
+  background:#fff;font-family:'Nunito',sans-serif;
+  font-size:12px;font-weight:700;color:#2A7A52;
+  cursor:pointer;transition:all .15s;
+}
+.free-notes-btn:hover{background:#E8F8F0;transform:translateY(-1px)}
+.free-notes-btn.primary{
+  background:linear-gradient(135deg,#3A9E6F,#2A7A52);
+  color:#fff;border-color:transparent;
+}
+.free-notes-btn.primary:hover{opacity:.9}
+</style>
+
+<script>
+/* ── FREE NOTES (localStorage, manual save) ── */
+const FREE_KEY = 'jp2026_free_notes';
+
+(function initFreeNotes(){
+  const ta = document.getElementById('free-notes-ta');
+  const saved = localStorage.getItem(FREE_KEY) || '';
+  if (saved) ta.value = saved;
+})();
+
+function saveFreeNotes(){
+  const ta = document.getElementById('free-notes-ta');
+  const st = document.getElementById('free-notes-status');
+  localStorage.setItem(FREE_KEY, ta.value);
+  st.textContent = '✓ Saved!';
+  st.style.color = '#3A9E6F';
+  setTimeout(() => { st.textContent = ''; }, 2500);
+}
+</script>
+
 </body>
 </html>
