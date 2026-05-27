@@ -411,6 +411,33 @@ svg{display:block;width:100%}
   .flight-time{grid-column:2;color:var(--text-soft);text-align:left}
 }
 </style>
+<script>
+/* ── PASSWORD — defined early so onclick handlers can reach it ── */
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim();
+  var err = document.getElementById('pw-error');
+  if(val==='0703'){
+    sessionStorage.setItem('jp2026_unlocked','1');
+    var screen = document.getElementById('pw-screen');
+    screen.style.transition='opacity .4s';
+    screen.style.opacity='0';
+    document.body.style.overflow='';
+    setTimeout(function(){screen.classList.add('hidden');},420);
+  } else {
+    err.classList.add('show');
+    var input = document.getElementById('pw-input');
+    input.value='';
+    input.style.borderColor='#E53E3E';
+    input.style.animation='shake .35s ease';
+    setTimeout(function(){
+      err.classList.remove('show');
+      input.style.borderColor='';
+      input.style.animation='';
+    },2200);
+    input.focus();
+  }
+}
+</script>
 </head>
 <body>
 
@@ -935,45 +962,16 @@ function importNotes(file) {
   reader.readAsText(file);
 }
 
-/* ── PASSWORD ── */
-(function(){
-  const KEY = 'jp2026_unlocked';
-  const PW  = '0703';
-  if(sessionStorage.getItem(KEY)==='1'){
+/* ── PASSWORD INIT (runs after DOM ready) ── */
+document.addEventListener('DOMContentLoaded', function(){
+  if(sessionStorage.getItem('jp2026_unlocked')==='1'){
     document.getElementById('pw-screen').classList.add('hidden');
   } else {
     document.body.style.overflow='hidden';
   }
-})();
-
-function checkPw(){
-  const val = document.getElementById('pw-input').value.trim();
-  const err = document.getElementById('pw-error');
-  if(val==='0703'){
-    sessionStorage.setItem('jp2026_unlocked','1');
-    const screen = document.getElementById('pw-screen');
-    screen.style.transition='opacity .4s';
-    screen.style.opacity='0';
-    document.body.style.overflow='';
-    setTimeout(()=>screen.classList.add('hidden'),420);
-  } else {
-    err.classList.add('show');
-    const input = document.getElementById('pw-input');
-    input.value='';
-    input.style.borderColor='#E53E3E';
-    input.style.animation='shake .35s ease';
-    setTimeout(()=>{
-      err.classList.remove('show');
-      input.style.borderColor='';
-      input.style.animation='';
-    },2200);
-    input.focus();
-  }
-}
-
-/* Auto-submit when 4 digits entered */
-document.getElementById('pw-input').addEventListener('input',function(){
-  if(this.value.length===4) checkPw();
+  document.getElementById('pw-input').addEventListener('input',function(){
+    if(this.value.length===4) checkPw();
+  });
 });
 </script>
 <style>
