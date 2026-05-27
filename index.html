@@ -437,6 +437,23 @@ function checkPw(){
     input.focus();
   }
 }
+
+/* ── NAV — defined early so onclick handlers can reach it ── */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('page-' + name).classList.add('active');
+  var btn = document.querySelector('[onclick="showPage(\'' + name + '\')"]');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleCard(id) {
+  var body = document.getElementById('body-' + id);
+  var chev = document.getElementById('chev-' + id);
+  var open = body.classList.toggle('open');
+  chev.style.transform = open ? 'rotate(180deg)' : '';
+}
 </script>
 </head>
 <body>
@@ -675,7 +692,9 @@ const days = [
       {name:'Blue Seal Ice Cream 🍦',desc:'Okinawa\'s beloved ice cream brand on Kokusai-dori. Beniimo (purple sweet potato) is the must-try!'},
       {name:'Makishi Public Market (evening)',desc:'The market stays lively into the evening — grab fresh fruit, local snacks and watch the vendors in action, a great intro to Okinawan food culture'},
       {name:'Don Quijote Kokusai-dori',desc:'Open 24h, great for stocking up on Japanese snacks, drinks and essentials for the trip — the kids will love browsing the toy and candy floors'},
-    ],city:'okinawa',color:'#3A9E6F',num:'D2',label:'Churaumi Day',title:'Churaumi Day 🐋',date:'31 May (Sun)',
+    ]
+  },
+  {id:'d2',city:'okinawa',color:'#3A9E6F',num:'D2',label:'Churaumi Day',title:'Churaumi Day 🐋',date:'31 May (Sun)',
     stops:[
       {name:'Hotel → Naha Bus Terminal',note:'Leave ~7–8am',transport:'🚕 Taxi ~5–10 min to bus terminal'},
       {name:'Churaumi Aquarium',note:'Whale shark tank · manta rays · sea turtles · Ocean Expo Park · dolphin show · lunch on site',transport:'🚌 Highway bus ~2.5–3h · book in advance!'},
@@ -688,7 +707,9 @@ const days = [
       {name:'Orion Beer Factory',desc:'Okinawa\'s famous local brewery is near Churaumi — tours available for a fun grown-up pitstop 🍺'},
       {name:'Ocean Expo Park Tropical Dream Center',desc:'Stunning botanical gardens right inside the park with a huge orchid collection — free with aquarium entry and a peaceful contrast to the busy tanks'},
       {name:'Kouri Ocean Tower',desc:'On the way back south, this hilltop tower on Kouri Island has spectacular views of the turquoise straits and a short beach walk below — great for a sunset stop'},
-    ],city:'okinawa',color:'#C4724A',num:'D3',label:'History Day',title:'History Day 🏯',date:'1 Jun (Mon)',
+    ]
+  },
+  {id:'d3',city:'okinawa',color:'#C4724A',num:'D3',label:'History Day',title:'History Day 🏯',date:'1 Jun (Mon)',
     stops:[
       {name:'Shurijo Castle',note:'Ryukyu Kingdom history · castle walls & gates · reconstruction areas',transport:'🚉 Yui Rail + short taxi from hotel'},
       {name:'Lunch — Tsuboya Pottery Street',note:'Great spots for soba and browsing local pottery shops'},
@@ -701,7 +722,9 @@ const days = [
       {name:'Hakugincho Shopping Arcade',desc:'Covered old-school local shopping street near the hotel — very un-touristy, great for a quiet evening browse'},
       {name:'Naminoue Shrine 🏮',desc:'Okinawa\'s most important Shinto shrine perched on a dramatic cliff overlooking the sea — a short taxi from Shurijo and a serene place to decompress after the heavy Navy HQ visit'},
       {name:'Okinawa Prefectural Museum',desc:'Right near Omoromachi station on the Yui Rail — excellent exhibits on Ryukyu Kingdom history and culture that give great context to what you saw at Shurijo, free for under-18s'},
-    ],city:'okinawa',color:'#F4845F',num:'D4',label:'Relax Day',title:'Relax Day 🌅',date:'2 Jun (Tue)',
+    ]
+  },
+  {id:'d4',city:'okinawa',color:'#F4845F',num:'D4',label:'Relax Day',title:'Relax Day 🌅',date:'2 Jun (Tue)',
     stops:[
       {name:'American Village, Chatan',note:'Seaside walk · cafés · shopping · sunset · snacks · completely free-and-easy day',transport:'🚌 Bus or taxi from Naha ~40 min'},
     ],
@@ -711,7 +734,9 @@ const days = [
       {name:'Zhyvago Coffee Works ☕',desc:'Popular café in American Village with great coffee and tiramisu — perfect for a relaxed afternoon sit-down'},
       {name:'Sunset Beach',desc:'A short walk north of American Village, this wider beach is great for watching the Okinawan sunset — bring snacks from a nearby combini and just sit and watch'},
       {name:'Mihama American Village Ferris Wheel',desc:'Small ferris wheel right in the American Village complex — cheap, quick and the kids will enjoy it, with good views over the bay and the village lights at dusk'},
-    ],city:'okinawa',color:'#9B72CF',num:'D5',label:'Flexible Day',title:'Flexible Day 🎮',date:'3 Jun (Wed)',
+    ]
+  },
+  {id:'d5',city:'okinawa',color:'#9B72CF',num:'D5',label:'Flexible Day',title:'Flexible Day 🎮',date:'3 Jun (Wed)',
     stops:[
       {name:'No fixed plan · keep it light',note:'Options: Makishi Market · Pokémon Center · shopping · café hopping · rest',transport:'🚶 Makishi Market: walk from hotel · 🚌 Pokémon Center: bus ~50 min to Ion Mall'},
     ],
@@ -721,7 +746,9 @@ const days = [
       {name:'Kakigori shaved ice 🍧',desc:'Look for an old-school zenzai shop near Makishi — Okinawan shaved ice with red beans, locals queue for it'},
       {name:'Palette Kumoji (shopping mall)',desc:'Naha\'s central shopping mall on Kokusai-dori — good for browsing Okinawan craft goods, clothing and a food court lunch without leaving the city centre'},
       {name:'Yui Rail day pass',desc:'Worth grabbing a day pass (¥700) if you\'re hopping around Naha — covers all stations from the airport to Shuri, great for spontaneous exploring without worrying about fares'},
-    ],city:'okinawa',color:'#5B9FD4',num:'D6',label:'Fly to Osaka',title:'Fly to Osaka ✈️',date:'4 Jun (Thu)',
+    ]
+  },
+  {id:'d6',city:'okinawa',color:'#5B9FD4',num:'D6',label:'Fly to Osaka',title:'Fly to Osaka ✈️',date:'4 Jun (Thu)',
     stops:[
       {name:'Checkout · Naha Airport',note:'NU004 departs 11:15',transport:'🚉 Yui Rail: Makishi → Airport ~10 min'},
       {name:'Kansai International Airport (KIX)',note:'Land 13:15',transport:'🚄 Nankai Rapi:t → Namba ~35 min · walk to Fraser Suites'},
@@ -734,7 +761,9 @@ const days = [
       {name:'Dotonbori canal at night 🌟',desc:'The neon canal is spectacular after dark — walk the whole strip for giant food signs and electric city energy'},
       {name:'Namba Grand Kagetsu (NGK)',desc:'Osaka\'s most famous comedy theatre is right in Namba — if you can catch a show, the physical comedy is entertaining even without Japanese, and it gives a real taste of Osaka culture'},
       {name:'Hozenji Yokocho for dinner',desc:'Stone-paved alley a 5-min walk from the hotel with atmospheric old-Osaka restaurants — a quieter, more intimate alternative to the Dotonbori main strip on your first night'},
-    ],city:'osaka',color:'#3A9E6F',num:'D7',label:'Aquarium + Legoland Day',title:'Aquarium + Legoland Day 🦈',date:'5 Jun (Fri)',
+    ]
+  },
+  {id:'d7',city:'osaka',color:'#3A9E6F',num:'D7',label:'Aquarium + Legoland Day',title:'Aquarium + Legoland Day 🦈',date:'5 Jun (Fri)',
     stops:[
       {name:'Osaka Aquarium Kaiyukan',note:'Whale shark · penguins · jellyfish · spiral 8-floor tank · book tickets online!',transport:'🚇 Osaka Metro → Osakako Stn ~20 min'},
       {name:'Legoland Discovery Center Osaka',note:'Indoor rides · Lego play zones · same Tempozan area as Kaiyukan',transport:'🚶 2 min walk from Kaiyukan'},
@@ -746,7 +775,9 @@ const days = [
       {name:'Santa Maria Harbour Cruise ⛵',desc:'45-min cruise from Tempozan on a replica of Columbus\'s ship — a lovely bonus if the kids still have energy'},
       {name:'Osaka Culturarium at Tempozan',desc:'Interactive digital art museum right at Tempozan — if the kids still have steam after Legoland, the immersive projections are stunning and very different from anything else on the trip'},
       {name:'Namba Parks (evening)',desc:'Walking back to the hotel, cut through Namba Parks for the rooftop garden and a look at the illuminated waterfall wall — a nice wind-down after a big day at the waterfront'},
-    ],city:'osaka',color:'#C4724A',num:'D8',label:'Tennoji Day',title:'Tennoji Day 🦁',date:'6 Jun (Sat)',
+    ]
+  },
+  {id:'d8',city:'osaka',color:'#C4724A',num:'D8',label:'Tennoji Day',title:'Tennoji Day 🦁',date:'6 Jun (Sat)',
     stops:[
       {name:'Tennoji Zoo',note:'Morning visit · ¥500 entry (great value!) · closes 5pm · closed Mon',transport:'🚇 Osaka Metro → Dobutsuen-mae or Tennoji Stn'},
       {name:'Shinsekai + Tsutenkaku Tower',note:'Retro Osaka streets · local snacks · optional tower climb for city views',transport:'🚶 5 min walk from zoo'},
@@ -758,7 +789,9 @@ const days = [
       {name:'Osaka Museum of Housing & Living',desc:'Life-size recreation of Edo-period Osaka streets — surprisingly great for curious kids and fascinating for adults'},
       {name:'Tennoji Park & Keitakuen Garden',desc:'Just behind the zoo entrance, this traditional Japanese garden is free with zoo admission and lovely for a slow afternoon stroll — peaceful escape from the Shinsekai bustle'},
       {name:'Spa World Osaka',desc:'Massive public onsen complex a 5-min walk from Tennoji — if the kids are up for it, the international themed bath floors are a fun and very Osaka experience for the whole family'},
-    ],city:'osaka',color:'#F4A430',num:'D9',label:'Kuromon Day',title:'Kuromon Day 🦐',date:'7 Jun (Sun)',
+    ]
+  },
+  {id:'d9',city:'osaka',color:'#F4A430',num:'D9',label:'Kuromon Day',title:'Kuromon Day 🦐',date:'7 Jun (Sun)',
     stops:[
       {name:'Kuromon Ichiba Market (morning)',note:'Go early before the crowds · grilled seafood · wagyu skewers · fruits · tamago',transport:'🚇 Osaka Metro → Nippombashi Stn · 5 min walk'},
       {name:'Free afternoon — shopping',note:'Pokémon Center · Nintendo Store (Umeda) · Daimaru · Shinsaibashi',transport:'🚇 Nintendo Store: Metro to Umeda ~10 min'},
@@ -769,7 +802,9 @@ const days = [
       {name:'Sushiro Dotonbori 🍣',desc:'Conveyor belt sushi right in Namba — go at 3pm to skip dinner queues, kids love the touch-screen ordering'},
       {name:'Daimaru Shinsaibashi food basement',desc:'The B2 food hall under Daimaru is one of Osaka\'s best depachika — stunning Japanese sweets, bento, wagashi and beautifully packaged gifts, great for last Osaka souvenirs'},
       {name:'Amerikamura "Triangle Park"',desc:'5 min from Shinsaibashi — this quirky little square is the heart of Osaka streetwear culture, great for people-watching and the surrounding vintage and sneaker shops are excellent for browsing'},
-    ],city:'osaka',color:'#718096',num:'D10',label:'Fly Home',title:'Fly Home 🛫',date:'8 Jun (Mon)',
+    ]
+  },
+  {id:'d10',city:'osaka',color:'#718096',num:'D10',label:'Fly Home',title:'Fly Home 🛫',date:'8 Jun (Mon)',
     stops:[
       {name:'Last morning + checkout',note:'Final breakfast · last-minute snacks at Don Quijote or Family Mart'},
       {name:'Nankai Namba Station → KIX',note:'SQ621 departs 17:25 · arrive airport by 15:15',transport:'🚄 Nankai Rapi:t ~35 min · station is 2 min walk from hotel'},
@@ -782,6 +817,8 @@ const days = [
       {name:'Namba station souvenir shops',desc:'The underground Nankai Namba concourse has a row of souvenir and snack shops — great for last-minute Osaka-specific omiyage (gifts) without going back to Dotonbori'},
       {name:'KIX observation deck (Skygarden)',desc:'If you arrive at the airport with time to spare, the 4th floor Sky Garden has great views of planes and the bay — free, and a nice low-key activity to keep the kids entertained before the gate opens'},
     ]
+  },
+];
 
 function renderDay(d, container) {
   const el = document.createElement('div');
@@ -831,13 +868,6 @@ function renderDay(d, container) {
   container.appendChild(el);
 }
 
-function toggleCard(id) {
-  const body = document.getElementById('body-' + id);
-  const chev = document.getElementById('chev-' + id);
-  const open = body.classList.toggle('open');
-  chev.style.transform = open ? 'rotate(180deg)' : '';
-}
-
 const okiContainer = document.getElementById('okinawa-days');
 const osaContainer = document.getElementById('osaka-days');
 const quickContainer = document.getElementById('quickdays');
@@ -881,14 +911,6 @@ days.forEach((d, i) => {
   `;
   quickContainer.appendChild(el);
 });
-
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.querySelector(`[onclick="showPage('${name}')"]`).classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
 
 /* ── PERSISTENT NOTES (storage API + localStorage fallback) ── */
 async function saveNote(id, value, statusEl) {
