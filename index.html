@@ -1,1144 +1,995 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Japan (Okinawa-Osaka) Family Trip 2026</title>
-<!-- Favicon: palm tree + sun emoji rendered as SVG data URI -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌴</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+<title>Desaru Coast Family Trip</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── PASSWORD SCREEN ── */
-#pw-screen{
-  position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(135deg,#1A5F9A 0%,#2B7FBF 50%,#5BA4D4 100%);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Nunito',sans-serif;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: 'Inter', sans-serif;
+background: linear-gradient(135deg, #0e6ba8 0%, #1a8ac8 50%, #0d7fb8 100%);
+min-height: 100vh;
+color: #1a1a2e;
 }
-#pw-screen.hidden{display:none}
-.pw-card{
-  background:#fff;border-radius:24px;
-  padding:40px 36px 36px;
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
-  text-align:center;max-width:340px;width:90%;
+
+#lock-screen {
+display: flex;
+align-items: center;
+justify-content: center;
+min-height: 100vh;
+padding: 20px;
 }
-.pw-emoji{font-size:52px;margin-bottom:8px;display:block;line-height:1}
-.pw-title{
-  font-family:'Pacifico',cursive;
-  font-size:22px;color:#1A5F9A;
-  margin-bottom:4px;line-height:1.2;
+.lock-card {
+background: white;
+border-radius: 24px;
+padding: 48px 40px 40px;
+text-align: center;
+width: 100%;
+max-width: 380px;
+box-shadow: 0 20px 60px rgba(0,0,0,0.2);
 }
-.pw-sub{font-size:13px;font-weight:600;color:#718096;margin-bottom:24px}
-.pw-input{
-  width:100%;padding:13px 16px;
-  border:2px solid #E2E8F0;border-radius:12px;
-  font-family:'Nunito',sans-serif;font-size:22px;
-  font-weight:800;letter-spacing:.25em;
-  text-align:center;color:#2D3748;
-  outline:none;transition:border-color .2s;
-  background:#F7FAFF;
+.lock-card .emojis { font-size: 52px; line-height: 1; margin-bottom: 16px; }
+.lock-card h1 {
+font-family: 'Dancing Script', cursive;
+font-size: 36px;
+color: #0e6ba8;
+margin-bottom: 4px;
 }
-.pw-input:focus{border-color:#2B7FBF;background:#fff}
-.pw-btn{
-  width:100%;margin-top:12px;padding:13px;
-  background:linear-gradient(135deg,#1A5F9A,#2B7FBF);
-  color:#fff;border:none;border-radius:12px;
-  font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;
-  cursor:pointer;transition:opacity .2s,transform .1s;
-  letter-spacing:.02em;
+.lock-card p {
+color: #777;
+font-size: 14px;
+margin-bottom: 28px;
 }
-.pw-btn:hover{opacity:.92;transform:translateY(-1px)}
-.pw-btn:active{transform:translateY(0)}
-.pw-error{
-  font-size:13px;font-weight:700;color:#E53E3E;
-  margin-top:10px;min-height:20px;
-  opacity:0;transition:opacity .2s;
+.lock-card input {
+width: 100%;
+padding: 14px 18px;
+border: none;
+background: #eef7fb;
+border-radius: 12px;
+font-size: 20px;
+text-align: center;
+letter-spacing: 6px;
+outline: none;
+margin-bottom: 14px;
+color: #333;
 }
-.pw-error.show{opacity:1}
+.lock-card input::placeholder { letter-spacing: 8px; color: #aaa; font-size: 16px; }
+.lock-card button {
+width: 100%;
+padding: 15px;
+background: #0e6ba8;
+color: white;
+border: none;
+border-radius: 12px;
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+transition: background 0.2s;
+}
+.lock-card button:hover { background: #0a5486; }
+.lock-error { color: #e55; font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+#app { display: none; }
+
+.app-header {
+background: rgba(255,255,255,0.12);
+backdrop-filter: blur(10px);
+color: white;
+padding: 20px 24px 0;
+position: sticky;
+top: 0;
+z-index: 100;
+}
+.app-header-top {
+display: flex;
+align-items: center;
+gap: 14px;
+margin-bottom: 16px;
+}
+.header-emoji { font-size: 32px; }
+.header-text h2 {
+font-family: 'Dancing Script', cursive;
+font-size: 26px;
+line-height: 1.1;
+}
+.header-text p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+.tabs {
+display: flex;
+gap: 4px;
+overflow-x: auto;
+scrollbar-width: none;
+padding-bottom: 1px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+padding: 9px 16px;
+border-radius: 10px 10px 0 0;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+white-space: nowrap;
+color: rgba(255,255,255,0.75);
+background: rgba(255,255,255,0.1);
+border: none;
+transition: all 0.2s;
+}
+.tab.active { background: white; color: #0e6ba8; }
+.tab:hover:not(.active) { background: rgba(255,255,255,0.2); color: white; }
+
+.content {
+max-width: 780px;
+margin: 0 auto;
+padding: 24px 16px 60px;
+}
+.section { display: none; }
+.section.active { display: block; }
+
+.card {
+background: white;
+border-radius: 16px;
+overflow: hidden;
+margin-bottom: 16px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.card-header {
+padding: 14px 18px;
+font-weight: 700;
+font-size: 15px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.card-body { padding: 16px 18px; }
+
+.flight {
+background: white;
+border-radius: 16px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+padding: 18px;
+margin-bottom: 14px;
+}
+.flight-label {
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 1px;
+color: #0e6ba8;
+margin-bottom: 10px;
+}
+.flight-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+}
+.flight-endpoint { text-align: center; }
+.flight-time { font-size: 24px; font-weight: 700; }
+.flight-airport { font-size: 12px; color: #666; margin-top: 2px; }
+.flight-line {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+}
+.flight-num { font-size: 12px; font-weight: 600; color: #444; }
+.flight-bar {
+width: 100%;
+display: flex;
+align-items: center;
+gap: 4px;
+}
+.flight-bar-line { flex: 1; height: 2px; background: #ddd; }
+.flight-plane { font-size: 16px; }
+.flight-date { font-size: 11px; color: #888; }
+.flight-tags { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.tag {
+padding: 3px 9px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 600;
+}
+.tag-blue { background: #e6f2fb; color: #0e6ba8; }
+.tag-green { background: #e8f7ee; color: #2a7a4f; }
+.tag-orange { background: #fff3e0; color: #c05000; }
+.tag-gray { background: #f0f0f0; color: #555; }
+
+.hotel-card {
+background: white;
+border-radius: 16px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+overflow: hidden;
+margin-bottom: 14px;
+}
+.hotel-banner {
+padding: 14px 18px;
+color: white;
+font-weight: 700;
+font-size: 14px;
+}
+.hotel-body { padding: 16px 18px; }
+.hotel-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.hotel-meta { font-size: 13px; color: #555; margin-bottom: 10px; line-height: 1.5; }
+.hotel-detail {
+display: flex;
+gap: 8px;
+align-items: flex-start;
+margin-bottom: 6px;
+font-size: 13px;
+}
+.hotel-detail .icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.hotel-detail .text { color: #444; line-height: 1.4; }
+
+.day-card {
+background: white;
+border-radius: 16px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+overflow: hidden;
+margin-bottom: 14px;
+}
+.day-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 14px 18px;
+cursor: pointer;
+user-select: none;
+transition: background 0.15s;
+}
+.day-header:hover { filter: brightness(0.95); }
+.day-header-left { display: flex; align-items: center; gap: 12px; }
+.day-num {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: rgba(255,255,255,0.3);
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 700;
+font-size: 13px;
+color: white;
+flex-shrink: 0;
+}
+.day-title { font-weight: 700; font-size: 15px; color: white; }
+.day-sub { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 1px; }
+.day-chevron { font-size: 16px; color: rgba(255,255,255,0.8); transition: transform 0.2s; }
+.day-card.open .day-chevron { transform: rotate(180deg); }
+
+.day-body { display: none; padding: 0 18px 18px; }
+.day-card.open .day-body { display: block; }
+
+.activity {
+padding: 10px 0;
+border-bottom: 1px solid #f0f0f0;
+display: flex;
+gap: 12px;
+align-items: flex-start;
+}
+.activity:last-child { border-bottom: none; }
+.activity-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.activity-name { font-weight: 600; font-size: 14px; }
+.activity-note { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.5; }
+.transport { font-size: 11px; color: #0e6ba8; font-weight: 500; margin-top: 4px; }
+
+.consider-section {
+margin-top: 14px;
+background: #fffbf0;
+border-radius: 10px;
+padding: 12px 14px;
+border-left: 3px solid #f4b942;
+}
+.consider-title {
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 1px;
+color: #c07800;
+margin-bottom: 10px;
+}
+.consider-item {
+display: flex;
+gap: 8px;
+margin-bottom: 8px;
+font-size: 13px;
+}
+.consider-item:last-child { margin-bottom: 0; }
+.consider-item .ci-name { font-weight: 600; color: #333; }
+.consider-item .ci-desc { color: #666; font-size: 12px; margin-top: 2px; line-height: 1.4; }
+
+.map-wrap {
+background: white;
+border-radius: 16px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+overflow: hidden;
+margin-bottom: 16px;
+}
+.map-title {
+padding: 14px 18px;
+font-weight: 700;
+font-size: 15px;
+background: #f8f9fa;
+border-bottom: 1px solid #eee;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.map-legend {
+padding: 14px 18px;
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
+.legend-item {
+display: flex;
+align-items: center;
+gap: 5px;
+font-size: 12px;
+color: #444;
+}
+.legend-dot {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+flex-shrink: 0;
+}
+
+.notes-card {
+background: white;
+border-radius: 16px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+padding: 20px;
+}
+.notes-card h3 { font-size: 15px; margin-bottom: 12px; color: #333; }
+.notes-card textarea {
+width: 100%;
+min-height: 200px;
+border: 1.5px solid #e0e0e0;
+border-radius: 10px;
+padding: 12px;
+font-family: 'Inter', sans-serif;
+font-size: 13px;
+resize: vertical;
+outline: none;
+color: #333;
+transition: border-color 0.2s;
+}
+.notes-card textarea:focus { border-color: #0e6ba8; }
+.notes-card button {
+margin-top: 10px;
+padding: 10px 20px;
+background: #0e6ba8;
+color: white;
+border: none;
+border-radius: 8px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+}
+.notes-hint {
+margin-top: 8px;
+font-size: 11px;
+color: #999;
+line-height: 1.5;
+}
+
+.section-head {
+color: white;
+font-size: 13px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 1px;
+opacity: 0.8;
+margin-bottom: 14px;
+margin-top: 8px;
+display: flex;
+align-items: center;
+gap: 6px;
+}
+.section-head::after {
+content: '';
+flex: 1;
+height: 1px;
+background: rgba(255,255,255,0.3);
+}
+
+.info-pill {
+background: rgba(255,255,255,0.15);
+border-radius: 10px;
+padding: 12px 16px;
+color: white;
+font-size: 13px;
+margin-bottom: 14px;
+line-height: 1.6;
+}
+.info-pill strong { font-weight: 700; }
+
+.c-teal { background: linear-gradient(135deg, #1a8a7a, #22b39e); }
+.c-coral { background: linear-gradient(135deg, #c0503a, #e06a50); }
+.c-purple { background: linear-gradient(135deg, #6a4c9c, #8e6dc8); }
+.c-gold { background: linear-gradient(135deg, #c07800, #e8a020); }
+.c-blue { background: linear-gradient(135deg, #0e6ba8, #1a8ac8); }
+.c-green { background: linear-gradient(135deg, #2a7a4f, #3aaa6e); }
+.c-rose { background: linear-gradient(135deg, #a04060, #d06080); }
+
+svg text { pointer-events: none; }
 </style>
-<style>
-/* ── RESET ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root{
-  --sky:#E8F4FD;
-  --ocean:#2B7FBF;
-  --ocean-deep:#1A5F9A;
-  --ocean-light:#5BA4D4;
-  --sand:#FEF3E2;
-  --sand-dark:#F5E0B8;
-  --coral:#F4845F;
-  --coral-dark:#D9612F;
-  --sun:#FFCA3A;
-  --palm:#3A9E6F;
-  --palm-dark:#2A7A52;
-  --text:#2D3748;
-  --text-soft:#718096;
-  --white:#FFFFFF;
-  --card-shadow:0 2px 12px rgba(43,127,191,.10), 0 1px 4px rgba(43,127,191,.06);
-
-  --d1:#5B9FD4;
-  --d2:#3A9E6F;
-  --d3:#C4724A;
-  --d4:#F4845F;
-  --d5:#9B72CF;
-  --d6:#5B9FD4;
-  --d7:#3A9E6F;
-  --d8:#C4724A;
-  --d9:#F4A430;
-  --d10:#718096;
-}
-
-html{scroll-behavior:smooth}
-
-body{
-  background:var(--sky);
-  background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(255,202,58,.18) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 0%, rgba(91,159,212,.2) 0%, transparent 55%);
-  color:var(--text);
-  font-family:'Nunito',sans-serif;
-  font-size:15px;
-  line-height:1.65;
-  min-height:100vh;
-}
-
-/* ── WAVY DECORATION ── */
-.wave-divider{
-  width:100%;overflow:hidden;line-height:0;
-  background:var(--ocean-deep);
-}
-.wave-divider svg{display:block;width:100%;height:32px}
-
-/* ── HERO ── */
-.hero{
-  background:linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean) 50%, var(--ocean-light) 100%);
-  color:#fff;
-  padding:48px 28px 40px;
-  position:relative;
-  overflow:hidden;
-}
-.hero-bubbles{
-  position:absolute;inset:0;pointer-events:none;overflow:hidden;
-}
-.bubble{
-  position:absolute;border-radius:50%;
-  background:rgba(255,255,255,.06);
-  animation:rise 8s infinite ease-in;
-}
-.bubble:nth-child(1){width:60px;height:60px;left:8%;animation-delay:0s;animation-duration:9s}
-.bubble:nth-child(2){width:35px;height:35px;left:22%;animation-delay:2s;animation-duration:7s}
-.bubble:nth-child(3){width:80px;height:80px;left:55%;animation-delay:1s;animation-duration:11s}
-.bubble:nth-child(4){width:45px;height:45px;left:75%;animation-delay:3s;animation-duration:8s}
-.bubble:nth-child(5){width:25px;height:25px;left:90%;animation-delay:0.5s;animation-duration:6s}
-@keyframes rise{
-  0%{bottom:-80px;opacity:0}
-  10%{opacity:1}
-  90%{opacity:.4}
-  100%{bottom:110%;opacity:0}
-}
-
-.hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1}
-.hero h1{
-  font-family:'Pacifico',cursive;
-  font-size:clamp(32px,6vw,58px);
-  line-height:1.1;
-  margin-bottom:6px;
-  text-shadow:0 2px 20px rgba(0,0,0,.15);
-}
-.hero h1 .highlight{
-  color:var(--sun);
-  display:inline-block;
-}
-.hero-sub{
-  font-size:17px;font-weight:600;
-  color:rgba(255,255,255,.85);
-  margin-bottom:20px;
-}
-/* ── WAVE BOTTOM ── */
-.hero-wave{
-  position:absolute;bottom:-1px;left:0;right:0;
-  pointer-events:none;
-}
-
-/* ── NAV ── */
-.sticky-nav{
-  position:sticky;top:0;z-index:100;
-  background:rgba(232,244,253,.96);
-  backdrop-filter:blur(12px);
-  border-bottom:2px solid rgba(43,127,191,.12);
-  box-shadow:0 2px 12px rgba(43,127,191,.08);
-}
-.nav-inner{
-  max-width:900px;margin:0 auto;
-  display:flex;align-items:center;gap:2px;
-  padding:0 20px;overflow-x:auto;
-  scrollbar-width:none;
-}
-.nav-inner::-webkit-scrollbar{display:none}
-.nav-btn{
-  flex-shrink:0;
-  padding:12px 16px;
-  font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;
-  color:var(--text-soft);background:none;border:none;cursor:pointer;
-  border-bottom:3px solid transparent;
-  border-radius:0;
-  transition:color .2s,border-color .2s;
-  white-space:nowrap;
-}
-.nav-btn:hover{color:var(--ocean)}
-.nav-btn.active{color:var(--ocean);border-bottom-color:var(--ocean)}
-
-/* ── LAYOUT ── */
-.page{display:none}
-.page.active{display:block}
-.content{max-width:900px;margin:0 auto;padding:32px 20px 72px}
-
-/* ── SECTION LABEL ── */
-.section-label{
-  font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--ocean);margin-bottom:18px;
-  display:flex;align-items:center;gap:10px;
-}
-.section-label::after{content:'';flex:1;height:2px;background:linear-gradient(to right,rgba(43,127,191,.2),transparent);border-radius:2px}
-
-/* ── CITY BANNER ── */
-.city-banner{
-  border-radius:18px;padding:20px 22px;margin-bottom:24px;
-  display:flex;align-items:center;gap:14px;
-  position:relative;overflow:hidden;
-}
-.city-banner.oki{background:linear-gradient(135deg,#1A7F5A,#2BAF82)}
-.city-banner.osa{background:linear-gradient(135deg,#C4724A,#F4845F)}
-.city-banner-emoji{font-size:36px;line-height:1;flex-shrink:0}
-.city-banner-text h2{font-size:20px;font-weight:800;color:#fff;line-height:1.2}
-.city-banner-text p{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;margin-top:2px}
-
-/* ── CARDS ── */
-.card{
-  background:var(--white);
-  border-radius:20px;
-  overflow:hidden;
-  margin-bottom:14px;
-  box-shadow:var(--card-shadow);
-  border:1.5px solid rgba(43,127,191,.08);
-  transition:box-shadow .2s, transform .15s;
-}
-.card:hover{box-shadow:0 6px 24px rgba(43,127,191,.13);transform:translateY(-1px)}
-
-.card-header{
-  display:flex;align-items:center;gap:14px;
-  padding:16px 20px;cursor:pointer;
-  user-select:none;
-  transition:background .15s;
-  border-radius:20px 20px 0 0;
-}
-.card-header:hover{background:#F7FBFF}
-
-.day-pill{
-  width:42px;height:42px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;color:#fff;flex-shrink:0;
-  box-shadow:0 3px 10px rgba(0,0,0,.15);
-}
-.card-titles{flex:1;min-width:0}
-.card-day-name{font-size:12px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.05em}
-.card-title{font-size:16px;font-weight:800;color:var(--text)}
-.card-date{
-  font-size:12px;font-weight:600;color:var(--text-soft);
-  background:var(--sky);border-radius:20px;padding:3px 10px;
-  flex-shrink:0;margin-left:auto;
-}
-.chevron{
-  font-size:16px;color:var(--text-soft);
-  transition:transform .25s;flex-shrink:0;margin-left:4px;
-}
-
-.card-body{display:none;border-top:1.5px solid rgba(43,127,191,.08)}
-.card-body.open{display:block}
-.card-body-inner{padding:20px 22px}
-
-/* ── STOPS ── */
-.stops-list{display:flex;flex-direction:column;gap:0}
-.stop{
-  display:flex;gap:14px;
-  padding:10px 0;
-  position:relative;
-}
-.stop-left{
-  display:flex;flex-direction:column;align-items:center;
-  flex-shrink:0;width:14px;padding-top:4px;
-}
-.stop-dot{
-  width:12px;height:12px;border-radius:50%;flex-shrink:0;
-  border:2px solid white;
-  box-shadow:0 0 0 1.5px currentColor;
-}
-.stop-line{
-  flex:1;width:2px;
-  background:linear-gradient(to bottom,rgba(43,127,191,.15),rgba(43,127,191,.05));
-  margin:3px 0;min-height:14px;
-}
-.stop:last-child .stop-line{display:none}
-.stop-text{padding-bottom:6px;flex:1;min-width:0}
-.stop-name{font-size:14px;font-weight:700;color:var(--text)}
-.stop-note{font-size:13px;color:var(--text-soft);margin-top:2px;line-height:1.5}
-.transport{
-  display:inline-flex;align-items:center;gap:5px;
-  background:var(--sky);
-  border:1.5px solid rgba(43,127,191,.15);
-  border-radius:20px;padding:3px 10px;
-  font-size:11px;font-weight:600;color:var(--ocean);margin-top:5px;
-}
-
-/* ── SUGGESTIONS ── */
-.suggestions{
-  margin-top:20px;padding:16px 18px;
-  background:linear-gradient(135deg,#FFFBF0,#FFF9E8);
-  border-radius:14px;
-  border:1.5px solid rgba(244,164,48,.2);
-}
-.suggestions-label{
-  font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-  color:#C68A1A;margin-bottom:12px;
-  display:flex;align-items:center;gap:6px;
-}
-.sugg-list{display:flex;flex-direction:column;gap:10px}
-.sugg-item{
-  background:rgba(255,255,255,.7);
-  border-radius:10px;
-  padding:10px 14px;
-  border:1px solid rgba(244,164,48,.15);
-}
-.sugg-name{font-size:13px;font-weight:700;color:var(--text)}
-.sugg-desc{font-size:12px;color:var(--text-soft);margin-top:2px;line-height:1.5}
-
-/* ── NOTES ── */
-.notes-area{
-  margin-top:16px;padding:14px 16px;
-  background:linear-gradient(135deg,#F0FBF6,#E8F8F0);
-  border-radius:14px;
-  border:1.5px solid rgba(58,158,111,.2);
-}
-.notes-label{
-  font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-  color:#2A7A52;margin-bottom:8px;
-  display:flex;align-items:center;gap:6px;
-}
-textarea.notes{
-  width:100%;min-height:72px;
-  background:rgba(255,255,255,.8);
-  border:1.5px solid rgba(58,158,111,.2);
-  border-radius:10px;
-  padding:10px 12px;
-  font-family:'Nunito',sans-serif;
-  font-size:13px;font-weight:500;color:var(--text);
-  resize:vertical;outline:none;
-  transition:border-color .2s,background .2s;
-  line-height:1.55;
-}
-textarea.notes::placeholder{color:#A8C4B8;font-weight:400}
-textarea.notes:focus{border-color:rgba(58,158,111,.5);background:#fff}
-.save-note{
-  margin-top:6px;font-size:11px;font-weight:600;
-  color:#A8C4B8;display:flex;align-items:center;gap:5px;
-}
-.save-note.saved{color:#3A9E6F}
-
-/* ── FLIGHT & HOTEL CARDS ── */
-.flight-row{
-  background:var(--white);border-radius:14px;
-  box-shadow:var(--card-shadow);
-  border:1.5px solid rgba(43,127,191,.08);
-  padding:14px 18px;margin-bottom:10px;
-  display:grid;grid-template-columns:auto 1fr auto;
-  align-items:center;gap:14px;
-}
-.flight-no{
-  font-size:11px;font-weight:800;
-  background:var(--ocean);color:#fff;
-  padding:3px 9px;border-radius:20px;white-space:nowrap;
-}
-.flight-route{font-size:14px;font-weight:700}
-.flight-time{font-size:12px;font-weight:600;color:var(--text-soft);text-align:right}
-
-.hotel-card{
-  background:var(--white);border-radius:14px;
-  box-shadow:var(--card-shadow);border:1.5px solid rgba(43,127,191,.08);
-  padding:16px 18px;margin-bottom:10px;
-  display:flex;gap:14px;align-items:flex-start;
-}
-.hotel-icon{font-size:26px;line-height:1;flex-shrink:0}
-.hotel-name{font-size:15px;font-weight:800}
-.hotel-detail{font-size:12px;font-weight:500;color:var(--text-soft);margin-top:3px;line-height:1.5}
-
-/* ── QUICK DAY LIST ── */
-.quick-item{
-  background:var(--white);border-radius:14px;
-  box-shadow:var(--card-shadow);border:1.5px solid rgba(43,127,191,.08);
-  padding:12px 16px;margin-bottom:8px;
-  display:flex;align-items:center;gap:12px;
-  cursor:pointer;transition:all .15s;
-}
-.quick-item:hover{transform:translateX(4px);box-shadow:0 4px 18px rgba(43,127,191,.14)}
-
-/* ── MAP CARDS ── */
-.map-card{
-  background:var(--white);border-radius:20px;
-  box-shadow:var(--card-shadow);border:1.5px solid rgba(43,127,191,.08);
-  padding:24px 20px 16px;margin-bottom:24px;
-  overflow:hidden;
-}
-.map-card-title{font-size:17px;font-weight:800;margin-bottom:2px}
-.map-card-sub{font-size:13px;font-weight:500;color:var(--text-soft);margin-bottom:16px}
-.map-legend{
-  display:flex;flex-wrap:wrap;gap:8px 18px;
-  margin-top:14px;padding-top:12px;
-  border-top:1.5px solid rgba(43,127,191,.08);
-}
-.leg-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-soft)}
-.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-
-svg{display:block;width:100%}
-
-@media(max-width:600px){
-  .hero{padding:36px 16px 32px}
-  .hero h1{font-size:36px}
-  .content{padding:20px 14px 60px}
-  .card-date{display:none}
-  .flight-row{grid-template-columns:auto 1fr;gap:10px}
-  .flight-time{grid-column:2;color:var(--text-soft);text-align:left}
-}
-</style>
-<script>
-/* ── PASSWORD — defined early so onclick handlers can reach it ── */
-function checkPw(){
-  var val = document.getElementById('pw-input').value.trim();
-  var err = document.getElementById('pw-error');
-  if(val==='0703'){
-    sessionStorage.setItem('jp2026_unlocked','1');
-    var screen = document.getElementById('pw-screen');
-    screen.style.transition='opacity .4s';
-    screen.style.opacity='0';
-    document.body.style.overflow='';
-    setTimeout(function(){screen.classList.add('hidden');},420);
-  } else {
-    err.classList.add('show');
-    var input = document.getElementById('pw-input');
-    input.value='';
-    input.style.borderColor='#E53E3E';
-    input.style.animation='shake .35s ease';
-    setTimeout(function(){
-      err.classList.remove('show');
-      input.style.borderColor='';
-      input.style.animation='';
-    },2200);
-    input.focus();
-  }
-}
-
-/* ── NAV — defined early so onclick handlers can reach it ── */
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
-  document.getElementById('page-' + name).classList.add('active');
-  var btn = document.querySelector('[onclick="showPage(\'' + name + '\')"]');
-  if (btn) btn.classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-function toggleCard(id) {
-  var body = document.getElementById('body-' + id);
-  var chev = document.getElementById('chev-' + id);
-  var open = body.classList.toggle('open');
-  chev.style.transform = open ? 'rotate(180deg)' : '';
-}
-</script>
 </head>
 <body>
 
-<!-- PASSWORD SCREEN -->
-<div id="pw-screen">
-  <div class="pw-card">
-    <span class="pw-emoji">🌴✈️🗾</span>
-    <div class="pw-title">Japan Family Trip</div>
-    <div class="pw-sub">Okinawa · Osaka · 2026</div>
-    <input class="pw-input" id="pw-input" type="password"
-           maxlength="4" placeholder="····"
-           autocomplete="off" inputmode="numeric"
-           onkeydown="if(event.key==='Enter')checkPw()">
-    <button class="pw-btn" onclick="checkPw()">Let's go! 🚀</button>
-    <div class="pw-error" id="pw-error">Wrong password — try again! 🙈</div>
-
-  </div>
-</div>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-bubbles">
-    <div class="bubble"></div><div class="bubble"></div>
-    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
-  </div>
-  <div class="hero-inner">
-    <h1>Japan <span class="highlight">Trip!</span></h1>
-    <div class="hero-sub">Andrew, Cheryl, Ethan & Elroy · 30 May – 8 Jun 2026 🌴</div>
-  </div>
-  <svg class="hero-wave" viewBox="0 0 1440 48" preserveAspectRatio="none" style="height:48px">
-    <path d="M0,32 C360,0 720,48 1080,16 C1260,0 1380,24 1440,32 L1440,48 L0,48 Z" fill="#E8F4FD"/>
-  </svg>
-</div>
-
-<!-- NAV -->
-<nav class="sticky-nav">
-  <div class="nav-inner">
-    <button class="nav-btn active" onclick="showPage('overview')">🗓 Overview</button>
-    <button class="nav-btn" onclick="showPage('okinawa')">🏝 Okinawa</button>
-    <button class="nav-btn" onclick="showPage('osaka')">🏙 Osaka</button>
-    <button class="nav-btn" onclick="showPage('maps')">🗺 Maps</button>
-    <button class="nav-btn" onclick="showPage('notes')">📝 Notes</button>
-  </div>
-</nav>
-
-<!-- ════════ OVERVIEW ════════ -->
-<div id="page-overview" class="page active">
-<div class="content">
-  <div class="section-label">✈️ Flights</div>
-  <div style="margin-bottom:28px">
-    <div class="flight-row">
-      <span class="flight-no">SQ 656</span>
-      <span class="flight-route">Singapore Changi T2 → Fukuoka T1</span>
-      <span class="flight-time">30 May · 01:20 → 08:20</span>
-    </div>
-    <div class="flight-row">
-      <span class="flight-no">NH 1207</span>
-      <span class="flight-route">Fukuoka T1 (Domestic) → Okinawa Naha T1</span>
-      <span class="flight-time">30 May · 12:05 → 13:55</span>
-    </div>
-    <div class="flight-row">
-      <span class="flight-no">NU 004</span>
-      <span class="flight-route">Okinawa Naha T1 → Osaka KIX T1</span>
-      <span class="flight-time">4 Jun · 11:15 → 13:15</span>
-    </div>
-    <div class="flight-row">
-      <span class="flight-no">SQ 621</span>
-      <span class="flight-route">Osaka KIX T1 → Singapore Changi T3</span>
-      <span class="flight-time">8 Jun · 17:25 → 22:55</span>
-    </div>
-  </div>
-
-  <div class="section-label">🏨 Hotels</div>
-  <div style="margin-bottom:28px">
-    <div class="hotel-card">
-      <div class="hotel-icon">🌊</div>
-      <div>
-        <div class="hotel-name">JR Kyushu Hotel Blossom Naha</div>
-        <div class="hotel-detail">30 May – 4 Jun · 5 nights · 1 min walk to Kokusai-dori · next to Makishi Yui Rail station · free coffee bar on 13th floor!</div>
-      </div>
-    </div>
-    <div class="hotel-card">
-      <div class="hotel-icon">🌆</div>
-      <div>
-        <div class="hotel-name">Fraser Residence Nankai Osaka</div>
-        <div class="hotel-detail">4–8 Jun · 4 nights · next to Nankai Namba station · apartment with kitchen, washer/dryer · great for families</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section-label">📅 All Days</div>
-  <div id="quickdays"></div>
+<div id="lock-screen">
+<div class="lock-card">
+<div class="emojis">🌊🚐🌴</div>
+<h1>Desaru Coast Trip</h1>
+<p>Desaru, Johor · Sep 2026</p>
+<input type="password" id="pw-input" placeholder="· · · · · ·" maxlength="20"
+onkeydown="if(event.key==='Enter')unlock()">
+<button onclick="unlock()">Let's go! 🏖️</button>
+<div class="lock-error" id="pw-error"></div>
 </div>
 </div>
 
-<!-- ════════ OKINAWA ════════ -->
-<div id="page-okinawa" class="page">
-<div class="content">
-  <div class="city-banner oki">
-    <div class="city-banner-emoji">🌺</div>
-    <div class="city-banner-text">
-      <h2>Okinawa</h2>
-      <p>30 May – 4 Jun · JR Kyushu Hotel Blossom Naha</p>
-    </div>
-  </div>
-  <div id="okinawa-days"></div>
+<div id="app">
+<div class="app-header">
+<div class="app-header-top">
+<div class="header-emoji">🌊</div>
+<div class="header-text">
+<h2>Desaru Coast Trip</h2>
+<p>Andrew, Cheryl, Ethan, Elroy, Mama, Mummy &amp; Yiyi · 10–13 Sep 2026 🐚</p>
+</div>
+</div>
+<div class="tabs">
+<button class="tab active" onclick="showTab('overview',this)">🗓 Overview</button>
+<button class="tab" onclick="showTab('desaru',this)">🏖 Desaru</button>
+<button class="tab" onclick="showTab('map',this)">🗺 Map</button>
+<button class="tab" onclick="showTab('notes',this)">📝 Notes</button>
 </div>
 </div>
 
-<!-- ════════ OSAKA ════════ -->
-<div id="page-osaka" class="page">
-<div class="content">
-  <div class="city-banner osa">
-    <div class="city-banner-emoji">🦌</div>
-    <div class="city-banner-text">
-      <h2>Osaka</h2>
-      <p>4–8 Jun · Fraser Residence Nankai Osaka</p>
-    </div>
-  </div>
-  <div id="osaka-days"></div>
-</div>
-</div>
-
-<!-- ════════ MAPS ════════ -->
-<div id="page-maps" class="page">
 <div class="content">
 
-  <div class="map-card">
-    <div class="map-card-title">🌺 Okinawa</div>
-    <div class="map-card-sub">30 May – 4 Jun · all locations</div>
-    <svg viewBox="0 0 620 600">
-      <text x="295" y="18" text-anchor="middle" font-size="9" fill="#aaa" font-family="Nunito">N ↑</text>
-      <ellipse cx="295" cy="305" rx="178" ry="262" fill="#F0FBF6" stroke="#B2DEC8" stroke-width="1.5" transform="rotate(-8,295,305)"/>
-      <circle cx="340" cy="90" r="9" fill="#3A9E6F"/>
-      <text x="355" y="86" font-size="12" font-weight="700" fill="#3A9E6F" font-family="Nunito">Churaumi Aquarium</text>
-      <text x="355" y="100" font-size="10" fill="#888" font-family="Nunito">D2 · Churaumi Day</text>
-      <circle cx="392" cy="168" r="8" fill="#3A9E6F"/>
-      <text x="405" y="164" font-size="12" font-weight="700" fill="#3A9E6F" font-family="Nunito">Busena Marine Park</text>
-      <text x="405" y="178" font-size="10" fill="#888" font-family="Nunito">D2 · optional</text>
-      <circle cx="202" cy="268" r="8" fill="#F4845F"/>
-      <line x1="192" y1="268" x2="90" y2="268" stroke="#F4845F" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
-      <text x="86" y="264" font-size="12" font-weight="700" fill="#F4845F" text-anchor="end" font-family="Nunito">American Village</text>
-      <text x="86" y="278" font-size="10" fill="#888" text-anchor="end" font-family="Nunito">D4 · Relax Day</text>
-      <circle cx="400" cy="272" r="8" fill="#9B72CF"/>
-      <text x="413" y="268" font-size="12" font-weight="700" fill="#9B72CF" font-family="Nunito">Pokémon Center</text>
-      <text x="413" y="282" font-size="10" fill="#888" font-family="Nunito">D5 · Flexible Day</text>
-      <circle cx="368" cy="320" r="8" fill="#C4724A"/>
-      <text x="381" y="316" font-size="12" font-weight="700" fill="#C4724A" font-family="Nunito">Shurijo Castle</text>
-      <text x="381" y="330" font-size="10" fill="#888" font-family="Nunito">D3 · History Day</text>
-      <circle cx="280" cy="348" r="11" fill="#1A5F9A"/>
-      <text x="280" y="372" text-anchor="middle" font-size="11" font-weight="800" fill="#1A5F9A" font-family="Nunito">🏨 Hotel</text>
-      <text x="280" y="384" text-anchor="middle" font-size="9" fill="#888" font-family="Nunito">JR Kyushu Blossom</text>
-      <circle cx="318" cy="354" r="7" fill="#5B9FD4"/>
-      <text x="327" y="350" font-size="11" font-weight="700" fill="#5B9FD4" font-family="Nunito">Kokusai-dori</text>
-      <text x="327" y="362" font-size="9" fill="#888" font-family="Nunito">+ Makishi · D1, D5</text>
-      <circle cx="224" cy="406" r="8" fill="#C4724A"/>
-      <line x1="214" y1="406" x2="90" y2="406" stroke="#C4724A" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
-      <text x="86" y="402" font-size="12" font-weight="700" fill="#C4724A" text-anchor="end" font-family="Nunito">Navy HQ</text>
-      <text x="86" y="416" font-size="10" fill="#888" text-anchor="end" font-family="Nunito">D3 · History Day</text>
-      <circle cx="240" cy="452" r="8" fill="#5B9FD4"/>
-      <text x="228" y="474" text-anchor="middle" font-size="11" font-weight="700" fill="#5B9FD4" font-family="Nunito">✈ Airport</text>
-      <text x="228" y="486" text-anchor="middle" font-size="9" fill="#888" font-family="Nunito">D1 arrive · D6 depart</text>
-      <text x="295" y="572" text-anchor="middle" font-size="9" fill="#bbb" font-family="Nunito">Naha ↔ Churaumi ~100km · highway bus ~2.5–3h</text>
-    </svg>
-    <div class="map-legend">
-      <div class="leg-item"><div class="leg-dot" style="background:#1A5F9A"></div>Hotel</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#5B9FD4"></div>D1 Arrive</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#3A9E6F"></div>D2 Churaumi Day</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#C4724A"></div>D3 History Day</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#F4845F"></div>D4 Relax Day</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#9B72CF"></div>D5 Flexible Day</div>
-    </div>
-  </div>
+<div id="sec-overview" class="section active">
 
-  <div class="map-card">
-    <div class="map-card-title">🦌 Osaka</div>
-    <div class="map-card-sub">4–8 Jun · all locations</div>
-    <svg viewBox="0 0 620 540">
-      <text x="308" y="18" text-anchor="middle" font-size="9" fill="#aaa" font-family="Nunito">N ↑</text>
-      <circle cx="308" cy="270" r="218" fill="#FFF8F0" stroke="#F5D5B8" stroke-width="1.5"/>
-      <path d="M 96 175 Q 68 250 94 325" fill="none" stroke="#A8D4F0" stroke-width="2.5" stroke-dasharray="5 4"/>
-      <text x="52" y="252" font-size="9" fill="#99C4E0" text-anchor="middle" font-family="Nunito">Osaka Bay</text>
-      <circle cx="295" cy="82" r="8" fill="#F4A430"/>
-      <text x="307" y="78" font-size="12" font-weight="700" fill="#F4A430" font-family="Nunito">Nintendo Store</text>
-      <text x="307" y="92" font-size="10" fill="#888" font-family="Nunito">D9 · Umeda · optional</text>
-      <circle cx="122" cy="232" r="9" fill="#3A9E6F"/>
-      <line x1="112" y1="232" x2="72" y2="232" stroke="#3A9E6F" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>
-      <text x="68" y="220" font-size="12" font-weight="700" fill="#3A9E6F" text-anchor="end" font-family="Nunito">Kaiyukan</text>
-      <text x="68" y="234" font-size="11" fill="#3A9E6F" text-anchor="end" font-family="Nunito">+ Legoland</text>
-      <text x="68" y="247" font-size="10" fill="#888" text-anchor="end" font-family="Nunito">D7</text>
-      <circle cx="308" cy="272" r="11" fill="#1A5F9A"/>
-      <text x="308" y="294" text-anchor="middle" font-size="11" font-weight="800" fill="#1A5F9A" font-family="Nunito">🏨 Hotel</text>
-      <text x="308" y="306" text-anchor="middle" font-size="9" fill="#888" font-family="Nunito">Fraser Residence Nankai</text>
-      <circle cx="342" cy="244" r="8" fill="#5B9FD4"/>
-      <text x="354" y="240" font-size="12" font-weight="700" fill="#5B9FD4" font-family="Nunito">Dotonbori</text>
-      <text x="354" y="254" font-size="10" fill="#888" font-family="Nunito">+ Shinsaibashi · D6, D9</text>
-      <circle cx="388" cy="278" r="8" fill="#F4A430"/>
-      <text x="400" y="274" font-size="12" font-weight="700" fill="#F4A430" font-family="Nunito">Kuromon Market</text>
-      <text x="400" y="288" font-size="10" fill="#888" font-family="Nunito">D9 · Kuromon Day</text>
-      <circle cx="372" cy="362" r="8" fill="#C4724A"/>
-      <text x="384" y="358" font-size="12" font-weight="700" fill="#C4724A" font-family="Nunito">Tennoji Zoo</text>
-      <text x="384" y="372" font-size="11" fill="#C4724A" font-family="Nunito">+ Tsutenkaku</text>
-      <text x="384" y="385" font-size="10" fill="#888" font-family="Nunito">D8 · Tennoji Day</text>
-      <circle cx="112" cy="464" r="8" fill="#999"/>
-      <text x="124" y="460" font-size="12" font-weight="700" fill="#888" font-family="Nunito">✈ KIX Airport</text>
-      <text x="124" y="474" font-size="10" fill="#888" font-family="Nunito">D6 arrive · D10 fly home</text>
-      <line x1="296" y1="278" x2="124" y2="456" stroke="#ccc" stroke-width="1.5" stroke-dasharray="5 4"/>
-      <text x="195" y="388" font-size="9" fill="#bbb" transform="rotate(-45,195,388)" font-family="Nunito">Nankai Rapi:t ~35 min</text>
-      <text x="308" y="524" text-anchor="middle" font-size="9" fill="#ccc" font-family="Nunito">south Osaka ↓</text>
-    </svg>
-    <div class="map-legend">
-      <div class="leg-item"><div class="leg-dot" style="background:#1A5F9A"></div>Hotel</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#5B9FD4"></div>D6 Fly in</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#3A9E6F"></div>D7 Aquarium + Lego</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#C4724A"></div>D8 Tennoji Day</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#F4A430"></div>D9 Kuromon Day</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#999"></div>D10 Fly Home</div>
-    </div>
-  </div>
+<div class="section-head">🚐 Transport</div>
 
+<div class="flight">
+<div class="flight-label">Pick-up · 10 Sep (Thu)</div>
+<div class="flight-row">
+<div class="flight-endpoint">
+<div class="flight-time">9:00am</div>
+<div class="flight-airport">Singapore</div>
+</div>
+<div class="flight-line">
+<div class="flight-num">Soon Brothers Transport</div>
+<div class="flight-bar">
+<div class="flight-bar-line"></div>
+<div class="flight-plane">🚐</div>
+<div class="flight-bar-line"></div>
+</div>
+<div class="flight-date">Hyundai Starex · 7 pax</div>
+</div>
+<div class="flight-endpoint">
+<div class="flight-time">Westin</div>
+<div class="flight-airport">Desaru</div>
 </div>
 </div>
+<div class="flight-tags">
+<span class="tag tag-blue">Ref: 455869</span>
+<span class="tag tag-green">SGD 200 nett</span>
+<span class="tag tag-gray">Cash or PayNow</span>
+</div>
+</div>
+
+<div class="flight">
+<div class="flight-label">Return · 13 Sep (Sun)</div>
+<div class="flight-row">
+<div class="flight-endpoint">
+<div class="flight-time">10:30am</div>
+<div class="flight-airport">Westin Desaru</div>
+</div>
+<div class="flight-line">
+<div class="flight-num">Soon Brothers Transport</div>
+<div class="flight-bar">
+<div class="flight-bar-line"></div>
+<div class="flight-plane">🚐</div>
+<div class="flight-bar-line"></div>
+</div>
+<div class="flight-date">Hyundai Starex · 7 pax</div>
+</div>
+<div class="flight-endpoint">
+<div class="flight-time">SG</div>
+<div class="flight-airport">home</div>
+</div>
+</div>
+<div class="flight-tags">
+<span class="tag tag-blue">+65 9686 2444</span>
+<span class="tag tag-green">SGD 200 nett</span>
+<span class="tag tag-gray">Driver contacts on pickup</span>
+</div>
+</div>
+
+<div class="info-pill">
+🛃 <strong>Singaporeans are exempt from the MDAC</strong> at manual counters — the driver handles the crossing, nothing extra needed from us.
+</div>
+<div class="info-pill">
+💳 <strong>Payment:</strong> cash to the driver or PayNow to Soon Brothers, settled on each leg.
+</div>
+
+<div class="section-head">🏨 Hotel</div>
+
+<div class="hotel-card">
+<div class="hotel-banner c-teal">🏨 The Westin Desaru Coast Resort · 10–13 Sep · 3 nights</div>
+<div class="hotel-body">
+<div class="hotel-name">The Westin Desaru Coast Resort</div>
+<div class="hotel-meta">Jalan Pantai 3, 81930 Desaru, Johor · ☎ +60-7-8383333</div>
+<div class="hotel-detail">
+<span class="icon">🛏</span>
+<span class="text">1 King, Garden View (2 adults) + 1 King & 1×2 Queen, Garden View (3 adults)</span>
+</div>
+<div class="hotel-detail">
+<span class="icon">🕒</span>
+<span class="text">Check-in after <strong>16:00</strong> on 10 Sep · Check-out before <strong>11:00</strong> on 13 Sep</span>
+</div>
+<div class="hotel-detail">
+<span class="icon">🍳</span>
+<span class="text">Breakfast included, all rooms</span>
+</div>
+<div class="hotel-detail">
+<span class="icon">🍽</span>
+<span class="text">Dinner booked: <strong>Seafood Corner</strong>, table for 7, Thu 6:30pm</span>
+</div>
+<div class="hotel-detail">
+<span class="icon">💳</span>
+<span class="text">MYR 200/day deposit required at check-in (cash/card)</span>
+</div>
+<div class="hotel-detail">
+<span class="icon">🍉</span>
+<span class="text">No durian or mangosteen in the hotel</span>
+</div>
+</div>
+</div>
+
+<div class="section-head">📅 All Days</div>
+
+<div class="card">
+<div class="card-body" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+<div style="padding:10px;background:#f0f7ff;border-radius:10px;">
+<div style="font-size:11px;color:#0e6ba8;font-weight:700;text-transform:uppercase;margin-bottom:4px;">D1 · Thu 10 Sep</div>
+<div style="font-size:13px;font-weight:600;">🎢 Arrive & Waterpark</div>
+<div style="font-size:12px;color:#666;margin-top:2px;">Pick-up 9am · Waterpark · Dinner · Live band</div>
+</div>
+<div style="padding:10px;background:#fff8f0;border-radius:10px;">
+<div style="font-size:11px;color:#c07800;font-weight:700;text-transform:uppercase;margin-bottom:4px;">D2 · Fri 11 Sep</div>
+<div style="font-size:13px;font-weight:600;">🏖 Beach, Mangroves &amp; Fireflies</div>
+<div style="font-size:12px;color:#666;margin-top:2px;">Mangrove tour · Desaru Beach · Firefly cruise</div>
+</div>
+<div style="padding:10px;background:#f0fff7;border-radius:10px;">
+<div style="font-size:11px;color:#2a7a4f;font-weight:700;text-transform:uppercase;margin-bottom:4px;">D3 · Sat 12 Sep</div>
+<div style="font-size:13px;font-weight:600;">🦞 Mini Zoo &amp; Lobster</div>
+<div style="font-size:12px;color:#666;margin-top:2px;">Mini Zoo · Lobster lunch · Fruit Farm (KIV)</div>
+</div>
+<div style="padding:10px;background:#fdf0ff;border-radius:10px;">
+<div style="font-size:11px;color:#6a4c9c;font-weight:700;text-transform:uppercase;margin-bottom:4px;">D4 · Sun 13 Sep</div>
+<div style="font-size:13px;font-weight:600;">🚐 Head Home</div>
+<div style="font-size:12px;color:#666;margin-top:2px;">Checkout · Van pickup 10:30am</div>
+</div>
+</div>
+</div>
+</div><!-- /overview -->
+
+<div id="sec-desaru" class="section">
+
+<!-- D1 -->
+<div class="day-card" onclick="toggleDay(this)">
+<div class="day-header c-blue">
+<div class="day-header-left">
+<div class="day-num">D1</div>
+<div>
+<div class="day-title">🎢 Arrive & Waterpark</div>
+<div class="day-sub">Thu 10 Sep · The Westin Desaru</div>
+</div>
+</div>
+<div class="day-chevron">▾</div>
+</div>
+<div class="day-body">
+<div class="activity">
+<div class="activity-icon">🚐</div>
+<div>
+<div class="activity-name">Pick-up & drive down</div>
+<div class="activity-note">Soon Brothers van at 9:00am · via the Second Link and Kota Tinggi. A lunch stop along the way is still being decided — maybe around JB after clearing customs.</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🎒</div>
+<div>
+<div class="activity-name">Drop bags at the Westin</div>
+<div class="activity-note">Arrive around midday — hotel can hold bags at the front desk if it's before the 4pm check-in</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🎢</div>
+<div>
+<div class="activity-name">Adventure Waterpark Desaru Coast</div>
+<div class="activity-note">Straight into the waterpark for the afternoon — 20+ rides across themed zones, one of the region's biggest wave pools, and a water coaster</div>
+<div class="transport">🏖 rent a beachside cabana — a base for bags between slides</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🏨</div>
+<div>
+<div class="activity-name">Check in</div>
+<div class="activity-note">From 4pm · MYR 200/day deposit at check-in, cash or card</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🍽</div>
+<div>
+<div class="activity-name">Dinner — Seafood Corner</div>
+<div class="activity-note">Table for 7, booked for 6:30pm</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🎸</div>
+<div>
+<div class="activity-name">Live band at Hard Rock Hotel</div>
+<div class="activity-note">Nightly live music at Hard Rock Hotel Desaru Coast, a short drive along the coast — a fun way to close out the first night</div>
+</div>
+</div>
+<div class="consider-section">
+<div class="consider-title">✨ Also Consider</div>
+<div class="consider-item">
+<span style="font-size:18px">⏱️</span>
+<div>
+<div class="ci-name">Timing after the waterpark</div>
+<div class="ci-desc">Leave enough time to shower and change between the waterpark and the 6:30pm dinner</div>
+</div>
+</div>
+<div class="consider-item">
+<span style="font-size:18px">👵</span>
+<div>
+<div class="ci-name">Grandma's afternoon</div>
+<div class="ci-desc">The waterpark itself is a lot of walking, sun, and stairs — she could stay back and settle into the room, or relax by a quieter pool at the resort, then join everyone fresh for dinner and the live band</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- D2 -->
+<div class="day-card" onclick="toggleDay(this)">
+<div class="day-header c-gold">
+<div class="day-header-left">
+<div class="day-num">D2</div>
+<div>
+<div class="day-title">🏖 Beach, Mangroves &amp; Fireflies</div>
+<div class="day-sub">Fri 11 Sep · Desaru Beach &amp; Kota Tinggi</div>
+</div>
+</div>
+<div class="day-chevron">▾</div>
+</div>
+<div class="day-body">
+<div class="activity">
+<div class="activity-icon">🍳</div>
+<div>
+<div class="activity-name">Hotel breakfast</div>
+<div class="activity-note">A slower morning after yesterday's waterpark</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🌿</div>
+<div>
+<div class="activity-name">Sungai Lebam mangrove tour</div>
+<div class="activity-note">Private boat tour through the mangroves — kingfishers, sea eagles, and sometimes otters, with a guide on the ecosystem. About 2.5 hours, morning (separate from tonight's firefly cruise)</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🏖</div>
+<div>
+<div class="activity-name">Desaru Beach</div>
+<div class="activity-note">An easy afternoon on the sand — 25km of coastline to explore, with time to rest before the evening</div>
+<div class="transport">🪼 check with the hotel on jellyfish conditions before swimming</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">✨</div>
+<div>
+<div class="activity-name">Kota Tinggi Firefly Park</div>
+<div class="activity-note">Evening river cruise to watch fireflies light up the mangroves — about a 30–40 min drive from Desaru</div>
+<div class="transport">🚐 boats leave ~7:30pm · book ahead, spots go fast · bring a light jacket</div>
+</div>
+</div>
+<div class="consider-section">
+<div class="consider-title">✨ Also Consider</div>
+<div class="consider-item">
+<span style="font-size:18px">🌅</span>
+<div>
+<div class="ci-name">Sunset on the beach</div>
+<div class="ci-desc">A good spot to catch it before heading out for the firefly cruise</div>
+</div>
+</div>
+<div class="consider-item">
+<span style="font-size:18px">🍤</span>
+<div>
+<div class="ci-name">Quick dinner before the firefly tour</div>
+<div class="ci-desc">Something light near the pickup point, since the boat departs in the evening</div>
+</div>
+</div>
+<div class="consider-item">
+<span style="font-size:18px">👵</span>
+<div>
+<div class="ci-name">A full day — pace it for Grandma</div>
+<div class="ci-desc">Beach + mangrove boat + firefly boat in one day is a lot. She could sit out the beach walk and join fresh for the mangrove tour, or skip the late firefly boat and rest instead — see the note below</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- D3 -->
+<div class="day-card" onclick="toggleDay(this)">
+<div class="day-header c-green">
+<div class="day-header-left">
+<div class="day-num">D3</div>
+<div>
+<div class="day-title">🦞 Mini Zoo &amp; Lobster</div>
+<div class="day-sub">Sat 12 Sep · Fruit Farm KIV in the afternoon</div>
+</div>
+</div>
+<div class="day-chevron">▾</div>
+</div>
+<div class="day-body">
+<div class="activity">
+<div class="activity-icon">🍳</div>
+<div>
+<div class="activity-name">Hotel breakfast</div>
+<div class="activity-note">Last full day — an easier pace after yesterday's waterpark</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🐾</div>
+<div>
+<div class="activity-name">Desaru Mini Zoo</div>
+<div class="activity-note">Small, kid-friendly petting zoo on the way toward Sungai Rengit — an easy first stop before lunch</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🦞</div>
+<div>
+<div class="activity-name">Lunch — Super Lobster Village</div>
+<div class="activity-note">Fresh lobster and seafood at good prices in Sungai Rengit — well worth the drive</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🍉</div>
+<div>
+<div class="activity-name">Desaru Fruit Farm — KIV</div>
+<div class="activity-note">Orchard tour through 100+ fruit varieties, a beekeeping talk with honey tasting, its own petting zoo — pencilled in for the afternoon, depending on energy after lunch</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🌅</div>
+<div>
+<div class="activity-name">Last evening</div>
+<div class="activity-note">Pack the night before so the morning stays easy</div>
+</div>
+</div>
+<div class="consider-section">
+<div class="consider-title">✨ Also Consider</div>
+<div class="consider-item">
+<span style="font-size:18px">👵</span>
+<div>
+<div class="ci-name">Gentlest day of the trip</div>
+<div class="ci-desc">The mini zoo, orchard paths, and lobster lunch are all flat and easy — a comfortable day for Grandma to join everything</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- D4 -->
+<div class="day-card" onclick="toggleDay(this)">
+<div class="day-header c-purple">
+<div class="day-header-left">
+<div class="day-num">D4</div>
+<div>
+<div class="day-title">🚐 Head Home</div>
+<div class="day-sub">Sun 13 Sep · Van pickup 10:30am</div>
+</div>
+</div>
+<div class="day-chevron">▾</div>
+</div>
+<div class="day-body">
+<div class="activity">
+<div class="activity-icon">🍳</div>
+<div>
+<div class="activity-name">Last hotel breakfast</div>
+<div class="activity-note">Checkout before 11:00</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🧳</div>
+<div>
+<div class="activity-name">Checkout & deposit refund</div>
+<div class="activity-note">Collect the MYR 200/day deposit back at the front desk</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🚐</div>
+<div>
+<div class="activity-name">Soon Brothers van pickup</div>
+<div class="activity-note">10:30am from the Westin, ahead of the 11am checkout — back via Kota Tinggi and the Second Link</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- /desaru -->
+
+<div id="sec-map" class="section">
+<div class="map-wrap">
+<div class="map-title">🗺 Desaru — Key Locations</div>
+<svg viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#dcf0ea;">
+
+<!-- South China Sea runs along the east (right) edge -->
+<ellipse cx="580" cy="240" rx="90" ry="260" fill="#bfe3f0" opacity="0.6"/>
+<text x="565" y="60" font-size="10" fill="#4090b0" font-family="Inter,sans-serif" opacity="0.8" transform="rotate(90,565,60)">South China Sea</text>
+
+<!-- Coastal road, north-south along the coast -->
+<line x1="500" y1="40" x2="470" y2="440" stroke="#7cc8e0" stroke-width="14" stroke-linecap="round" opacity="0.5"/>
+
+<!-- Road inland to Bandar Penawar / Fruit Farm -->
+<line x1="470" y1="230" x2="330" y2="220" stroke="#ccc" stroke-width="5" stroke-linecap="round"/>
+<!-- Road up to Kota Tinggi (northwest) -->
+<line x1="330" y1="220" x2="130" y2="100" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+<!-- Road down to Pengerang / Super Lobster (further south along the coast) -->
+<line x1="470" y1="270" x2="440" y2="420" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+<!-- Road onward to the Second Link / Singapore (southwest) -->
+<line x1="440" y1="420" x2="60" y2="460" stroke="#ccc" stroke-width="4" stroke-dasharray="6,4"/>
+
+<text x="360" y="205" text-anchor="middle" font-size="9" fill="#999" font-family="Inter,sans-serif">Bandar Penawar</text>
+<text x="200" y="150" font-size="9" fill="#999" font-family="Inter,sans-serif" transform="rotate(-40,200,150)">to Kota Tinggi</text>
+<text x="480" y="350" font-size="9" fill="#999" font-family="Inter,sans-serif" transform="rotate(75,480,350)">to Pengerang (~35km)</text>
+
+<!-- Westin -->
+<circle cx="450" cy="230" r="18" fill="#e84444" stroke="white" stroke-width="2.5"/>
+<text x="450" y="235" text-anchor="middle" font-size="13" fill="white" font-family="Inter,sans-serif">🏨</text>
+<rect x="405" y="252" width="90" height="16" rx="4" fill="rgba(232,68,68,0.15)"/>
+<text x="450" y="263" text-anchor="middle" font-size="10" fill="#c02020" font-weight="600" font-family="Inter,sans-serif">Westin Desaru</text>
+
+<!-- Beach (just north along the same coast) -->
+<circle cx="470" cy="150" r="14" fill="#3aacce" stroke="white" stroke-width="2"/>
+<text x="470" y="154" text-anchor="middle" font-size="12" font-family="Inter,sans-serif">🏖</text>
+<text x="470" y="173" text-anchor="middle" font-size="9" fill="#1a7a9a" font-weight="600" font-family="Inter,sans-serif">Desaru Beach</text>
+
+<!-- Adventure Waterpark (just south along the coast) -->
+<circle cx="460" cy="310" r="16" fill="#e8a020" stroke="white" stroke-width="2.5"/>
+<text x="460" y="315" text-anchor="middle" font-size="13" font-family="Inter,sans-serif">🎢</text>
+<rect x="425" y="332" width="70" height="16" rx="4" fill="rgba(232,160,32,0.15)"/>
+<text x="460" y="343" text-anchor="middle" font-size="9" fill="#a06800" font-weight="600" font-family="Inter,sans-serif">Waterpark</text>
+
+<!-- Fruit Farm (inland, Bandar Penawar) -->
+<circle cx="330" cy="220" r="13" fill="#3aaa6e" stroke="white" stroke-width="2" opacity="0.9"/>
+<text x="330" y="225" text-anchor="middle" font-size="11" font-family="Inter,sans-serif">🍉</text>
+<text x="330" y="243" text-anchor="middle" font-size="9" fill="#1a5a3a" font-family="Inter,sans-serif">Fruit Farm</text>
+
+<!-- Desaru Mini Zoo (on the way toward Sungai Rengit) -->
+<circle cx="475" cy="360" r="12" fill="#d4a020" stroke="white" stroke-width="2" opacity="0.9"/>
+<text x="475" y="365" text-anchor="middle" font-size="10" font-family="Inter,sans-serif">🐾</text>
+<text x="475" y="382" text-anchor="middle" font-size="8" fill="#8a6300" font-weight="600" font-family="Inter,sans-serif">Mini Zoo</text>
+
+<!-- Super Lobster Village (further south along the coast, Sungai Rengit/Pengerang) -->
+<circle cx="440" cy="420" r="15" fill="#2a7a4f" stroke="white" stroke-width="2.5"/>
+<text x="440" y="425" text-anchor="middle" font-size="12" font-family="Inter,sans-serif">🦞</text>
+<text x="440" y="445" text-anchor="middle" font-size="9" fill="#1a5a3a" font-weight="600" font-family="Inter,sans-serif">Super Lobster</text>
+<text x="440" y="457" text-anchor="middle" font-size="8" fill="#1a5a3a" font-family="Inter,sans-serif">(Sungai Rengit)</text>
+
+<!-- Kota Tinggi Firefly Park (northwest, inland) -->
+<circle cx="130" cy="100" r="14" fill="#6a4c9c" stroke="white" stroke-width="2.5"/>
+<text x="130" y="105" text-anchor="middle" font-size="12" font-family="Inter,sans-serif">✨</text>
+<text x="130" y="124" text-anchor="middle" font-size="9" fill="#4a2c7c" font-weight="600" font-family="Inter,sans-serif">Firefly Park</text>
+<text x="130" y="136" text-anchor="middle" font-size="8" fill="#4a2c7c" font-family="Inter,sans-serif">(Kota Tinggi)</text>
+
+<text x="560" y="448" text-anchor="middle" font-size="16" font-family="Inter,sans-serif">N</text>
+<line x1="560" y1="476" x2="560" y2="458" stroke="#666" stroke-width="2" marker-end="url(#arr)"/>
+<defs>
+<marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+<path d="M0,0 L6,3 L0,6 Z" fill="#666"/>
+</marker>
+</defs>
+
+<text x="20" y="475" font-size="10" fill="#888" font-family="Inter,sans-serif">↙ Second Link / Singapore ~2–2.5h</text>
+</svg>
+
+<div class="map-legend">
+<div class="legend-item"><div class="legend-dot" style="background:#e84444"></div> Westin Desaru</div>
+<div class="legend-item"><div class="legend-dot" style="background:#3aacce"></div> Desaru Beach</div>
+<div class="legend-item"><div class="legend-dot" style="background:#e8a020"></div> Waterpark</div>
+<div class="legend-item"><div class="legend-dot" style="background:#2a7a4f"></div> Lobster / Fruit Farm</div>
+<div class="legend-item"><div class="legend-dot" style="background:#d4a020"></div> Mini Zoo</div>
+<div class="legend-item"><div class="legend-dot" style="background:#6a4c9c"></div> Firefly Park</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header" style="background:#f8f9fa;border-bottom:1px solid #eee;">🚐 Getting Around</div>
+<div class="card-body">
+<div class="activity">
+<div class="activity-icon">🚐</div>
+<div>
+<div class="activity-name">Soon Brothers Transport</div>
+<div class="activity-note">Handles the Singapore ↔ Desaru legs on 10 & 13 Sep. Driver contacts us directly on pickup.</div>
+</div>
+</div>
+<div class="activity">
+<div class="activity-icon">🚖</div>
+<div>
+<div class="activity-note">Grab coverage is thinner out here than in the city — check with the hotel concierge for local trips to the farms or firefly park if we're not all going together.</div>
+</div>
+</div>
+</div>
+</div>
+</div><!-- /map -->
+
+<div id="sec-notes" class="section">
+<div class="notes-card">
+<h3>📝 Trip Notes</h3>
+<p style="font-size:13px;color:#666;margin-bottom:14px;">Jot down reminders, food spots, anything useful</p>
+<textarea id="notes-area" placeholder="e.g. lunch stop on the way down / firefly booking confirmation / packing checklist..."></textarea>
+<button onclick="saveNotes()">💾 Save Notes</button>
+<div class="notes-hint">
+Notes are saved in <strong>this browser's localStorage</strong> — they'll be here every time you open this page in the same browser.
+</div>
+</div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /app -->
 
 <script>
-const days = [
-  {id:'d1',city:'okinawa',color:'#5B9FD4',num:'D1',label:'Arrive Okinawa',title:'Arrive Okinawa',date:'30 May (Sat)',
-    stops:[
-      {name:'Naha Airport',note:'Arrive ~12:30pm · immigration + baggage',transport:'🚕 Taxi to hotel ~15 min · ¥1,800–2,500'},
-      {name:'JR Kyushu Hotel Blossom Naha',note:'Check in · rest · free coffee bar on 13th floor!'},
-      {name:'Kokusai-dori (evening)',note:'Walking + Okinawan snacks + souvenir shopping · Don Quijote if needed · dinner: soba / taco rice',transport:'🚶 1 min walk from hotel'},
-    ],
-    suggestions:[
-      {name:'Helios Pub & Brewery',desc:'Okinawan craft beer and food — great casual first-night dinner right on Kokusai-dori'},
-      {name:'Pork Tamago Onigiri',desc:'Iconic Okinawan rice balls — look for the stalls inside Makishi Market, open late and super tasty'},
-      {name:'Blue Seal Ice Cream 🍦',desc:'Okinawa\'s beloved ice cream brand on Kokusai-dori. Beniimo (purple sweet potato) is the must-try!'},
-      {name:'Makishi Public Market (evening)',desc:'The market stays lively into the evening — grab fresh fruit, local snacks and watch the vendors in action, a great intro to Okinawan food culture'},
-      {name:'Don Quijote Kokusai-dori',desc:'Open 24h, great for stocking up on Japanese snacks, drinks and essentials for the trip — the kids will love browsing the toy and candy floors'},
-    ]
-  },
-  {id:'d2',city:'okinawa',color:'#3A9E6F',num:'D2',label:'Churaumi Day',title:'Churaumi Day 🐋',date:'31 May (Sun)',
-    stops:[
-      {name:'Hotel → Naha Bus Terminal',note:'Leave ~7–8am',transport:'🚕 Taxi ~5–10 min to bus terminal'},
-      {name:'Churaumi Aquarium',note:'Whale shark tank · manta rays · sea turtles · Ocean Expo Park · dolphin show · lunch on site',transport:'🚌 Highway bus ~2.5–3h · book in advance!'},
-      {name:'Busena Marine Park (optional)',note:'Glass-bottom boat · decide on the day based on energy',transport:'🚕 Taxi from Churaumi ~45–60 min · ¥7,000–10,000'},
-      {name:'Return to Naha · dinner near hotel',note:'',transport:'🚌 Bus back to Naha'},
-    ],
-    suggestions:[
-      {name:'Emerald Beach (Ocean Expo Park)',desc:'Free beach right inside the park — calm, sheltered, perfect for the kids to splash around after the aquarium 🏖'},
-      {name:'Nakijin Castle Ruins',desc:'UNESCO World Heritage site on the drive back — quick 20-min stop with great views, worth the detour'},
-      {name:'Orion Beer Factory',desc:'Okinawa\'s famous local brewery is near Churaumi — tours available for a fun grown-up pitstop 🍺'},
-      {name:'Ocean Expo Park Tropical Dream Center',desc:'Stunning botanical gardens right inside the park with a huge orchid collection — free with aquarium entry and a peaceful contrast to the busy tanks'},
-      {name:'Kouri Ocean Tower',desc:'On the way back south, this hilltop tower on Kouri Island has spectacular views of the turquoise straits and a short beach walk below — great for a sunset stop'},
-    ]
-  },
-  {id:'d3',city:'okinawa',color:'#C4724A',num:'D3',label:'History Day',title:'History Day 🏯',date:'1 Jun (Mon)',
-    stops:[
-      {name:'Shurijo Castle',note:'Ryukyu Kingdom history · castle walls & gates · reconstruction areas',transport:'🚉 Yui Rail + short taxi from hotel'},
-      {name:'Lunch — Tsuboya Pottery Street',note:'Great spots for soba and browsing local pottery shops'},
-      {name:'Former Navy Underground HQ',note:'WWII tunnel complex · historical · sombre · allow ~1h',transport:'🚕 Taxi from Shuri area'},
-      {name:'Return to hotel · relaxed dinner',note:''},
-    ],
-    suggestions:[
-      {name:'Kinjo-cho Stone Pavement Street',desc:'Beautiful old Ryukyu stone-paved lane, 15 min downhill walk from Shurijo — gorgeous photos, very peaceful 📸'},
-      {name:'Tsuboya Pottery Museum',desc:'Small but lovely museum on Okinawan pottery culture, right on the walk back toward Makishi'},
-      {name:'Hakugincho Shopping Arcade',desc:'Covered old-school local shopping street near the hotel — very un-touristy, great for a quiet evening browse'},
-      {name:'Naminoue Shrine 🏮',desc:'Okinawa\'s most important Shinto shrine perched on a dramatic cliff overlooking the sea — a short taxi from Shurijo and a serene place to decompress after the heavy Navy HQ visit'},
-      {name:'Okinawa Prefectural Museum',desc:'Right near Omoromachi station on the Yui Rail — excellent exhibits on Ryukyu Kingdom history and culture that give great context to what you saw at Shurijo, free for under-18s'},
-    ]
-  },
-  {id:'d4',city:'okinawa',color:'#F4845F',num:'D4',label:'Relax Day',title:'Relax Day 🌅',date:'2 Jun (Tue)',
-    stops:[
-      {name:'American Village, Chatan',note:'Seaside walk · cafés · shopping · sunset · snacks · completely free-and-easy day',transport:'🚌 Bus or taxi from Naha ~40 min'},
-    ],
-    suggestions:[
-      {name:'Araha Beach',desc:'Right next to American Village — sandy, calm, great for the kids to run around while you grab a coffee at the beachside cafés 🏄'},
-      {name:'Depot Island',desc:'The main shopping complex in American Village — good mix of local boutiques, surf shops, and kid-friendly restaurants'},
-      {name:'Zhyvago Coffee Works ☕',desc:'Popular café in American Village with great coffee and tiramisu — perfect for a relaxed afternoon sit-down'},
-      {name:'Sunset Beach',desc:'A short walk north of American Village, this wider beach is great for watching the Okinawan sunset — bring snacks from a nearby combini and just sit and watch'},
-      {name:'Mihama American Village Ferris Wheel',desc:'Small ferris wheel right in the American Village complex — cheap, quick and the kids will enjoy it, with good views over the bay and the village lights at dusk'},
-    ]
-  },
-  {id:'d5',city:'okinawa',color:'#9B72CF',num:'D5',label:'Flexible Day',title:'Flexible Day 🎮',date:'3 Jun (Wed)',
-    stops:[
-      {name:'No fixed plan · keep it light',note:'Options: Makishi Market · Pokémon Center · shopping · café hopping · rest',transport:'🚶 Makishi Market: walk from hotel · 🚌 Pokémon Center: bus ~50 min to Ion Mall'},
-    ],
-    suggestions:[
-      {name:'Makishi Public Market 🐟',desc:'Buy fresh seafood downstairs, have it cooked upstairs for ¥500/person — the real Okinawa seafood experience'},
-      {name:'Naminoue Shrine & Beach',desc:'Quiet clifftop shrine with a small beach below — hidden gem close to Naha, easy taxi ride'},
-      {name:'Kakigori shaved ice 🍧',desc:'Look for an old-school zenzai shop near Makishi — Okinawan shaved ice with red beans, locals queue for it'},
-      {name:'Palette Kumoji (shopping mall)',desc:'Naha\'s central shopping mall on Kokusai-dori — good for browsing Okinawan craft goods, clothing and a food court lunch without leaving the city centre'},
-      {name:'Yui Rail day pass',desc:'Worth grabbing a day pass (¥700) if you\'re hopping around Naha — covers all stations from the airport to Shuri, great for spontaneous exploring without worrying about fares'},
-    ]
-  },
-  {id:'d6',city:'okinawa',color:'#5B9FD4',num:'D6',label:'Fly to Osaka',title:'Fly to Osaka ✈️',date:'4 Jun (Thu)',
-    stops:[
-      {name:'Checkout · Naha Airport',note:'NU004 departs 11:15',transport:'🚉 Yui Rail: Makishi → Airport ~10 min'},
-      {name:'Kansai International Airport (KIX)',note:'Land 13:15',transport:'🚄 Nankai Rapi:t → Namba ~35 min · walk to Fraser Suites'},
-      {name:'Fraser Residence Nankai Osaka',note:'Check in · settle in'},
-      {name:'Dotonbori + Shinsaibashi (evening)',note:'Glico sign · street snacks · arcades · shopping',transport:'🚶 5 min walk from hotel'},
-    ],
-    suggestions:[
-      {name:'Ichiran Ramen 🍜',desc:'Solo-booth ramen — a genuine Osaka experience and the kids will find the little booths fascinating'},
-      {name:'Don Quijote Shinsaibashi',desc:'Open late, massive floors of snacks, cosmetics and novelties — great first-night browse'},
-      {name:'Dotonbori canal at night 🌟',desc:'The neon canal is spectacular after dark — walk the whole strip for giant food signs and electric city energy'},
-      {name:'Namba Grand Kagetsu (NGK)',desc:'Osaka\'s most famous comedy theatre is right in Namba — if you can catch a show, the physical comedy is entertaining even without Japanese, and it gives a real taste of Osaka culture'},
-      {name:'Hozenji Yokocho for dinner',desc:'Stone-paved alley a 5-min walk from the hotel with atmospheric old-Osaka restaurants — a quieter, more intimate alternative to the Dotonbori main strip on your first night'},
-    ]
-  },
-  {id:'d7',city:'osaka',color:'#3A9E6F',num:'D7',label:'Aquarium + Legoland Day',title:'Aquarium + Legoland Day 🦈',date:'5 Jun (Fri)',
-    stops:[
-      {name:'Osaka Aquarium Kaiyukan',note:'Whale shark · penguins · jellyfish · spiral 8-floor tank · book tickets online!',transport:'🚇 Osaka Metro → Osakako Stn ~20 min'},
-      {name:'Legoland Discovery Center Osaka',note:'Indoor rides · Lego play zones · same Tempozan area as Kaiyukan',transport:'🚶 2 min walk from Kaiyukan'},
-      {name:'Dinner — Tempozan or back to Namba',note:''},
-    ],
-    suggestions:[
-      {name:'Tempozan Ferris Wheel 🎡',desc:'One of Japan\'s largest ferris wheels right at the harbour — great views, kids absolutely love it, ~15 min ride'},
-      {name:'Tempozan Marketplace food hall',desc:'Good lunch right beside the aquarium — decent Osaka-style food without going far'},
-      {name:'Santa Maria Harbour Cruise ⛵',desc:'45-min cruise from Tempozan on a replica of Columbus\'s ship — a lovely bonus if the kids still have energy'},
-      {name:'Osaka Culturarium at Tempozan',desc:'Interactive digital art museum right at Tempozan — if the kids still have steam after Legoland, the immersive projections are stunning and very different from anything else on the trip'},
-      {name:'Namba Parks (evening)',desc:'Walking back to the hotel, cut through Namba Parks for the rooftop garden and a look at the illuminated waterfall wall — a nice wind-down after a big day at the waterfront'},
-    ]
-  },
-  {id:'d8',city:'osaka',color:'#C4724A',num:'D8',label:'Tennoji Day',title:'Tennoji Day 🦁',date:'6 Jun (Sat)',
-    stops:[
-      {name:'Tennoji Zoo',note:'Morning visit · ¥500 entry (great value!) · closes 5pm · closed Mon',transport:'🚇 Osaka Metro → Dobutsuen-mae or Tennoji Stn'},
-      {name:'Shinsekai + Tsutenkaku Tower',note:'Retro Osaka streets · local snacks · optional tower climb for city views',transport:'🚶 5 min walk from zoo'},
-      {name:'Afternoon — flexible',note:'Shopping · arcades · cafés · rest at hotel'},
-    ],
-    suggestions:[
-      {name:'Kushikatsu Daruma 🍢',desc:'The birthplace of Osaka kushikatsu (deep-fried skewers) — the original Shinsekai branch is legendary'},
-      {name:'Abeno Harukas',desc:'Japan\'s tallest building at Tennoji Station — observation deck on the 60th floor, stunning views on a clear day'},
-      {name:'Osaka Museum of Housing & Living',desc:'Life-size recreation of Edo-period Osaka streets — surprisingly great for curious kids and fascinating for adults'},
-      {name:'Tennoji Park & Keitakuen Garden',desc:'Just behind the zoo entrance, this traditional Japanese garden is free with zoo admission and lovely for a slow afternoon stroll — peaceful escape from the Shinsekai bustle'},
-      {name:'Spa World Osaka',desc:'Massive public onsen complex a 5-min walk from Tennoji — if the kids are up for it, the international themed bath floors are a fun and very Osaka experience for the whole family'},
-    ]
-  },
-  {id:'d9',city:'osaka',color:'#F4A430',num:'D9',label:'Kuromon Day',title:'Kuromon Day 🦐',date:'7 Jun (Sun)',
-    stops:[
-      {name:'Kuromon Ichiba Market (morning)',note:'Go early before the crowds · grilled seafood · wagyu skewers · fruits · tamago',transport:'🚇 Osaka Metro → Nippombashi Stn · 5 min walk'},
-      {name:'Free afternoon — shopping',note:'Pokémon Center · Nintendo Store (Umeda) · Daimaru · Shinsaibashi',transport:'🚇 Nintendo Store: Metro to Umeda ~10 min'},
-    ],
-    suggestions:[
-      {name:'Hozenji Yokocho Alley',desc:'Atmospheric stone-paved alley near Dotonbori with a moss-covered statue — peaceful contrast to the crowds 🌿'},
-      {name:'Shinsaibashi-suji arcade',desc:'Covered shopping street all the way to Dotonbori — Uniqlo, toy shops, snack stores, rain-proof!'},
-      {name:'Sushiro Dotonbori 🍣',desc:'Conveyor belt sushi right in Namba — go at 3pm to skip dinner queues, kids love the touch-screen ordering'},
-      {name:'Daimaru Shinsaibashi food basement',desc:'The B2 food hall under Daimaru is one of Osaka\'s best depachika — stunning Japanese sweets, bento, wagashi and beautifully packaged gifts, great for last Osaka souvenirs'},
-      {name:'Amerikamura "Triangle Park"',desc:'5 min from Shinsaibashi — this quirky little square is the heart of Osaka streetwear culture, great for people-watching and the surrounding vintage and sneaker shops are excellent for browsing'},
-    ]
-  },
-  {id:'d10',city:'osaka',color:'#718096',num:'D10',label:'Fly Home',title:'Fly Home 🛫',date:'8 Jun (Mon)',
-    stops:[
-      {name:'Last morning + checkout',note:'Final breakfast · last-minute snacks at Don Quijote or Family Mart'},
-      {name:'Nankai Namba Station → KIX',note:'SQ621 departs 17:25 · arrive airport by 15:15',transport:'🚄 Nankai Rapi:t ~35 min · station is 2 min walk from hotel'},
-      {name:'Singapore Changi ✈️',note:'Arrives 22:55 · welcome home!'},
-    ],
-    suggestions:[
-      {name:'KIX duty-free 🛍',desc:'Terminal 1 has excellent Japanese snacks, wagashi sweets and cosmetics — leave 45 min for a proper browse'},
-      {name:'Last takoyaki at Dotonbori 🐙',desc:'One final round of street food before heading to the station — Kukuru and Aizuya are both excellent'},
-      {name:'Konbini run for the flight 🍙',desc:'Load up at Family Mart near Fraser Suites — Japanese onigiri and Pocky beat airport food every time'},
-      {name:'Namba station souvenir shops',desc:'The underground Nankai Namba concourse has a row of souvenir and snack shops — great for last-minute Osaka-specific omiyage (gifts) without going back to Dotonbori'},
-      {name:'KIX observation deck (Skygarden)',desc:'If you arrive at the airport with time to spare, the 4th floor Sky Garden has great views of planes and the bay — free, and a nice low-key activity to keep the kids entertained before the gate opens'},
-    ]
-  },
-];
+const PW = 'desaru';
 
-function renderDay(d, container) {
-  const el = document.createElement('div');
-  el.className = 'card';
-  el.id = 'card-' + d.id;
-  el.innerHTML = `
-    <div class="card-header" onclick="toggleCard('${d.id}')">
-      <div class="day-pill" style="background:${d.color}">${d.num}</div>
-      <div class="card-titles">
-        <div class="card-day-name">${d.label}</div>
-        <div class="card-title">${d.title}</div>
-      </div>
-      <div class="card-date">${d.date}</div>
-      <div class="chevron" id="chev-${d.id}">▾</div>
-    </div>
-    <div class="card-body" id="body-${d.id}">
-      <div class="card-body-inner">
-        <div class="stops-list">
-          ${d.stops.map((s,i) => `
-            <div class="stop">
-              <div class="stop-left">
-                <div class="stop-dot" style="color:${d.color};background:${d.color}"></div>
-                <div class="stop-line"></div>
-              </div>
-              <div class="stop-text">
-                <div class="stop-name">${s.name}</div>
-                ${s.note ? `<div class="stop-note">${s.note}</div>` : ''}
-                ${s.transport ? `<div><span class="transport">${s.transport}</span></div>` : ''}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-        <div class="suggestions">
-          <div class="suggestions-label">✨ Also consider</div>
-          <div class="sugg-list">
-            ${d.suggestions.map(s => `
-              <div class="sugg-item">
-                <div class="sugg-name">${s.name}</div>
-                <div class="sugg-desc">${s.desc}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  container.appendChild(el);
+function unlock() {
+const val = document.getElementById('pw-input').value.trim().toLowerCase();
+if (val === PW) {
+document.getElementById('lock-screen').style.display = 'none';
+document.getElementById('app').style.display = 'block';
+} else {
+document.getElementById('pw-error').textContent = 'Wrong password — try again! 🙈';
+document.getElementById('pw-input').value = '';
+document.getElementById('pw-input').focus();
+}
 }
 
-const okiContainer = document.getElementById('okinawa-days');
-const osaContainer = document.getElementById('osaka-days');
-const quickContainer = document.getElementById('quickdays');
+function showTab(id, btn) {
+document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+document.getElementById('sec-' + id).classList.add('active');
+btn.classList.add('active');
+}
 
-days.forEach(d => {
-  if (d.city === 'okinawa') renderDay(d, okiContainer);
-  else renderDay(d, osaContainer);
+function toggleDay(card) {
+card.classList.toggle('open');
+}
+
+const NOTES_KEY = 'desaru_trip_notes';
+window.addEventListener('load', () => {
+const saved = localStorage.getItem(NOTES_KEY);
+if (saved) document.getElementById('notes-area').value = saved;
 });
-
-days.forEach((d, i) => {
-  // Insert city break labels
-  if (i === 0) {
-    const hdr = document.createElement('div');
-    hdr.innerHTML = `<div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#3A9E6F;margin:0 0 8px;display:flex;align-items:center;gap:8px">🏝 Okinawa <span style="flex:1;height:2px;background:linear-gradient(to right,rgba(58,158,111,.25),transparent);border-radius:2px;display:inline-block"></span></div>`;
-    quickContainer.appendChild(hdr);
-  }
-  if (i === 6) {
-    const hdr = document.createElement('div');
-    hdr.innerHTML = `<div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#C4724A;margin:16px 0 8px;display:flex;align-items:center;gap:8px">🏙 Osaka <span style="flex:1;height:2px;background:linear-gradient(to right,rgba(196,114,74,.25),transparent);border-radius:2px;display:inline-block"></span></div>`;
-    quickContainer.appendChild(hdr);
-  }
-
-  const el = document.createElement('div');
-  el.className = 'quick-item';
-  el.onclick = () => {
-    showPage(d.city === 'okinawa' ? 'okinawa' : 'osaka');
-    setTimeout(() => {
-      document.getElementById('card-' + d.id).scrollIntoView({behavior:'smooth', block:'center'});
-      const body = document.getElementById('body-' + d.id);
-      const chev = document.getElementById('chev-' + d.id);
-      if (!body.classList.contains('open')) { body.classList.add('open'); chev.style.transform = 'rotate(180deg)'; }
-    }, 120);
-  };
-  el.innerHTML = `
-    <div style="width:38px;height:38px;border-radius:50%;background:${d.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.12)">${d.num}</div>
-    <div style="flex:1;min-width:0">
-      <div style="font-size:14px;font-weight:800;color:#2D3748">${d.title}</div>
-      <div style="font-size:12px;font-weight:600;color:#718096">${d.date}</div>
-    </div>
-    <div style="font-size:18px;color:#CBD5E0">›</div>
-  `;
-  quickContainer.appendChild(el);
-});
-
-/* ── PERSISTENT NOTES (storage API + localStorage fallback) ── */
-async function saveNote(id, value, statusEl) {
-  // Try Artifacts persistent storage first
-  try {
-    await window.storage.set('note-' + id, value);
-  } catch(e) {}
-  // Always also write to localStorage as backup
-  try { localStorage.setItem('note-' + id, value); } catch(e) {}
-  if (statusEl) {
-    statusEl.textContent = '✓ Saved!';
-    statusEl.classList.add('saved');
-    setTimeout(() => {
-      statusEl.textContent = 'Type to add notes — saved automatically';
-      statusEl.classList.remove('saved');
-    }, 2000);
-  }
+function saveNotes() {
+localStorage.setItem(NOTES_KEY, document.getElementById('notes-area').value);
+const btn = document.querySelector('.notes-card button');
+btn.textContent = '✅ Saved!';
+setTimeout(() => btn.textContent = '💾 Save Notes', 1500);
 }
-
-async function loadNote(id) {
-  let val = '';
-  // Try persistent storage first
-  try {
-    const r = await window.storage.get('note-' + id);
-    if (r && r.value) val = r.value;
-  } catch(e) {
-    // Fall back to localStorage
-    try { val = localStorage.getItem('note-' + id) || ''; } catch(e2) {}
-  }
-  // If nothing in persistent store, check localStorage
-  if (!val) {
-    try { val = localStorage.getItem('note-' + id) || ''; } catch(e) {}
-  }
-  const ta = document.getElementById('notes-' + id);
-  if (ta && val) ta.value = val;
-}
-
-/* ── EXPORT / IMPORT NOTES ── */
-function exportNotes() {
-  const notes = {};
-  days.forEach(d => {
-    const ta = document.getElementById('notes-' + d.id);
-    if (ta && ta.value.trim()) notes[d.id] = ta.value;
-  });
-  const json = JSON.stringify(notes, null, 2);
-  const blob = new Blob([json], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'japan-trip-notes.json';
-  a.click();
-}
-
-function importNotes(file) {
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try {
-      const notes = JSON.parse(e.target.result);
-      for (const [id, val] of Object.entries(notes)) {
-        const ta = document.getElementById('notes-' + id);
-        if (ta) {
-          ta.value = val;
-          await saveNote(id, val, null);
-        }
-      }
-      document.getElementById('import-status').textContent = '✓ Notes imported!';
-      setTimeout(() => document.getElementById('import-status').textContent = '', 3000);
-    } catch(err) {
-      alert('Could not read notes file.');
-    }
-  };
-  reader.readAsText(file);
-}
-
-/* ── PASSWORD INIT (runs after DOM ready) ── */
-document.addEventListener('DOMContentLoaded', function(){
-  if(sessionStorage.getItem('jp2026_unlocked')==='1'){
-    document.getElementById('pw-screen').classList.add('hidden');
-  } else {
-    document.body.style.overflow='hidden';
-  }
-  document.getElementById('pw-input').addEventListener('input',function(){
-    if(this.value.length===4) checkPw();
-  });
+document.getElementById('notes-area').addEventListener('input', () => {
+localStorage.setItem(NOTES_KEY, document.getElementById('notes-area').value);
 });
 </script>
-<style>
-@keyframes shake{
-  0%,100%{transform:translateX(0)}
-  20%{transform:translateX(-8px)}
-  40%{transform:translateX(8px)}
-  60%{transform:translateX(-6px)}
-  80%{transform:translateX(6px)}
-}
-
-/* ── NOTES BACKUP PANEL ── */
-.notes-backup-panel{
-  margin-top:32px;
-  background:#fff;border-radius:16px;
-  border:1.5px solid rgba(58,158,111,.2);
-  padding:18px 20px;
-  box-shadow:var(--card-shadow);
-}
-.backup-title{font-size:14px;font-weight:800;color:#2A7A52;margin-bottom:4px}
-.backup-desc{font-size:12px;font-weight:500;color:var(--text-soft);margin-bottom:14px;line-height:1.5}
-.backup-btns{display:flex;gap:10px;flex-wrap:wrap}
-.backup-btn{
-  padding:9px 16px;border-radius:10px;border:1.5px solid rgba(58,158,111,.3);
-  background:linear-gradient(135deg,#F0FBF6,#E8F8F0);
-  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
-  color:#2A7A52;cursor:pointer;transition:all .15s;
-}
-.backup-btn:hover{background:linear-gradient(135deg,#E0F5EC,#D4F0E4);transform:translateY(-1px)}
-</style>
-<!-- ════════ NOTES ════════ -->
-<div id="page-notes" class="page">
-<div class="content">
-
-  <div style="background:linear-gradient(135deg,#3A9E6F,#2A7A52);border-radius:18px;padding:20px 22px;margin-bottom:24px;display:flex;align-items:center;gap:14px">
-    <div style="font-size:36px;line-height:1">📝</div>
-    <div>
-      <div style="font-size:20px;font-weight:800;color:#fff">Trip Notes</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.75);font-weight:500;margin-top:2px">Jot down food spots, reminders, anything you like</div>
-    </div>
-  </div>
-
-  <div class="free-notes-card">
-    <textarea id="free-notes-ta"
-      placeholder="✍️  Start typing here…
-
-Ideas:
-• Food places to try
-• Things to pack
-• Things to book in advance
-• Reminders for the kids
-• Anything goes!"
-    ></textarea>
-    <div class="free-notes-footer">
-      <span class="free-notes-status" id="free-notes-status"></span>
-      <button class="free-notes-btn primary" onclick="saveFreeNotes()">💾 Save</button>
-    </div>
-  </div>
-
-  <div style="margin-top:12px;padding:12px 16px;background:rgba(58,158,111,.08);border-radius:12px;border:1.5px solid rgba(58,158,111,.15)">
-    <div style="font-size:12px;font-weight:700;color:#2A7A52;margin-bottom:2px">💡 About saving</div>
-    <div style="font-size:12px;font-weight:500;color:#718096;line-height:1.55">Notes are saved in <strong>this browser's localStorage</strong> — they'll be here every time you open this file in the same browser, even after closing.</div>
-  </div>
-
-</div>
-</div>
-
-<style>
-.free-notes-card{
-  background:#fff;border-radius:20px;
-  box-shadow:var(--card-shadow);
-  border:1.5px solid rgba(58,158,111,.15);
-  overflow:hidden;
-}
-#free-notes-ta{
-  display:block;width:100%;
-  min-height:420px;
-  padding:20px 22px;
-  font-family:'Nunito',sans-serif;
-  font-size:15px;font-weight:500;
-  line-height:1.7;color:var(--text);
-  border:none;outline:none;resize:vertical;
-  background:#fff;
-}
-#free-notes-ta::placeholder{color:#C0BDB7;font-weight:400}
-.free-notes-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 18px;
-  border-top:1.5px solid rgba(58,158,111,.1);
-  background:linear-gradient(135deg,#F0FBF6,#EBF8F2);
-  flex-wrap:wrap;gap:8px;
-}
-.free-notes-status{
-  font-size:12px;font-weight:700;color:#3A9E6F;
-  display:flex;align-items:center;gap:5px;
-}
-.free-notes-status.saving{color:#B8843A}
-.free-notes-actions{display:flex;gap:8px}
-.free-notes-btn{
-  padding:7px 14px;border-radius:9px;
-  border:1.5px solid rgba(58,158,111,.25);
-  background:#fff;font-family:'Nunito',sans-serif;
-  font-size:12px;font-weight:700;color:#2A7A52;
-  cursor:pointer;transition:all .15s;
-}
-.free-notes-btn:hover{background:#E8F8F0;transform:translateY(-1px)}
-.free-notes-btn.primary{
-  background:linear-gradient(135deg,#3A9E6F,#2A7A52);
-  color:#fff;border-color:transparent;
-}
-.free-notes-btn.primary:hover{opacity:.9}
-</style>
-
-<script>
-/* ── FREE NOTES (localStorage, manual save) ── */
-const FREE_KEY = 'jp2026_free_notes';
-
-(function initFreeNotes(){
-  const ta = document.getElementById('free-notes-ta');
-  const saved = localStorage.getItem(FREE_KEY) || '';
-  if (saved) ta.value = saved;
-})();
-
-function saveFreeNotes(){
-  const ta = document.getElementById('free-notes-ta');
-  const st = document.getElementById('free-notes-status');
-  localStorage.setItem(FREE_KEY, ta.value);
-  st.textContent = '✓ Saved!';
-  st.style.color = '#3A9E6F';
-  setTimeout(() => { st.textContent = ''; }, 2500);
-}
-</script>
-
-  <!-- TRIP COMPLETE PLACEHOLDER -->
-  <div id="trip-complete" style="position:fixed;bottom:24px;right:24px;z-index:9998;background:linear-gradient(135deg,#1A5F9A,#2B7FBF);color:#fff;border-radius:16px;padding:16px 22px;box-shadow:0 8px 32px rgba(26,95,154,.35);font-family:'Nunito',sans-serif;max-width:280px;animation:slideUp .6s ease">
-      <div style="font-size:22px;margin-bottom:4px">🎉🇯🇵✈️</div>div>
-      <div style="font-size:15px;font-weight:800;line-height:1.3">Trip Complete!</div>div>
-      <div style="font-size:12px;font-weight:500;opacity:.85;margin-top:4px">Japan 2026 · Okinawa & Osaka · 30 May – 8 Jun</div>div>
-      <div style="font-size:11px;opacity:.7;margin-top:6px">📸 Photos & memories coming soon</div>div>
-      <button onclick="document.getElementById('trip-complete').style.display='none'" style="position:absolute;top:8px;right:10px;background:none;border:none;color:#fff;opacity:.6;font-size:16px;cursor:pointer;line-height:1">✕</button>button>
-  </div>div>
-  <style>
-    @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-    </style>
-  </style>
 
 </body>
 </html>
