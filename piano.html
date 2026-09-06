@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Performance Coach — Piano Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wood-dark:#241c17;
+    --wood-mid:#39291f;
+    --wood-light:#4a3626;
+    --seam:#5c4630;
+    --ivory:#f1e9da;
+    --ivory-dim:#bdae95;
+    --brass:#c9a227;
+    --brass-bright:#e5c04a;
+    --sage:#8ba17c;
+    --rust:#c07152;
+    --serif:'Fraunces', serif;
+    --sans:'Inter', sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 34px),
+      radial-gradient(ellipse at 50% -10%, var(--wood-light) 0%, var(--wood-dark) 65%);
+    color:var(--ivory);
+    font-family:var(--sans);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:36px 20px 60px;
+    line-height:1.5;
+  }
+  .app{ width:100%; max-width:380px; text-align:center; }
+
+  h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-style:italic;
+    font-size:1.5rem;
+    margin:0 0 6px;
+    color:var(--ivory);
+  }
+  .sub{
+    color:var(--ivory-dim);
+    font-size:0.88rem;
+    margin:0 0 40px;
+  }
+
+  .score-ring{
+    width:200px;
+    height:200px;
+    margin:0 auto 28px;
+    border-radius:50%;
+    border:3px solid var(--seam);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    transition:border-color 0.3s ease;
+  }
+  .score-ring.recording{
+    border-color:var(--rust);
+    animation:pulse-ring 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-ring{
+    0%, 100% { box-shadow:0 0 0 0 rgba(192,113,82,0.35); }
+    50% { box-shadow:0 0 0 10px rgba(192,113,82,0); }
+  }
+  .score-tag{
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ivory-dim);
+    margin-bottom:6px;
+  }
+  .score-big{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:3.6rem;
+    color:var(--brass-bright);
+    line-height:1;
+  }
+  .score-progress{
+    font-size:0.75rem;
+    color:var(--ivory-dim);
+    margin-top:6px;
+    min-height:1em;
+  }
+
+  button{
+    font-family:var(--sans);
+    font-weight:600;
+    border:none;
+    border-radius:26px;
+    cursor:pointer;
+    transition:transform 0.08s ease, opacity 0.15s ease;
+  }
+  button:active{ transform:scale(0.97); }
+  button:disabled{ opacity:0.4; cursor:not-allowed; }
+  button:focus-visible{ outline:2px solid var(--brass-bright); outline-offset:2px; }
+
+  #recordBtn{
+    background:var(--brass);
+    color:#241c17;
+    font-size:1rem;
+    padding:14px 40px;
+  }
+  #recordBtn.recording{ background:var(--rust); color:var(--ivory); }
+
+  .status{
+    font-size:0.86rem;
+    color:var(--ivory-dim);
+    margin:16px 0 0;
+    min-height:2.4em;
+  }
+  .status.ok{ color:var(--sage); }
+  .status.warn{ color:var(--rust); }
+
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--ivory-dim);
+    font-size:0.78rem;
+    font-weight:500;
+    text-decoration:underline;
+    padding:6px;
+    margin-top:26px;
+  }
+
+  .details{
+    display:none;
+    text-align:left;
+    margin-top:18px;
+    padding-top:18px;
+    border-top:1px solid var(--seam);
+  }
+  .details.show{ display:block; }
+  .bar-row{ margin-bottom:12px; }
+  .bar-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.8rem;
+    color:var(--ivory-dim);
+    margin-bottom:4px;
+  }
+  .bar-track{
+    height:8px;
+    background:var(--wood-dark);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .bar-fill{ height:100%; border-radius:4px; background:var(--sage); }
+  .chips{ display:flex; flex-wrap:wrap; gap:5px; margin-top:14px; }
+  .chip{ width:12px; height:12px; border-radius:3px; }
+
+  footer{
+    margin-top:40px;
+    font-size:0.75rem;
+    color:var(--ivory-dim);
+    opacity:0.8;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Performance Coach</h1>
+  <p class="sub">Practice companion for "Colors of the Wind"</p>
+
+  <div class="score-ring" id="scoreRing">
+    <div class="score-tag" id="scoreTag">Ready</div>
+    <div class="score-big" id="scoreBig">—</div>
+    <div class="score-progress" id="scoreProgress"></div>
+  </div>
+
+  <button id="recordBtn">Record reference</button>
+  <p class="status" id="mainStatus">First, play the melody through once correctly — that take becomes your target.</p>
+
+  <button class="link-btn" id="toggleDetails" style="display:none">Show note-by-note breakdown</button>
+  <div class="details" id="details">
+    <div class="bar-row">
+      <div class="bar-label"><span>Pitch accuracy</span><span id="pitchPct">0%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="pitchBar"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><span>Timing</span><span id="rhythmPct">0%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="rhythmBar"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><span>Completeness</span><span id="completePct">0%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="completeBar"></div></div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div>
+    <button class="link-btn" id="resetRefBtn" style="display:none">Reset reference</button>
+  </div>
+
+  <footer>Audio never leaves your browser.</footer>
+</div>
+
+<script>
+(() => {
+  const STORE_KEY = 'colors-of-the-wind-reference';
+
+  let audioCtx, analyser, dataArray, sourceStream;
+  let rafId = null;
+  let recording = null;
+  let referenceNotes = null;
+  let testNotes = null;
+  let appState = 'noRef'; // noRef | idle | recordingRef | recordingTest
+  let lastLiveCheckCount = 0;
+
+  const recordBtn = document.getElementById('recordBtn');
+  const mainStatus = document.getElementById('mainStatus');
+  const scoreRing = document.getElementById('scoreRing');
+  const scoreTag = document.getElementById('scoreTag');
+  const scoreBig = document.getElementById('scoreBig');
+  const scoreProgress = document.getElementById('scoreProgress');
+  const toggleDetailsBtn = document.getElementById('toggleDetails');
+  const detailsEl = document.getElementById('details');
+  const resetRefBtn = document.getElementById('resetRefBtn');
+
+  const NOTE_MIN_DUR = 0.09;
+
+  function freqToMidi(f){ return 69 + 12 * Math.log2(f / 440); }
+
+  function detectPitch(buf, sampleRate){
+    const SIZE = buf.length;
+    let rms = 0;
+    for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / SIZE);
+    if (rms < 0.01) return { freq: -1, rms };
+
+    let r1 = 0, r2 = SIZE - 1;
+    const thresh = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) { if (Math.abs(buf[i]) < thresh) { r1 = i; break; } }
+    for (let i = 1; i < SIZE / 2; i++) { if (Math.abs(buf[SIZE - i]) < thresh) { r2 = SIZE - i; break; } }
+    const trimmed = buf.slice(r1, r2);
+    const n = trimmed.length;
+
+    const c = new Array(n).fill(0);
+    for (let lag = 0; lag < n; lag++) {
+      let sum = 0;
+      for (let i = 0; i < n - lag; i++) sum += trimmed[i] * trimmed[i + lag];
+      c[lag] = sum;
+    }
+
+    let d = 0;
+    while (d < n - 1 && c[d] > c[d + 1]) d++;
+    let maxVal = -1, maxPos = -1;
+    for (let i = d; i < n; i++) { if (c[i] > maxVal) { maxVal = c[i]; maxPos = i; } }
+    let T0 = maxPos;
+    if (T0 <= 0) return { freq: -1, rms };
+
+    const x1 = c[T0 - 1] || 0, x2 = c[T0], x3 = c[T0 + 1] || 0;
+    const a = (x1 + x3 - 2 * x2) / 2;
+    const b = (x3 - x1) / 2;
+    if (a) T0 = T0 - b / (2 * a);
+
+    const freq = sampleRate / T0;
+    if (freq < 60 || freq > 1500) return { freq: -1, rms };
+    return { freq, rms };
+  }
+
+  function showAudioError(message){
+    mainStatus.textContent = message;
+    mainStatus.className = 'status warn';
+  }
+
+  async function ensureAudio(){
+    if (audioCtx) return true;
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showAudioError('This browser (or this preview) does not expose microphone access. Try opening the downloaded file directly in Chrome, Safari, or Firefox.');
+      return false;
+    }
+
+    try {
+      sourceStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:false, noiseSuppression:false, autoGainControl:false } });
+    } catch (err) {
+      if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+        showAudioError('Microphone access was blocked. Check your browser\u2019s site permissions (or, if you\u2019re in a preview/embedded view, open the downloaded file directly in a full browser tab) and try again.');
+      } else if (err.name === 'NotFoundError') {
+        showAudioError('No microphone was found on this device.');
+      } else {
+        showAudioError('Could not access the microphone (' + err.name + '). Try opening the downloaded file directly in your browser.');
+      }
+      return false;
+    }
+
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      const src = audioCtx.createMediaStreamSource(sourceStream);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      dataArray = new Float32Array(analyser.fftSize);
+      src.connect(analyser);
+    } catch (err) {
+      showAudioError('Audio setup failed (' + err.name + '). Try reloading the page.');
+      audioCtx = null;
+      return false;
+    }
+    return true;
+  }
+
+  function cleanNotes(rawNotes){
+    return rawNotes
+      .filter(n => (n.end - n.start) > NOTE_MIN_DUR)
+      .map(n => ({ midi: n.midi, start: n.start, end: n.end }));
+  }
+
+  function loop(){
+    analyser.getFloatTimeDomainData(dataArray);
+    const { freq } = detectPitch(dataArray, audioCtx.sampleRate);
+    const t = audioCtx.currentTime - recording.startTime;
+
+    if (freq > 0) {
+      const midi = freqToMidi(freq);
+      const last = recording.notes[recording.notes.length - 1];
+      if (last && !last.end && Math.abs(last.midi - midi) < 1.1) {
+        last.end = t;
+        last.midiSum += midi;
+        last.count += 1;
+        last.midi = last.midiSum / last.count;
+      } else {
+        if (last && !last.end) last.end = t;
+        recording.notes.push({ midi, midiSum: midi, count: 1, start: t, end: t });
+      }
+    } else {
+      const last = recording.notes[recording.notes.length - 1];
+      if (last && !last.end) last.end = t;
+    }
+
+    if (recording.mode === 'test' && referenceNotes) {
+      const finalizedCount = Math.max(0, recording.notes.length - 1);
+      if (finalizedCount > lastLiveCheckCount) {
+        lastLiveCheckCount = finalizedCount;
+        const soFar = cleanNotes(recording.notes.slice(0, finalizedCount));
+        if (soFar.length) updateLiveScore(computeLiveAccuracy(soFar));
+      }
+    }
+
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function startRecording(mode){
+    recording = { notes: [], startTime: audioCtx.currentTime, mode };
+    lastLiveCheckCount = 0;
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function stopRecording(){
+    cancelAnimationFrame(rafId);
+    return cleanNotes(recording.notes);
+  }
+
+  // ---- Alignment: DTW on pitch, shared by live and final scoring ----
+  function alignNotes(ref, test){
+    const GAP_PENALTY = 5;
+    const n = ref.length, m = test.length;
+    const cost = Array.from({length:n+1}, () => new Array(m+1).fill(0));
+    for (let i=1;i<=n;i++) cost[i][0] = i * GAP_PENALTY;
+    for (let j=1;j<=m;j++) cost[0][j] = j * GAP_PENALTY;
+    for (let i=1;i<=n;i++){
+      for (let j=1;j<=m;j++){
+        const sub = cost[i-1][j-1] + Math.abs(ref[i-1].midi - test[j-1].midi);
+        const del = cost[i-1][j] + GAP_PENALTY;
+        const ins = cost[i][j-1] + GAP_PENALTY;
+        cost[i][j] = Math.min(sub, del, ins);
+      }
+    }
+    let i = n, j = m;
+    const matches = [];
+    let extra = 0;
+    while (i > 0 || j > 0) {
+      if (i>0 && j>0 && cost[i][j] === cost[i-1][j-1] + Math.abs(ref[i-1].midi - test[j-1].midi)) {
+        matches.push({ ref: ref[i-1], test: test[j-1] });
+        i--; j--;
+      } else if (i>0 && cost[i][j] === cost[i-1][j] + GAP_PENALTY) {
+        matches.push({ ref: ref[i-1], test: null });
+        i--;
+      } else {
+        extra++; j--;
+      }
+    }
+    matches.reverse();
+    return { matches, extra };
+  }
+
+  function scoreAlignment(ref, test, matches, denomLen){
+    const matched = matches.filter(x => x.test);
+    let pitchSum = 0;
+    matched.forEach(x => {
+      const err = Math.abs(x.ref.midi - x.test.midi);
+      pitchSum += Math.max(0, 1 - err / 3);
+    });
+    const pitchScore = matched.length ? (pitchSum / denomLen) * 100 : 0;
+
+    const refDur = ref[ref.length-1].end - ref[0].start || 1;
+    const testDur = test[test.length-1].end - test[0].start || 1;
+    let rhythmSum = 0, rhythmCount = 0;
+    for (let k=1; k<matched.length; k++){
+      const prev = matched[k-1], cur = matched[k];
+      const refGap = (cur.ref.start - prev.ref.start) / refDur;
+      const testGap = (cur.test.start - prev.test.start) / testDur;
+      rhythmSum += Math.max(0, 1 - Math.abs(refGap - testGap) * 8);
+      rhythmCount++;
+    }
+    const rhythmScore = rhythmCount ? (rhythmSum / rhythmCount) * 100 : 60;
+    const completeScore = (matched.length / denomLen) * 100;
+    return { pitchScore, rhythmScore, completeScore, matched };
+  }
+
+  function gradePerformance(ref, test){
+    const { matches, extra } = alignNotes(ref, test);
+    const { pitchScore, rhythmScore, completeScore } = scoreAlignment(ref, test, matches, ref.length);
+    const overall = Math.round(pitchScore * 0.45 + rhythmScore * 0.30 + completeScore * 0.25);
+    return {
+      overall: Math.max(0, Math.min(100, overall)),
+      pitchScore: Math.round(pitchScore),
+      rhythmScore: Math.round(rhythmScore),
+      completeScore: Math.round(completeScore),
+      matches, extra
+    };
+  }
+
+  function computeLiveAccuracy(testSoFar){
+    const { matches } = alignNotes(referenceNotes, testSoFar);
+    const matched = matches.filter(x => x.test);
+    const { pitchScore, rhythmScore } = scoreAlignment(referenceNotes, testSoFar, matches, matched.length || 1);
+    const liveOverall = Math.round(pitchScore * 0.6 + rhythmScore * 0.4);
+    return {
+      liveOverall: Math.max(0, Math.min(100, liveOverall)),
+      matchedCount: matched.length,
+      refLen: referenceNotes.length
+    };
+  }
+
+  function tierColor(score){
+    return score >= 75 ? 'var(--sage)' : (score >= 45 ? 'var(--brass-bright)' : 'var(--rust)');
+  }
+
+  function updateLiveScore(live){
+    scoreBig.textContent = live.liveOverall;
+    scoreBig.style.color = tierColor(live.liveOverall);
+    scoreProgress.textContent = `note ${live.matchedCount} of ${live.refLen}`;
+  }
+
+  function feedbackFor(score){
+    if (score >= 90) return "Clean and confident — that's a performance-ready take.";
+    if (score >= 75) return "Solid pass. A few notes or timing slips are holding it back.";
+    if (score >= 55) return "Recognizable, but pitch or rhythm wandered in places.";
+    return "Rough take — try a slower, more deliberate run-through.";
+  }
+
+  function renderFinal(result){
+    scoreTag.textContent = 'Final score';
+    scoreBig.textContent = result.overall;
+    scoreBig.style.color = tierColor(result.overall);
+    scoreProgress.textContent = '';
+    mainStatus.textContent = feedbackFor(result.overall);
+    mainStatus.className = 'status ok';
+
+    document.getElementById('pitchPct').textContent = result.pitchScore + '%';
+    document.getElementById('rhythmPct').textContent = result.rhythmScore + '%';
+    document.getElementById('completePct').textContent = result.completeScore + '%';
+    document.getElementById('pitchBar').style.width = result.pitchScore + '%';
+    document.getElementById('rhythmBar').style.width = result.rhythmScore + '%';
+    document.getElementById('completeBar').style.width = result.completeScore + '%';
+
+    const chipsEl = document.getElementById('chips');
+    chipsEl.innerHTML = '';
+    result.matches.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'chip';
+      if (!m.test) {
+        div.style.background = 'var(--rust)';
+      } else {
+        const err = Math.abs(m.ref.midi - m.test.midi);
+        div.style.background = err < 0.7 ? 'var(--sage)' : (err < 2 ? 'var(--brass)' : 'var(--rust)');
+      }
+      chipsEl.appendChild(div);
+    });
+    for (let e=0; e<result.extra; e++){
+      const div = document.createElement('div');
+      div.className = 'chip';
+      div.style.background = 'var(--rust)';
+      chipsEl.appendChild(div);
+    }
+    toggleDetailsBtn.style.display = 'inline-block';
+  }
+
+  // ---- Single record button, state machine ----
+  recordBtn.addEventListener('click', async () => {
+    if (appState === 'noRef' || appState === 'idle') {
+      const ok = await ensureAudio();
+      if (!ok) return;
+      const mode = appState === 'noRef' ? 'recordingRef' : 'recordingTest';
+      appState = mode;
+      recordBtn.textContent = 'Stop';
+      recordBtn.classList.add('recording');
+      scoreRing.classList.add('recording');
+      detailsEl.classList.remove('show');
+      toggleDetailsBtn.textContent = 'Show note-by-note breakdown';
+
+      if (mode === 'recordingRef') {
+        mainStatus.textContent = 'Listening… play the melody now.';
+        mainStatus.className = 'status';
+        scoreTag.textContent = 'Setting reference';
+        scoreBig.textContent = '—';
+        scoreBig.style.color = 'var(--brass-bright)';
+      } else {
+        mainStatus.textContent = 'Listening… play your performance.';
+        mainStatus.className = 'status';
+        scoreTag.textContent = 'Live';
+        scoreBig.textContent = '—';
+        scoreBig.style.color = 'var(--brass-bright)';
+        scoreProgress.textContent = '';
+      }
+      startRecording(mode === 'recordingRef' ? 'ref' : 'test');
+      return;
+    }
+
+    // Stopping a recording
+    recordBtn.classList.remove('recording');
+    scoreRing.classList.remove('recording');
+    const notes = stopRecording();
+
+    if (appState === 'recordingRef') {
+      if (notes.length < 3) {
+        appState = 'noRef';
+        recordBtn.textContent = 'Record reference';
+        mainStatus.textContent = 'That was too short — try playing the full phrase.';
+        mainStatus.className = 'status warn';
+        scoreTag.textContent = 'Ready';
+        scoreBig.textContent = '—';
+        return;
+      }
+      referenceNotes = notes;
+      appState = 'idle';
+      recordBtn.textContent = 'Record';
+      scoreTag.textContent = 'Ready';
+      scoreBig.textContent = '—';
+      mainStatus.textContent = `Reference saved (${notes.length} notes). Tap Record to play.`;
+      mainStatus.className = 'status ok';
+      resetRefBtn.style.display = 'inline-block';
+      try { await window.storage.set(STORE_KEY, JSON.stringify(notes)); } catch (e) {}
+      return;
+    }
+
+    // Stopping a test recording
+    appState = 'idle';
+    recordBtn.textContent = 'Record';
+    if (notes.length < 3) {
+      mainStatus.textContent = 'Too short to grade — try again.';
+      mainStatus.className = 'status warn';
+      scoreTag.textContent = 'Ready';
+      scoreBig.textContent = '—';
+      return;
+    }
+    testNotes = notes;
+    const result = gradePerformance(referenceNotes, testNotes);
+    renderFinal(result);
+  });
+
+  toggleDetailsBtn.addEventListener('click', () => {
+    const show = !detailsEl.classList.contains('show');
+    detailsEl.classList.toggle('show', show);
+    toggleDetailsBtn.textContent = show ? 'Hide note-by-note breakdown' : 'Show note-by-note breakdown';
+  });
+
+  resetRefBtn.addEventListener('click', async () => {
+    referenceNotes = null;
+    appState = 'noRef';
+    recordBtn.textContent = 'Record reference';
+    scoreTag.textContent = 'Ready';
+    scoreBig.textContent = '—';
+    scoreBig.style.color = 'var(--brass-bright)';
+    scoreProgress.textContent = '';
+    mainStatus.textContent = 'First, play the melody through once correctly — that take becomes your target.';
+    mainStatus.className = 'status';
+    resetRefBtn.style.display = 'none';
+    toggleDetailsBtn.style.display = 'none';
+    detailsEl.classList.remove('show');
+    try { await window.storage.delete(STORE_KEY); } catch (e) {}
+  });
+
+  // ---- Load any saved reference on start ----
+  (async () => {
+    try {
+      const res = await window.storage.get(STORE_KEY);
+      if (res && res.value) {
+        referenceNotes = JSON.parse(res.value);
+        appState = 'idle';
+        recordBtn.textContent = 'Record';
+        mainStatus.textContent = `Using saved reference (${referenceNotes.length} notes). Tap Record to play.`;
+        mainStatus.className = 'status ok';
+        resetRefBtn.style.display = 'inline-block';
+      }
+    } catch (e) { /* no saved reference yet */ }
+  })();
+})();
+</script>
+</body>
+</html>
